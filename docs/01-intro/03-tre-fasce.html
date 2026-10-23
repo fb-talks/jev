@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 · The three-band pattern</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "3. The three-band pattern" in the video script (docs/01-intro-jev-video-script.md).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  The confidence values are real Jev answers (October 2026): the confidence of the toxicity score
+  (same question as /1-jev/demo3). "Truly groundbreaking stuff." is unstable (0.02–0.25), always below 0.5.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  /* ---------- Code snippet, top right ---------- */
+  .snippet { position: absolute; right: 80px; top: 56px; padding: 20px 26px; font-size: 22px; line-height: 1.6; }
+  .snippet .k { color: var(--pink); }
+  .snippet .num { display: inline-grid; }
+  .snippet .num span { grid-area: 1 / 1; }
+  .num .old { animation-name: old-val; }
+  .num .new { opacity: 0; animation-name: new-val; }
+
+  /* ---------- Incoming item (source spot) ---------- */
+  .item {
+    position: absolute; width: 420px; height: 72px; padding: 0 16px 0 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    background: #fff; border: 2px solid var(--ink); border-radius: 14px;
+    box-shadow: 0 10px 24px -16px rgba(0,0,0,.4);
+    font-size: 22px; opacity: 0;
+  }
+  .item .txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .item .chip { padding: 6px 12px; font-size: 20px; }
+  .item.auto .chip { border-color: var(--green); background: var(--green-bg); }
+  .item.sugg .chip { border-color: var(--amber); background: var(--amber-bg); }
+  .item.coda .chip { border-color: var(--red); background: var(--red-bg); }
+
+  /* lane slots: manual queue x=190, suggest x=750, automatic x=1310; slot y = 650 / 735 / 820 */
+  .i-a { left: 1310px; top: 650px; animation-name: i-a; }
+  .i-b { left: 1310px; top: 735px; animation-name: i-b; }
+  .i-c { left: 750px;  top: 650px; animation-name: i-c; }
+  .i-d { left: 190px;  top: 650px; animation-name: i-d; }
+  .i-e { left: 1310px; top: 820px; animation-name: i-e; }
+  .i-b .chip { animation-name: b-chip; }
+
+  /* ---------- Confidence axis ---------- */
+  .axis { position: absolute; left: 160px; top: 340px; width: 1600px; height: 56px; }
+  .band { position: absolute; top: 0; height: 100%; font-size: 22px; font-weight: 700; white-space: nowrap; }
+  .band span { position: absolute; left: 50%; top: 66px; transform: translateX(-50%); }
+  .band--coda { left: 0; width: 800px; background: var(--red-bg); color: #b42318; border-radius: 14px 0 0 14px; }
+  .band--sugg { left: 800px; width: 480px; background: var(--amber-bg); color: #b54708; animation-name: band-sugg; }
+  .band--auto { left: 1280px; width: 320px; background: var(--green-bg); color: #067647; border-radius: 0 14px 14px 0; animation-name: band-auto; }
+
+  .tick { position: absolute; top: 66px; z-index: 1; transform: translateX(-50%); font-family: var(--mono); font-size: 20px; opacity: .5; }
+
+  .thr { position: absolute; top: -14px; width: 0; height: 84px; border-left: 3px solid var(--ink); }
+  .thr b { position: absolute; left: 50%; top: -36px; transform: translateX(-50%); padding: 2px 10px; border-radius: 8px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 18px; font-weight: 500; white-space: nowrap; }
+  .thr--05 { left: 800px; }
+  .thr--08 { left: 1280px; animation-name: thr; }
+  .thr--08 b { width: 54px; height: 28px; }
+  .thr--08 b span { position: absolute; left: 0; right: 0; text-align: center; top: 2px; }
+  .thr--08 .old { animation-name: old-val; }
+  .thr--08 .new { opacity: 0; animation-name: new-val; }
+
+  .pin { position: absolute; top: 17px; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; border: 3px solid #fff; box-shadow: 0 0 0 2px var(--ink); opacity: 0; }
+  .pin::after { content: attr(data-v); position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); font-family: var(--mono); font-size: 18px; font-weight: 500; }
+  .pin.auto { background: var(--green); } .pin.sugg { background: var(--amber); } .pin.coda { background: var(--red); }
+  .p-a { left: 1536px; animation-name: p-a; }
+  .p-b { left: 1344px; animation-name: p-b; }
+  .p-c { left: 912px;  animation-name: p-c; }
+  .p-d { left: 384px;  animation-name: p-d; }
+  .p-e { left: 1600px; animation-name: p-e; }
+  .p-b { background: var(--green); animation-name: p-b, p-b-color; }
+
+  /* ---------- Lanes ---------- */
+  .lane { position: absolute; top: 560px; width: 480px; height: 400px; padding: 18px 22px; }
+  .lane h3 { margin: 0; font-family: var(--hand); font-size: 36px; line-height: 1.1; }
+  .lane p { margin: 2px 0 0; font-size: 17px; opacity: .55; }
+  .lane::before { content: ""; position: absolute; left: 22px; top: 0; width: 80px; height: 6px; border-radius: 0 0 4px 4px; }
+  .lane--coda { left: 160px; } .lane--coda::before { background: var(--red); }
+  .lane--sugg { left: 720px; } .lane--sugg::before { background: var(--amber); }
+  .lane--auto { left: 1280px; } .lane--auto::before { background: var(--green); }
+
+  /* ---------- Messages ---------- */
+  .note { position: absolute; left: 50%; top: 196px; transform: translateX(-50%); font-size: 30px; padding: 16px 30px; border-color: var(--pink); opacity: 0; animation-name: note; }
+  .title-overlay { animation-name: title; font-size: 96px; }
+
+  /* ---------- Timeline (14s loop) ----------
+     each item: appears in the centre (a), drops a pin on the axis (a+2..a+4), flies to its lane (a+4..a+7)
+       A 0.96 → a=3   B 0.84 → a=12   C 0.57 → a=21   D 0.24 → a=30   E 1.00 → a=39
+     50–60%  cursor drags the 0.8 threshold to 0.9
+     60–66%  B (0.84) moves from "automatic" to "suggest", E moves up a slot
+     63–82%  "no new call to Jev"
+     84–96%  closing title, 96–100% fade out */
+  @keyframes i-a { 0%, 3% { opacity: 0; transform: translate(-560px, -450px) scale(.9) } 4%, 7% { opacity: 1; transform: translate(-560px, -450px) scale(1) } 10%, 96% { opacity: 1; transform: none } 100% { opacity: 0; transform: none } }
+  @keyframes i-b { 0%, 12% { opacity: 0; transform: translate(-560px, -535px) scale(.9) } 13%, 16% { opacity: 1; transform: translate(-560px, -535px) scale(1) } 19%, 60% { opacity: 1; transform: none } 66%, 96% { opacity: 1; transform: translate(-560px, 0) } 100% { opacity: 0; transform: translate(-560px, 0) } }
+  @keyframes i-c { 0%, 21% { opacity: 0; transform: translate(0, -450px) scale(.9) } 22%, 25% { opacity: 1; transform: translate(0, -450px) scale(1) } 28%, 96% { opacity: 1; transform: none } 100% { opacity: 0; transform: none } }
+  @keyframes i-d { 0%, 30% { opacity: 0; transform: translate(560px, -450px) scale(.9) } 31%, 34% { opacity: 1; transform: translate(560px, -450px) scale(1) } 37%, 96% { opacity: 1; transform: none } 100% { opacity: 0; transform: none } }
+  @keyframes i-e { 0%, 39% { opacity: 0; transform: translate(-560px, -620px) scale(.9) } 40%, 43% { opacity: 1; transform: translate(-560px, -620px) scale(1) } 46%, 61% { opacity: 1; transform: none } 66%, 96% { opacity: 1; transform: translateY(-85px) } 100% { opacity: 0; transform: translateY(-85px) } }
+  @keyframes b-chip { 0%, 60% { border-color: var(--green); background: var(--green-bg) } 61%, 100% { border-color: var(--amber); background: var(--amber-bg) } }
+
+  @keyframes p-a { 0%, 5% { opacity: 0; transform: translateY(-120px) } 7%, 96% { opacity: 1; transform: none } 100% { opacity: 0 } }
+  @keyframes p-b { 0%, 14% { opacity: 0; transform: translateY(-120px) } 16%, 96% { opacity: 1; transform: none } 100% { opacity: 0 } }
+  @keyframes p-c { 0%, 23% { opacity: 0; transform: translateY(-120px) } 25%, 96% { opacity: 1; transform: none } 100% { opacity: 0 } }
+  @keyframes p-d { 0%, 32% { opacity: 0; transform: translateY(-120px) } 34%, 96% { opacity: 1; transform: none } 100% { opacity: 0 } }
+  @keyframes p-e { 0%, 41% { opacity: 0; transform: translateY(-120px) } 43%, 96% { opacity: 1; transform: none } 100% { opacity: 0 } }
+  @keyframes p-b-color { 0%, 56% { background: var(--green) } 57%, 100% { background: var(--amber) } }
+
+  @keyframes band-sugg { 0%, 52% { width: 480px } 60%, 100% { width: 640px } }
+  @keyframes band-auto { 0%, 52% { left: 1280px; width: 320px } 60%, 100% { left: 1440px; width: 160px } }
+  @keyframes thr { 0%, 52% { left: 1280px } 60%, 100% { left: 1440px } }
+  @keyframes old-val { 0%, 57% { opacity: 1 } 58%, 100% { opacity: 0 } }
+  @keyframes new-val { 0%, 57% { opacity: 0 } 58%, 100% { opacity: 1 } }
+
+  .cursor { animation-name: cursor; animation-timing-function: cubic-bezier(.55,0,.35,1); }
+  @keyframes cursor {
+    0%, 46% { transform: translate(1180px, 520px); opacity: 0 }
+    48% { transform: translate(1180px, 520px); opacity: 1 }
+    51% { transform: translate(1438px, 312px) scale(1) }
+    52% { transform: translate(1438px, 312px) scale(.85) }
+    60% { transform: translate(1598px, 312px) scale(.85) }
+    61% { transform: translate(1598px, 312px) scale(1); opacity: 1 }
+    66%, 100% { transform: translate(1640px, 240px); opacity: 0 }
+  }
+
+  @keyframes note { 0%, 63% { opacity: 0; transform: translate(-50%, 12px) } 65%, 82% { opacity: 1; transform: translate(-50%, 0) } 84%, 100% { opacity: 0; transform: translate(-50%, 0) } }
+  @keyframes title { 0%, 84% { opacity: 0 } 87%, 96% { opacity: 1 } 99%, 100% { opacity: 0 } }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="kicker"><small>03 · The decision</small>The three-band pattern</div>
+
+  <div class="card snippet code">
+    <div><span class="k">if</span> (confidence &gt;= <span class="num"><span class="old">0.8</span><span class="new">0.9</span></span>) automatic();</div>
+    <div><span class="k">else if</span> (confidence &gt;= 0.5) suggest();</div>
+    <div><span class="k">else</span> manualQueue();</div>
+  </div>
+
+  <div class="axis">
+    <div class="band band--coda"><span>manual queue</span></div>
+    <div class="band band--sugg"><span>suggest</span></div>
+    <div class="band band--auto"><span>automatic</span></div>
+
+    <span class="tick" style="left: 0">0</span>
+    <span class="tick" style="left: 1600px">1</span>
+    <div class="thr thr--05"><b>0.5</b></div>
+    <div class="thr thr--08"><b><span class="old">0.8</span><span class="new">0.9</span></b></div>
+
+    <i class="pin auto p-a" data-v="0.96"></i>
+    <i class="pin p-b" data-v="0.84"></i>
+    <i class="pin sugg p-c" data-v="0.57"></i>
+    <i class="pin coda p-d" data-v="0.24"></i>
+    <i class="pin auto p-e" data-v="1.00"></i>
+  </div>
+
+  <section class="card lane lane--coda"><h3>Manual queue</h3><p>or escalate to a bigger LLM</p></section>
+  <section class="card lane lane--sugg"><h3>Suggest</h3><p>a human confirms with one click</p></section>
+  <section class="card lane lane--auto"><h3>Automatic</h3><p>confident: act</p></section>
+
+  <div class="item auto i-a"><span class="txt">Nice intro, weak conclusion</span><span class="chip">0.96</span></div>
+  <div class="item i-b"><span class="txt">ugly.</span><span class="chip">0.84</span></div>
+  <div class="item sugg i-c"><span class="txt">Meh. Seen better.</span><span class="chip">0.57</span></div>
+  <div class="item coda i-d"><span class="txt">Truly groundbreaking stuff.</span><span class="chip">0.24</span></div>
+  <div class="item auto i-e"><span class="txt">Great article, thanks!</span><span class="chip">1.00</span></div>
+
+  <div class="chip note">⚡ no new call to Jev</div>
+
+  <div class="cursor">
+    <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3 L4 19 L8.5 15 L11.5 21.5 L14 20.3 L11.2 14 L17 14 Z" fill="#fff" stroke="#1f1f1f" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  </div>
+
+  <div class="title-overlay">
+    <div class="dim">Jev gives the probabilities.</div>
+    <div><span class="underline-pink">Your code decides.</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

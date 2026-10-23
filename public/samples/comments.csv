@@ -1,0 +1,21 @@
+comment,expected
+"Clear explanation of React Server Components. Have you measured how they affect bundle size?",publish
+"Great article, I finally understood how caching works in the App Router.",publish
+"I disagree: the benchmark only covers small apps, so the conclusion feels rushed.",publish
+"Thanks! Could you add an example with streaming and Suspense?",publish
+"The second code sample doesn't compile on TypeScript 5, the type of params is wrong.",publish
+"Not convinced. Signals solve the same problem with less boilerplate.",publish
+"Wow, another 'ultimate guide' that copies the docs word for word. Truly groundbreaking stuff.",review
+"This approach is garbage. useMemo here kills readability and the benchmark proves nothing.",review
+"What's the best pizza place near the conference venue? Asking for the meetup tonight.",review
+"Anyone selling a used PS5? Comment below.",review
+"Had the same bug, write me at marco.bianchi@example.com and I'll send you my fix.",review
+"Call me at +39 333 123 4567 if you need help with the migration.",review
+"I wrote a follow-up covering the edge cases you skipped: devnotes.example/rsc-edge-cases",review
+"Your code is wrong and so are you. Delete this blog before you embarrass yourself further.",reject
+"Only an idiot would write a tutorial like this. Pathetic.",reject
+"💰 Make $5,000/week from home!!! No experience needed. DM me now 💰",reject
+"BUY CHEAP FOLLOWERS 👉 www.fast-followers.example 👈 100% real, instant delivery",reject
+"Crypto signals group, 300% returns guaranteed, join t.me/example-pump now",reject
+"People like you shouldn't be allowed to code. Go back to your village.",reject
+"Best SEO services, cheap backlinks, contact seo-king.example for a quote today",reject

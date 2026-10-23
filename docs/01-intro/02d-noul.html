@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02d · noul</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "2. How to use it: state + questions" in the video script
+  (docs/01-intro-jev-video-script.md): the noul answer: one number.
+  One of three slides, one per question type (02d noul, 02e choice, 02f score), all on the support
+  ticket of 02c: on the left the question and the answer Jev returns for it, on the right its fields.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  Values are real Jev answers (October 2026): urgent 0.92–0.93 for this ticket (0.92 as in 02c),
+  0.17 for the annual-plan question.
+-->
+<style>
+  :root { --loop: 18s; --lh: 34px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+
+  /* ---------- Top right: which of the three types this slide is about ---------- */
+  .types { position: absolute; right: 80px; top: 92px; display: flex; gap: 14px; }
+  .types .chip { font-family: var(--mono); font-weight: 500; opacity: .35; }
+  .types .chip.here { opacity: 1; border-color: var(--pink); color: var(--pink); }
+
+  /* ---------- Top: the ticket of 02c, as a reminder ---------- */
+  .ticket { position: absolute; left: 760px; top: 76px; }
+  .ticket q { display: block; margin-top: 6px; font-family: var(--hand); font-size: 26px; white-space: nowrap; quotes: "\201C" "\201D"; }
+
+  /* ---------- Left: your question, and what Jev returns for it ---------- */
+  .answer { position: absolute; left: 80px; top: 190px; width: 640px; height: 740px; padding: 30px 36px; }
+  .code { margin: 14px 0 30px; font-family: var(--mono); font-size: 22px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .k { color: var(--indigo); }
+  .s { color: #9a3412; }
+  .v { color: var(--pink); }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 10px; opacity: .35; }
+  .answer .note { position: absolute; left: 36px; right: 36px; bottom: 30px; font-size: 20px; line-height: 1.45; opacity: .6; }
+
+  /* ---------- Right: the fields explained ---------- */
+  .panel { position: absolute; left: 760px; top: 190px; width: 1080px; height: 740px; padding: 30px 40px; }
+  .panel h2 { margin: 0; display: flex; align-items: baseline; gap: 20px; }
+  .panel h2 .f { font-family: var(--mono); font-size: 40px; font-weight: 500; color: var(--pink); }
+  .panel h2 .say { font-family: var(--hand); font-size: 38px; font-weight: 400; }
+  .step { margin-top: 30px; opacity: 0; }
+  .step .label { margin-bottom: 12px; }
+  .step .label .fld { font-family: var(--mono); color: var(--pink); opacity: 1; text-transform: none; font-size: 22px; letter-spacing: 0; margin-right: 6px; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 960px; text-align: center; font-family: var(--hand); font-size: 46px; opacity: 0; animation-name: caption; }
+
+  .s1 { animation-name: s1; } .s2 { animation-name: s2; } .s3 { animation-name: s3; }
+
+  /* one row per message: the text, then a 0..1 bar */
+  .msg { padding: 16px 22px; border-radius: 16px; background: var(--stage); }
+  .msg + .msg { margin-top: 16px; }
+  .msg q { display: block; font-size: 22px; font-style: italic; quotes: "\201C" "\201D"; }
+  .row { display: flex; align-items: center; gap: 18px; margin-top: 12px; }
+  .row .bar { flex: 1; height: 26px; }
+  .row .bar > i { width: 0; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .m1 .bar > i { animation-name: w92; }
+  .m2 .bar > i { animation-name: w17; background: var(--muted); }
+  .row .n { width: 90px; text-align: right; font-family: var(--mono); font-size: 32px; font-weight: 500; }
+  .m1 .n { color: var(--pink); }
+  .ends { display: flex; justify-content: space-between; margin: 10px 112px 0 0; font-size: 18px; font-weight: 600; opacity: .55; }
+
+  .if { font-family: var(--mono); font-size: 24px; line-height: 1.7; padding: 16px 22px; border-radius: 16px; background: var(--stage); }
+  .if .v { font-weight: 600; }
+
+  /* what notifyTeam() does: a small alert for the support team */
+  .alert { display: flex; align-items: center; gap: 18px; width: 640px; margin-top: 18px; padding: 16px 22px; border-radius: 16px; background: #fff; border: 2px solid var(--pink); box-shadow: 0 18px 36px -22px rgba(0,0,0,.45); opacity: 0; animation-name: alert; }
+  .alert .bell { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 50%; background: var(--pink-bg); font-size: 28px; animation-name: ring; }
+  .alert .t { font-size: 22px; font-weight: 700; }
+  .alert .t small { margin-left: 10px; font-size: 17px; font-weight: 500; opacity: .5; }
+  .alert .d { margin-top: 4px; font-size: 19px; opacity: .7; white-space: nowrap; }
+  .alert .d b { font-family: var(--mono); font-weight: 500; color: var(--pink); }
+
+  /* ---------- Timeline (18s loop) ----------
+     0–4%    scene in        6–9% the noul field on the left turns pink
+     10–14%  step 1: this ticket      14–26% bar fills to 0.92
+     34–38%  step 2: a calm ticket     38–48% bar fills to 0.17
+     56–60%  step 3: the threshold is yours
+     64–67%  the alert drops in under the if      67–71% its bell rings
+     74–78%  caption
+     94%  final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes caption { 0%, 74% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+  .g1 { animation-name: g1; }
+  @keyframes g1 { 0%, 6% { opacity: .35; background: transparent; box-shadow: inset 4px 0 0 transparent } 9%, 100% { opacity: 1; background: var(--pink-bg); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes s1 { 0%, 10% { opacity: 0; transform: translateY(16px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes w92 { 0%, 14% { width: 0 } 26%, 100% { width: 92% } }
+  @keyframes s2 { 0%, 34% { opacity: 0; transform: translateY(16px) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes w17 { 0%, 38% { width: 0 } 48%, 100% { width: 17% } }
+  @keyframes alert { 0%, 64% { opacity: 0; transform: translateY(-14px) } 67%, 100% { opacity: 1; transform: none } }
+  @keyframes ring { 0%, 67% { transform: none } 68% { transform: rotate(-16deg) } 69% { transform: rotate(14deg) } 70% { transform: rotate(-8deg) } 71%, 100% { transform: none } }
+  @keyframes s3 { 0%, 56% { opacity: 0; transform: translateY(16px) } 60%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Intro to Jev · 2</small>Three answer types · noul</div>
+    <div class="types"><span class="chip here">noul</span><span class="chip">choice</span><span class="chip">score</span></div>
+
+    <div class="ticket"><div class="label">The ticket</div><q>I was charged twice for my payment, reply by today!</q></div>
+
+    <div class="card answer">
+      <div class="label">Your question</div>
+      <div class="code">
+        <div class="l">urgent: <span class="k">noul</span>(</div>
+        <div class="l">  <span class="s">"The message needs action today"</span></div>
+        <div class="l">)</div>
+      </div>
+      <div class="label">What Jev returns</div>
+      <div class="code">
+        <div class="l">answers.urgent = {</div>
+        <div class="grp g1"><div class="l">  noul: <span class="v">0.92</span>,</div></div>
+        <div class="l">}</div>
+      </div>
+      <div class="note">That's all: no probabilities, no confidence.<br>The number itself says how sure Jev is.</div>
+    </div>
+
+    <div class="card panel">
+      <h2><span class="f">noul</span><span class="say">one number: the probability of “yes”</span></h2>
+      <div class="step s1">
+        <div class="label">From 0 to 1: how likely the "yes" is</div>
+        <div class="msg m1">
+          <q>I was charged twice for my payment, reply by today!</q>
+          <div class="row"><div class="bar"><i></i></div><span class="n">0.92</span></div>
+        </div>
+        <div class="ends"><span>0 · surely no</span><span>0.5 · can't tell</span><span>1 · surely yes</span></div>
+      </div>
+
+      <div class="step s2">
+        <div class="label">Another ticket, same question</div>
+        <div class="msg m2">
+          <q>Hi, when you have a moment, could you tell me if annual plans have a discount?</q>
+          <div class="row"><div class="bar"><i></i></div><span class="n">0.17</span></div>
+        </div>
+      </div>
+
+      <div class="step s3">
+        <div class="label">Where "yes" starts is up to your code</div>
+        <div class="if"><span class="k">if</span> (answers.urgent.noul &gt; <span class="v">0.8</span>) notifyTeam();</div>
+        <div class="alert">
+          <span class="bell">🔔</span>
+          <div>
+            <div class="t">Urgent ticket<small>support · now</small></div>
+            <div class="d">“I was charged twice for my payment…” · urgent <b>0.92</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="caption">Not a yes or a no: <span class="underline-pink">how likely the yes is</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

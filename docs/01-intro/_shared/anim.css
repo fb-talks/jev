@@ -1,0 +1,106 @@
+/*
+  Shared base for the docs/01-intro animations.
+  Style inspired by the mokup.dev mini-animations: CSS only, infinite loop.
+  Each page sets --loop and its own @keyframes; keyframe percentages
+  are relative to the loop.
+*/
+@import url("https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap");
+
+:root {
+  --loop: 12s;
+  --ink: #1f1f1f;
+  --pink: #FF00BF;
+  --pink-soft: #ffd6f2;
+  --pink-bg: #ffe3f6;
+  --blue: #0d99ff;
+  --blue-bg: #e3f2ff;
+  --green: #12b76a;
+  --green-bg: #dcfae6;
+  --amber: #f79009;
+  --amber-bg: #fef0c7;
+  --red: #f04438;
+  --red-bg: #fee4e2;
+  --indigo: #4f46e5;
+  --stage: #f0f6ff;
+  --line: #e8ecf4;
+  --muted: #b8c0d0;
+  --hand: "Architects Daughter", cursive;
+  --sans: "Inter", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
+
+/* 1920×1080 frame, centered in the window and scaled by anim.js.
+   Absolute + translate(-50%, -50%) keeps it centered even when the window is narrower than 1920px. */
+.frame {
+  position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+  transform: translate(-50%, -50%); transform-origin: center; color: var(--ink); font-family: var(--sans);
+  background-color: #fafbff;
+  background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1.5px, transparent 1.8px);
+  background-size: 32px 32px;
+  overflow: hidden;
+}
+.frame, .frame *, .frame *::before, .frame *::after { animation-duration: var(--loop); animation-iteration-count: infinite; }
+
+/* ---------- Shared building blocks ---------- */
+
+/* Section heading, top-left: "Step 1 — …" */
+.kicker { position: absolute; left: 80px; top: 56px; font-family: var(--hand); font-size: 44px; line-height: 1.1; }
+.kicker small { display: block; font-family: var(--sans); font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; margin-bottom: 6px; }
+.kicker::after { content: ""; display: block; height: 7px; margin-top: 6px; border-radius: 4px; background: var(--pink); width: 120px; }
+
+/* White card */
+.card { background: #fff; border: 1px solid #edf0f7; border-radius: 24px; box-shadow: 0 20px 40px -28px rgba(0,0,0,.35); }
+/* Light-blue inner area */
+.screen { border-radius: 16px; background: var(--stage); }
+
+/* Small pill / keyboard-like chip */
+.chip { display: inline-block; padding: 10px 18px; border-radius: 10px; background: #fff; border: 1.5px solid #d5dbe6; box-shadow: 0 2px 0 rgba(0,0,0,.08); font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip--pink { border-color: var(--pink); }
+
+/* Code / JSON badge */
+.code { font-family: var(--mono); font-size: 26px; }
+.json { display: inline-block; padding: 14px 22px; border-radius: 14px; font-family: var(--mono); font-size: 28px; background: var(--pink-bg); border: 2.5px solid var(--ink); white-space: nowrap; }
+
+/* Hand-drawn style tag: "Jev", "LLM" */
+.hand { font-family: var(--hand); }
+.underline-pink { position: relative; }
+.underline-pink::after { content: ""; position: absolute; left: 0; right: 0; bottom: -10px; height: 8px; border-radius: 4px; background: var(--pink); }
+
+/* Probability bar: <div class="bar"><i style="--w: 80%"></i></div> */
+.bar { height: 26px; border-radius: 999px; background: #dde4f0; overflow: hidden; }
+.bar > i { display: block; height: 100%; width: var(--w, 0%); border-radius: inherit; background: var(--pink); }
+.bar--grey > i { background: var(--muted); }
+
+/* Mouse cursor: <div class="cursor"><svg>…</svg></div> (see anim.js: cursorSvg) */
+.cursor { position: absolute; left: 0; top: 0; z-index: 30; pointer-events: none; }
+
+/* Full-frame closing title */
+.title-overlay {
+  position: absolute; inset: 0; z-index: 40; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: rgba(250,251,255,.93); font-family: var(--hand); font-size: 110px; line-height: 1.15; text-align: center; opacity: 0;
+}
+.title-overlay .dim { opacity: .45; }
+
+/* Play-again button, shown by anim.js when the animation ends. Outside .frame so it isn't scaled or paused. */
+.replay {
+  position: fixed; right: 32px; bottom: 32px; z-index: 50; width: 72px; height: 72px; padding: 0; border-radius: 50%;
+  display: grid; place-items: center; cursor: pointer; background: #fff; border: 2.5px solid var(--pink);
+  box-shadow: 0 12px 28px -14px rgba(0,0,0,.45); opacity: 0; pointer-events: none; transform: scale(.8);
+  transition: opacity .3s, transform .3s;
+}
+.replay.show { opacity: 1; pointer-events: auto; transform: none; }
+.replay:hover { background: var(--pink-bg); }
+.replay svg { width: 34px; height: 34px; margin-left: 4px; fill: var(--pink); }
+
+/* Slide number, shown by anim.js bottom left. Outside .frame, like the replay button. */
+.slide-id {
+  position: fixed; left: 24px; bottom: 20px; z-index: 50; padding: 6px 12px; border-radius: 8px;
+  background: rgba(255,255,255,.85); border: 1px solid #e3e7ef; color: #6b7280;
+  font: 500 14px/1 var(--mono); letter-spacing: .3px; pointer-events: none;
+}
+
+/* H toggles .bare on <html>: no on-screen controls, e.g. while recording */
+.bare .replay, .bare .slide-id { display: none; }

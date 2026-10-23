@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NN · Slide title</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "N. Section" in the video script (SCRIPT_FILE.md).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Main card ---------- */
+  .main { position: absolute; left: 135px; top: 270px; width: 1650px; height: 480px; padding: 40px 48px; opacity: 0; animation-name: main; }
+
+  /* ---------- Caption ---------- */
+  .caption { position: absolute; left: 0; right: 0; top: 840px; text-align: center; font-family: var(--hand); font-size: 58px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in        6–10%  main card
+     60–64%  caption         94%    final frame (playback stops here)
+     96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes main { 0%, 6% { opacity: 0; transform: translateY(20px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 60% { opacity: 0 } 64%, 100% { opacity: 1 } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>NN · Section label</small>Slide title</div>
+
+    <div class="card main"></div>
+
+    <div class="caption">One sentence with the <span class="underline-pink">key idea</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

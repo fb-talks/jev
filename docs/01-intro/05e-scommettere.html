@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>05e · Step 5 — Learning to bet</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "Step 5 — Jev's training teaches it to bet" (docs/01-intro-jev.md, section 7).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  The 10 trials (8 right, 2 wrong) illustrate what "calibrated" means: they are not real data.
+  The bets on "UGLY!!!" are a real Jev answer (October 2026, toxicity question of /1-jev/demo3): 0 · 4 · 10 · 86.
+  ("you're ugly" and similar direct insults give 100% Insults.)
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .scene { position: absolute; inset: 0; animation-name: scene; }
+
+  /* ---------- Training badge ---------- */
+  .training { position: absolute; left: 50%; top: 170px; transform: translateX(-50%); text-align: center; opacity: 0; animation-name: training; }
+  .training .card { display: inline-flex; align-items: center; gap: 22px; padding: 20px 34px; }
+  .training .ico { font-size: 44px; }
+  .training strong { display: block; font-size: 32px; }
+  .training strong b { color: var(--pink); }
+  .training span { display: block; font-size: 20px; opacity: .55; margin-top: 4px; text-align: left; }
+  .already { margin-top: 18px; font-family: var(--hand); font-size: 30px; opacity: 0; animation-name: already; }
+
+  /* ---------- The two lessons ---------- */
+  .lessons { position: absolute; left: 0; right: 0; top: 400px; display: flex; justify-content: center; gap: 48px; animation-name: lessons; }
+  .lesson { width: 840px; height: 540px; padding: 34px 38px; display: flex; flex-direction: column; opacity: 0; }
+  .lesson:nth-child(1) { animation-name: lesson1; }
+  .lesson:nth-child(2) { animation-name: lesson2; }
+  .lesson h2 { margin: 0 0 22px; font-family: var(--hand); font-size: 40px; font-weight: 400; }
+  .lesson h2 i { font-style: normal; color: var(--pink); }
+  .lesson .screen { flex: 1; padding: 28px 32px; position: relative; }
+
+  /* (a) writing → choosing */
+  .write { position: relative; display: inline-block; font-size: 30px; white-space: nowrap; }
+  .write .txt { display: inline-block; clip-path: inset(0 100% 0 0); animation-name: write; animation-timing-function: linear; }
+  .pencil { position: absolute; top: -18px; left: 0; font-size: 40px; animation-name: pencil; animation-timing-function: linear; }
+  .strike { position: absolute; left: -6px; top: 52%; height: 5px; width: 0; border-radius: 3px; background: var(--red); animation-name: strike; }
+  .nope { position: absolute; right: -58px; top: -10px; font-size: 44px; color: var(--red); font-weight: 700; opacity: 0; animation-name: nope; }
+  .choices { margin-top: 40px; display: grid; gap: 12px; }
+  .choice { display: flex; align-items: center; gap: 16px; font-size: 26px; opacity: 0; animation-name: choice; }
+  .box { width: 32px; height: 32px; flex: none; border: 2.5px solid var(--ink); border-radius: 7px; background: #fff; display: grid; place-items: center; font-weight: 700; color: #fff; }
+  .choice--on .box { animation-name: tick; }
+  .choice--on { font-weight: 600; }
+
+  /* (b) honest probabilities */
+  .says { font-size: 30px; }
+  .says b { font-size: 76px; color: var(--pink); vertical-align: -10px; margin-left: 10px; }
+  .trials { margin-top: 26px; display: grid; grid-template-columns: repeat(5, 64px); gap: 18px; }
+  .trial {
+    width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 32px; font-weight: 700; color: #fff; opacity: 0;
+    animation-name: trial; animation-delay: calc(var(--i) * 0.28s);
+  }
+  .ok { background: var(--green); }
+  .ko { background: var(--red); }
+  .hit { margin-top: 26px; font-size: 28px; opacity: 0; animation-name: hit; }
+  .hit b { color: var(--green); }
+
+  /* ---------- Result: the bets on "UGLY!!!" ---------- */
+  .result { position: absolute; left: 50%; top: 290px; width: 1180px; padding: 44px 56px; transform: translateX(-50%); opacity: 0; animation-name: result; }
+  .result h3 { margin: 0 0 30px; font-family: var(--hand); font-size: 64px; font-weight: 400; }
+  .bet { display: flex; align-items: center; gap: 26px; margin-bottom: 22px; font-size: 30px; }
+  .bet .lbl { width: 300px; }
+  .bet .bar { flex: 1; height: 34px; }
+  .bet .bar > i { width: 0; animation-name: fill; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .bet .pct { width: 110px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; opacity: 0; animation-name: pct; }
+  .bet--top .lbl, .bet--top .pct { font-weight: 700; }
+  .bet--top .pct { color: var(--pink); }
+  .note { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font-family: var(--hand); font-size: 46px; opacity: 0; animation-name: note; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–3%    scene appears              3–8%   training badge: synthetic data + RLCD
+     8–14%   "it doesn't learn what's offensive: it already knows"
+     14–38%  lesson 1: the pencil writes, gets crossed out, becomes a checkbox
+     38–66%  lesson 2: "says 80%" → 10 trials, 8 right and 2 wrong
+     70–94%  the bets on "UGLY!!!": 0% · 4% · 10% · 86%
+     96–100% fade out, loop */
+  @keyframes scene { 0% { opacity: 0 } 3%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes training { 0%, 3% { opacity: 0; transform: translate(-50%, 14px) } 7%, 68% { opacity: 1; transform: translate(-50%, 0) } 72%, 100% { opacity: 0; transform: translate(-50%, 0) } }
+  @keyframes already { 0%, 8% { opacity: 0 } 12%, 100% { opacity: .7 } }
+  @keyframes lessons { 0%, 68% { opacity: 1 } 72%, 100% { opacity: 0 } }
+  @keyframes lesson1 { 0%, 12% { opacity: 0; transform: translateY(16px) } 15%, 100% { opacity: 1; transform: none } }
+  @keyframes lesson2 { 0%, 36% { opacity: 0; transform: translateY(16px) } 39%, 100% { opacity: 1; transform: none } }
+
+  @keyframes write { 0%, 15% { clip-path: inset(0 100% 0 0) } 24%, 100% { clip-path: inset(0 0 0 0) } }
+  @keyframes pencil { 0%, 15% { transform: translateX(0); opacity: 1 } 24% { transform: translateX(520px); opacity: 1 } 26%, 100% { transform: translateX(520px); opacity: 0 } }
+  @keyframes strike { 0%, 25% { width: 0 } 28%, 100% { width: calc(100% + 12px) } }
+  @keyframes nope { 0%, 27% { opacity: 0; transform: scale(.4) } 29%, 100% { opacity: 1; transform: scale(1) } }
+  @keyframes choice { 0%, 29% { opacity: 0; transform: translateX(-12px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes tick { 0%, 34% { background: #fff } 36%, 100% { background: var(--pink); border-color: var(--pink) } }
+
+  @keyframes trial { 0%, 42% { opacity: 0; transform: scale(.4) } 44% { opacity: 1; transform: scale(1.15) } 46%, 80% { opacity: 1; transform: scale(1) } 84%, 100% { opacity: 0 } }
+  @keyframes hit { 0%, 62% { opacity: 0 } 65%, 100% { opacity: 1 } }
+
+  @keyframes result { 0%, 70% { opacity: 0; transform: translate(-50%, 20px) } 73%, 100% { opacity: 1; transform: translate(-50%, 0) } }
+  @keyframes fill { 0%, 73% { width: 0 } 83%, 100% { width: var(--w) } }
+  @keyframes pct { 0%, 81% { opacity: 0 } 84%, 100% { opacity: 1 } }
+  @keyframes note { 0%, 85% { opacity: 0; transform: translateY(12px) } 88%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="scene">
+    <div class="kicker"><small>Step 5</small>Training teaches it to bet</div>
+
+    <div class="training">
+      <div class="card">
+        <span class="ico">🧪</span>
+        <div>
+          <strong>Synthetic data only + <b>RLCD</b></strong>
+          <span>Reinforcement Learning for Calibrated Decisions</span>
+        </div>
+      </div>
+      <div class="already">It doesn't teach it that "ugly" is offensive: it already knows.</div>
+    </div>
+
+    <div class="lessons">
+      <section class="card lesson">
+        <h2><i>1.</i> Answer only by choosing</h2>
+        <div class="screen">
+          <div class="write">
+            <span class="txt">The comment seems offensive because…</span>
+            <span class="strike"></span>
+            <span class="nope">✗</span>
+            <span class="pencil">✏️</span>
+          </div>
+          <div class="choices">
+            <div class="choice"><span class="box"></span>0 · Polite or neutral</div>
+            <div class="choice"><span class="box"></span>1 · Critical but respectful</div>
+            <div class="choice"><span class="box"></span>2 · Combative or sarcastic</div>
+            <div class="choice choice--on"><span class="box">✓</span>3 · Insults, hate or attacks</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card lesson">
+        <h2><i>2.</i> Honest probabilities</h2>
+        <div class="screen">
+          <div class="says">If it says <b>80%</b></div>
+          <div class="trials">
+            <span class="trial ok" style="--i:0">✓</span>
+            <span class="trial ok" style="--i:1">✓</span>
+            <span class="trial ko" style="--i:2">✗</span>
+            <span class="trial ok" style="--i:3">✓</span>
+            <span class="trial ok" style="--i:4">✓</span>
+            <span class="trial ok" style="--i:5">✓</span>
+            <span class="trial ok" style="--i:6">✓</span>
+            <span class="trial ko" style="--i:7">✗</span>
+            <span class="trial ok" style="--i:8">✓</span>
+            <span class="trial ok" style="--i:9">✓</span>
+          </div>
+          <div class="hit">…it should be right <b>about 8 times out of 10</b>.</div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card result">
+      <h3>"UGLY!!!"</h3>
+      <div class="bet"><span class="lbl">0 · Polite</span><div class="bar bar--grey"><i style="--w: 0%"></i></div><span class="pct">0%</span></div>
+      <div class="bet"><span class="lbl">1 · Critical</span><div class="bar bar--grey"><i style="--w: 4%"></i></div><span class="pct">4%</span></div>
+      <div class="bet"><span class="lbl">2 · Combative</span><div class="bar bar--grey"><i style="--w: 10%"></i></div><span class="pct">10%</span></div>
+      <div class="bet bet--top"><span class="lbl">3 · Insults</span><div class="bar"><i style="--w: 86%"></i></div><span class="pct">86%</span></div>
+    </section>
+    <div class="note">An honest bet on every option.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

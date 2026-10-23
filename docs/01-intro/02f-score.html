@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02f · score</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "2. How to use it: state + questions" in the video script
+  (docs/01-intro-jev-video-script.md): the score answer: probabilities, score, confidence.
+  One of three slides, one per question type (02d noul, 02e choice, 02f score), all on the support
+  ticket of 02c: on the left the question and the answer Jev returns for it, on the right its fields.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  Values are real Jev answers (October 2026): frustration of this ticket 0.03 / 0.89 / 0.08, score 1.04,
+  confidence 0.82 (repeated calls give 1.04–1.05 and 0.82–0.83). The rounded products add up to 1.05.
+-->
+<style>
+  :root { --loop: 26s; --lh: 34px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+
+  /* ---------- Top right: which of the three types this slide is about ---------- */
+  .types { position: absolute; right: 80px; top: 92px; display: flex; gap: 14px; }
+  .types .chip { font-family: var(--mono); font-weight: 500; opacity: .35; }
+  .types .chip.here { opacity: 1; border-color: var(--pink); color: var(--pink); }
+
+  /* ---------- Top: the ticket of 02c, as a reminder ---------- */
+  .ticket { position: absolute; left: 760px; top: 76px; }
+  .ticket q { display: block; margin-top: 6px; font-family: var(--hand); font-size: 26px; white-space: nowrap; quotes: "\201C" "\201D"; }
+
+  /* ---------- Left: your question, and what Jev returns for it ---------- */
+  .answer { position: absolute; left: 80px; top: 190px; width: 640px; height: 740px; padding: 30px 36px; }
+  .code { margin: 14px 0 30px; font-family: var(--mono); font-size: 22px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .k { color: var(--indigo); }
+  .s { color: #9a3412; }
+  .v { color: var(--pink); }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 10px; opacity: .35; }
+  .answer .note { position: absolute; left: 36px; right: 36px; bottom: 30px; font-size: 20px; line-height: 1.45; opacity: .6; }
+
+  /* ---------- Right: the fields explained ---------- */
+  .panel { position: absolute; left: 760px; top: 190px; width: 1080px; height: 740px; padding: 30px 40px; }
+  .panel h2 { margin: 0; display: flex; align-items: baseline; gap: 20px; }
+  .panel h2 .f { font-family: var(--mono); font-size: 40px; font-weight: 500; color: var(--pink); }
+  .panel h2 .say { font-family: var(--hand); font-size: 38px; font-weight: 400; }
+  .step { margin-top: 30px; opacity: 0; }
+  .step .label { margin-bottom: 12px; }
+  .step .label .fld { font-family: var(--mono); color: var(--pink); opacity: 1; text-transform: none; font-size: 22px; letter-spacing: 0; margin-right: 6px; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 960px; text-align: center; font-family: var(--hand); font-size: 46px; opacity: 0; animation-name: caption; }
+
+  .s1 { animation-name: s1; } .s2 { animation-name: s2; } .s4 { animation-name: s4; }
+
+  /* probabilities and the weighted average, in one table */
+  .tbl { display: grid; grid-template-columns: 330px 100px 200px 1fr; row-gap: 6px; font-size: 23px; align-items: baseline; }
+  .tbl .h { font-size: 16px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+  .tbl .n { font-family: var(--mono); font-size: 25px; }
+  .tbl .w { color: var(--pink); }
+  .r { display: contents; }
+  .c4 { opacity: 0; animation-name: c4; }
+  .total { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; margin-top: 4px; padding-top: 10px; border-top: 3px solid var(--ink); opacity: 0; animation-name: total; }
+  .total .n b { color: var(--pink); font-size: 32px; font-weight: 500; }
+  .total small { font-size: 17px; opacity: .55; }
+
+  .ruler { position: relative; height: 40px; margin: 4px 20px 0; }
+  .ruler::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 6px; border-radius: 3px; background: #dde4f0; }
+  .tick { position: absolute; top: 0; width: 3px; height: 24px; background: #a3adbf; transform: translateX(-50%); }
+  .tick span { position: absolute; top: 28px; left: 50%; transform: translateX(-50%); font-size: 18px; font-weight: 600; white-space: nowrap; opacity: .6; }
+  .tick:first-child span { left: 0; transform: none; }
+  .tick:nth-child(3) span { left: auto; right: 0; transform: none; }
+  .tick:nth-child(2) span { animation-name: hit; }
+  .marker { position: absolute; top: -3px; left: 0; width: 30px; height: 30px; margin-left: -15px; border-radius: 50%; background: var(--pink); border: 3px solid #fff; box-shadow: 0 0 0 2px var(--pink); opacity: 0; animation-name: marker; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .ranges { display: flex; gap: 14px; margin-top: 30px; font-size: 19px; align-items: center; }
+  .rg { padding: 6px 14px; border-radius: 10px; background: var(--stage); }
+  .rg b { font-family: var(--mono); font-weight: 500; margin-left: 6px; }
+  .rg.here { box-shadow: inset 0 0 0 2px var(--pink); }
+  .rg.here b { color: var(--pink); }
+
+  .s4 p { margin: 0; font-size: 23px; }
+  .s4 p b { font-family: var(--mono); font-weight: 500; color: var(--pink); }
+
+  /* ---------- Timeline (26s loop) ----------
+     0–4%    scene in
+     8–12%   step 1: probabilities, one row per level (left group pink)
+     22–26%  the "= value × probability" column      30–34% score ≈ 1.04 (left group pink)
+     42–46%  step 2: the scale      46–54% marker lands on 1.04, level 1 turns pink; ranges by number of levels
+     64–68%  step 3: confidence 0.82 (left group pink)
+     80–84%  caption
+     94%  final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes caption { 0%, 80% { opacity: 0; transform: translateY(12px) } 84%, 100% { opacity: 1; transform: none } }
+  .g1 { animation-name: g1; }
+  @keyframes g1 { 0%, 8% { opacity: .35; background: transparent; box-shadow: inset 4px 0 0 transparent } 11%, 30% { opacity: 1; background: var(--pink-bg); box-shadow: inset 4px 0 0 var(--pink) } 33%, 100% { opacity: 1; background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  .g2 { animation-name: g2; }
+  @keyframes g2 { 0%, 30% { opacity: .35; background: transparent; box-shadow: inset 4px 0 0 transparent } 33%, 64% { opacity: 1; background: var(--pink-bg); box-shadow: inset 4px 0 0 var(--pink) } 67%, 100% { opacity: 1; background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  .g3 { animation-name: g3; }
+  @keyframes g3 { 0%, 64% { opacity: .35; background: transparent; box-shadow: inset 4px 0 0 transparent } 67%, 100% { opacity: 1; background: var(--pink-bg); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes s1 { 0%, 8% { opacity: 0; transform: translateY(16px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes c4 { 0%, 22% { opacity: 0 } 26%, 100% { opacity: 1 } }
+  @keyframes total { 0%, 30% { opacity: 0; transform: translateY(8px) } 34%, 100% { opacity: 1; transform: none } }
+  @keyframes s2 { 0%, 42% { opacity: 0; transform: translateY(16px) } 46%, 100% { opacity: 1; transform: none } }
+  @keyframes marker { 0%, 46% { left: 0%; opacity: 0 } 47% { left: 0%; opacity: 1 } 54%, 100% { left: 52%; opacity: 1 } }
+  @keyframes hit { 0%, 54% { color: inherit; opacity: .6 } 55%, 100% { color: var(--pink); opacity: 1 } }
+  @keyframes s4 { 0%, 64% { opacity: 0; transform: translateY(16px) } 68%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Intro to Jev · 2</small>Three answer types · score</div>
+    <div class="types"><span class="chip">noul</span><span class="chip">choice</span><span class="chip here">score</span></div>
+
+    <div class="ticket"><div class="label">The ticket</div><q>I was charged twice for my payment, reply by today!</q></div>
+
+    <div class="card answer">
+      <div class="label">Your question</div>
+      <div class="code">
+        <div class="l">frustration: <span class="k">score</span>(</div>
+        <div class="l">  <span class="s">"How frustrated is the customer?"</span>, [</div>
+        <div class="l">    <span class="s">"Calm, states the facts"</span>,</div>
+        <div class="l">    <span class="s">"Frustrated but polite"</span>,</div>
+        <div class="l">    <span class="s">"Very angry"</span>,</div>
+        <div class="l">  ])</div>
+      </div>
+      <div class="label">What Jev returns</div>
+      <div class="code">
+        <div class="l">answers.frustration = {</div>
+        <div class="grp g1">
+        <div class="l">  probabilities: {</div>
+        <div class="l">    0: <span class="v">0.03</span>,</div>
+        <div class="l">    1: <span class="v">0.89</span>,</div>
+        <div class="l">    2: <span class="v">0.08</span>,</div>
+        <div class="l">  },</div>
+        </div>
+        <div class="grp g2"><div class="l">  score: <span class="v">1.04</span>,</div></div>
+        <div class="grp g3"><div class="l">  confidence: <span class="v">0.82</span>,</div></div>
+        <div class="l">}</div>
+      </div>
+      <div class="note">Also legend: your levels by position.</div>
+    </div>
+
+    <div class="card panel">
+      <h2><span class="f">score</span><span class="say">a point on your scale</span></h2>
+      <div class="step s1">
+        <div class="label"><span class="fld">probabilities</span>a bet on each level · keys = positions in your list</div>
+        <div class="tbl">
+          <span class="h">level</span><span class="h">value</span><span class="h">probability</span><span class="h c4">= value × probability</span>
+          <div class="r"><span>0 · Calm</span><span class="n">0</span><span class="n w">0.03</span><span class="n c4">= 0.00</span></div>
+          <div class="r"><span>1 · Frustrated but polite</span><span class="n">1</span><span class="n w">0.89</span><span class="n c4">= 0.89</span></div>
+          <div class="r"><span>2 · Very angry</span><span class="n">2</span><span class="n w">0.08</span><span class="n c4">= 0.16</span></div>
+          <div class="total"><span><span class="fld" style="font-family: var(--mono); color: var(--pink)">score</span> add them up <small>(values rounded)</small></span><span class="n">≈ <b>1.04</b></span></div>
+        </div>
+      </div>
+
+      <div class="step s2">
+        <div class="label">So score is a position on your scale, not a percentage</div>
+        <div class="ruler">
+          <span class="tick" style="left: 0%"><span>0 Calm</span></span>
+          <span class="tick" style="left: 50%"><span>1 Frustrated but polite</span></span>
+          <span class="tick" style="left: 100%"><span>2 Very angry</span></span>
+          <span class="marker"></span>
+        </div>
+        <div class="ranges"><span>From 0 to levels − 1:</span><span class="rg">2 levels<b>0–1</b></span><span class="rg here">3 levels<b>0–2</b></span><span class="rg">5 levels<b>0–4</b></span></div>
+      </div>
+
+      <div class="step s4">
+        <div class="label"><span class="fld">confidence</span>same as in choice</div>
+        <p><b>0.82</b>: the bet is concentrated on one level, so you can trust the score.</p>
+      </div>
+    </div>
+
+    <div class="caption">A position on <span class="underline-pink">your</span> scale, not a percentage.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -6,9 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "slides:export": "node .claude/skills/anim-slides-shared/scripts/export.mjs"
   },
   "dependencies": {
+    "@typesafe-ai/sdk": "^0.7.0",
+    "ai": "^7.0.150",
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0"
