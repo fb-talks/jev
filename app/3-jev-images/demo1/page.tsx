@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-const samples = ["/samples/dog.jpg", "/samples/pug.jpg", "/samples/cars.jpg"];
+const samples = ["/samples/dog.jpg", "/samples/pug.jpg", "/samples/cars.jpg", "/samples/objects.jpg"];
 
 interface Result {
   found: number;
