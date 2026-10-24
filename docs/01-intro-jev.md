@@ -50,9 +50,30 @@ Cosa contengono i campi della risposta:
 - **`confidence`** (choice e score): quanto Jev è sicuro della risposta, da 0 a 1. L'SDK non pubblica la formula, ma nei dati reali è alta quando la probabilità si concentra su un'opzione (ticket: billing 100%, confidenza 1) e bassa quando è divisa (46% contro 44%, confidenza 0.19). Non coincide con la probabilità più alta;
 - **`legend`** (solo score): le descrizioni dei livelli che hai passato.
 
+### L'esempio più semplice: una sola domanda
+
+🎬 [`01-intro/02c-noul-base.html`](./01-intro/02c-noul-base.html)
+
+```ts
+import { noul, TypeSafeClient } from "@typesafe-ai/sdk";
+
+const client = new TypeSafeClient();
+
+const { answers } = await client.systemOne({
+  state: "Who taught you to code? Useless post.",
+  questions: {
+    offensive: noul("The comment is offensive or insulting"),
+  },
+});
+
+answers.offensive.noul; // 0.80: probabilità del "sì"
+```
+
+Uno state, una domanda, un numero. È la stessa domanda di `/1-jev/demo1` (valore reale a ottobre 2026: 0.79–0.81).
+
 ### Esempio: un ticket di supporto
 
-🎬 [`01-intro/02c-codice.html`](./01-intro/02c-codice.html) · 🎬 [`01-intro/02d-noul.html`](./01-intro/02d-noul.html) · 🎬 [`01-intro/02e-choice.html`](./01-intro/02e-choice.html) · 🎬 [`01-intro/02f-score.html`](./01-intro/02f-score.html)
+🎬 [`01-intro/02d-codice.html`](./01-intro/02d-codice.html) · 🎬 [`01-intro/02e-noul.html`](./01-intro/02e-noul.html) · 🎬 [`01-intro/02f-choice.html`](./01-intro/02f-choice.html) · 🎬 [`01-intro/02g-score.html`](./01-intro/02g-score.html)
 
 ```ts
 import { choice, noul, score, TypeSafeClient } from "@typesafe-ai/sdk";
@@ -292,14 +313,28 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 ---
 
-## 8. In pratica — 🚧 TODO (placeholder)
+## 8. Bonus: Jev guarda le immagini
+
+Le immagini sono sperimentali ("Dreamer-ready", non consigliate in produzione): si attivano con l'header `TypeSafe-Danger-Zone-Images: true`. Possono stare nello state, nelle istruzioni di una domanda o nei criteri. Solo PNG o JPEG, lati tra 280 e 1568 px, fino a 16 MiB per immagine; si pagano come token di input.
+
+La domanda `box` restituisce il rettangolo più piccolo che contiene l'oggetto: quattro bordi (`top`, `bottom`, `left`, `right`) come frazioni da 0 a 1 dell'immagine, dall'angolo in alto a sinistra, più una `confidence`. Un box risponde sempre, anche se l'oggetto non c'è: si abbina a una noul che chiede se c'è. Un box copre un solo oggetto, quindi va descritto con precisione.
+
+- Jev vede anche le immagini: 🎬 [`01-intro/08a-immagini.html`](./01-intro/08a-immagini.html)
+- box, quattro numeri: 🎬 [`01-intro/08b-box.html`](./01-intro/08b-box.html)
+- Un box arriva sempre: 🎬 [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html)
+- Descrivi quello che cerchi: 🎬 [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html)
+- Quanto ci mette, e cosa sapere: 🎬 [`01-intro/08e-tempi-limiti.html`](./01-intro/08e-tempi-limiti.html)
+
+---
+
+## 9. In pratica — 🚧 TODO (placeholder)
 
 Sezione da scrivere. Le slide segnaposto, nell'ordine:
 
-- Creare account e API key: 🎬 [`01-intro/08a-account.html`](./01-intro/08a-account.html)
-- Esempio di codice: 🎬 [`01-intro/08b-codice.html`](./01-intro/08b-codice.html)
-- Usiamo un gateway come Vercel: 🎬 [`01-intro/08c-gateway.html`](./01-intro/08c-gateway.html)
-- Demo time: 🎬 [`01-intro/08d-demo.html`](./01-intro/08d-demo.html)
+- Creare account e API key: 🎬 [`01-intro/09a-account.html`](./01-intro/09a-account.html)
+- Esempio di codice: 🎬 [`01-intro/09b-codice.html`](./01-intro/09b-codice.html)
+- Usiamo un gateway come Vercel: 🎬 [`01-intro/09c-gateway.html`](./01-intro/09c-gateway.html)
+- Demo time: 🎬 [`01-intro/09d-demo.html`](./01-intro/09d-demo.html)
 
 ---
 
@@ -308,6 +343,8 @@ Sezione da scrivere. Le slide segnaposto, nell'ordine:
 - [Jev (AI model) – Wikipedia](https://en.wikipedia.org/wiki/Jev_(AI_model))
 - [Introducing System One models and Jev – TypeSafe blog](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
 - [Quick start – TypeSafe docs](https://docs.typesafe.ai/introduction/quickstart)
+- [Images – TypeSafe docs](https://docs.typesafe.ai/images)
+- [Box – TypeSafe docs](https://docs.typesafe.ai/primitives/box)
 - [TypeSafe API with AI Gateway – Vercel docs](https://vercel.com/docs/ai-gateway/sdks-and-apis/typesafe)
 - [TypeSafe AI's Jev now available on AI Gateway – Vercel](https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway)
 - [How much does Jev cost? – Flavio Copes](https://flaviocopes.com/jev-pricing/)

@@ -102,7 +102,7 @@ its card or is clipped, and that the 94% frame is a complete conclusion. Needs G
 
 ```bash
 npm run slides:export -- docs/01-intro                          # whole deck: video/*.mp4 + png/*@50.png, *@94.png
-npm run slides:export -- docs/01-intro/02d-noul.html --only png --t 0.3,0.6,0.94
+npm run slides:export -- docs/01-intro/02e-noul.html --only png --t 0.3,0.6,0.94
 npm run slides:export -- docs/01-intro --only video --fps 60 --hold 3 --scale 2   # 4K, 60 fps
 ```
 

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>08d · Name what you are looking for</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "8. Bonus: Jev looks at images" in the video script (docs/01-intro-jev-video-script.md):
+  one box covers one target, so the prompt must say which one. Three prompts on the same photo,
+  the box moves, the confidence changes. Closes with two tips from docs.typesafe.ai/primitives/box.
+  Values are real Jev answers on the cars photo (October 2026):
+    "the main subject"           top 0.23 bottom 0.97 left 0    right 0.46 · confidence 0.20
+    "the white car on the left"  top 0.34 bottom 0.80 left 0    right 0.45 · confidence 0.86
+    "the brown car on the right" top 0.34 bottom 0.79 left 0.58 right 0.99 · confidence 0.44
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+
+  /* ---------- Left: the photo, one box that moves ---------- */
+  .shot { position: absolute; left: 80px; top: 200px; height: 702px; padding: 16px; }
+  .shot .label { margin: 4px 4px 12px; }
+  .photo { position: relative; width: 840px; height: 630px; border-radius: 16px; overflow: hidden; }
+  .photo img { display: block; width: 100%; height: 100%; }
+  .box { position: absolute; top: 23%; left: 0%; width: 46%; height: 74%; border: 5px solid var(--pink); border-radius: 8px; opacity: 0; animation-name: box; animation-timing-function: cubic-bezier(.5,0,.2,1); }
+  .box span { position: absolute; left: 8px; top: 8px; padding: 4px 16px; border-radius: 999px; background: var(--pink); color: #fff; font-size: 22px; font-weight: 600; white-space: nowrap; opacity: 0; }
+  .b1 { animation-name: b1; } .b2 { animation-name: b2; } .b3 { animation-name: b3; }
+
+  /* ---------- Right: three prompts, their confidence ---------- */
+  .panel { position: absolute; left: 1000px; top: 200px; width: 840px; height: 702px; padding: 28px 36px; }
+  .try { margin-top: 16px; padding: 14px 20px; border-radius: 16px; background: var(--stage); opacity: 0; }
+  .try .p { font-family: var(--mono); font-size: 24px; }
+  .row { display: flex; align-items: center; gap: 16px; margin-top: 10px; }
+  .row small { width: 130px; font-size: 18px; font-weight: 600; opacity: .55; }
+  .row .bar { flex: 1; height: 22px; }
+  .row .bar > i { width: 0; }
+  .row .n { width: 80px; text-align: right; font-family: var(--mono); font-size: 28px; font-weight: 500; }
+  .t1 { animation-name: t1; } .t2 { animation-name: t2; } .t3 { animation-name: t3; }
+  .t1 .bar > i { animation-name: w20; background: var(--muted); }
+  .t2 .bar > i { animation-name: w86; }
+  .t3 .bar > i { animation-name: w44; background: var(--muted); }
+  .t2 .n { color: var(--pink); }
+
+  .tips { position: absolute; left: 36px; right: 36px; bottom: 28px; display: flex; flex-direction: column; gap: 12px; opacity: 0; animation-name: tips; }
+  .tip { display: flex; align-items: center; gap: 14px; font-size: 24px; }
+  .tip i { font-style: normal; font-size: 30px; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font-family: var(--hand); font-size: 50px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in
+     8–14%   prompt 1 "the main subject": wide box, confidence 0.20 (bar 12–20%)
+     28–34%  prompt 2 "the white car on the left": the box tightens, 0.86 (bar 32–40%)
+     48–54%  prompt 3 "the brown car on the right": the box jumps right, 0.44 (bar 52–60%)
+     66–72%  back to prompt 2, the best one · tips
+     80–84%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes box {
+    0%, 8%   { opacity: 0; top: 23%; left: 0%; width: 46%; height: 74%; }
+    12%, 28% { opacity: 1; top: 23%; left: 0%; width: 46%; height: 74%; }
+    33%, 48% { opacity: 1; top: 34%; left: 0%; width: 45%; height: 46%; }
+    53%, 66% { opacity: 1; top: 34%; left: 58%; width: 41%; height: 45%; }
+    71%, 100% { opacity: 1; top: 34%; left: 0%; width: 45%; height: 46%; }
+  }
+  @keyframes b1 { 0%, 10% { opacity: 0 } 12%, 27% { opacity: 1 } 29%, 100% { opacity: 0 } }
+  @keyframes b2 { 0%, 31% { opacity: 0 } 33%, 47% { opacity: 1 } 49%, 69% { opacity: 0 } 71%, 100% { opacity: 1 } }
+  @keyframes b3 { 0%, 51% { opacity: 0 } 53%, 65% { opacity: 1 } 67%, 100% { opacity: 0 } }
+  @keyframes t1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 28% { opacity: 1; transform: none } 32%, 100% { opacity: .5 } }
+  @keyframes t2 { 0%, 28% { opacity: 0; transform: translateY(14px) } 32%, 48% { opacity: 1; transform: none; box-shadow: inset 4px 0 0 var(--pink) } 52%, 66% { opacity: .5; box-shadow: inset 4px 0 0 var(--pink) } 70%, 100% { opacity: 1; box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes t3 { 0%, 48% { opacity: 0; transform: translateY(14px) } 52%, 66% { opacity: 1; transform: none } 70%, 100% { opacity: .5 } }
+  @keyframes w20 { 0%, 12% { width: 0 } 20%, 100% { width: 20% } }
+  @keyframes w86 { 0%, 32% { width: 0 } 40%, 100% { width: 86% } }
+  @keyframes w44 { 0%, 52% { width: 0 } 60%, 100% { width: 44% } }
+  @keyframes tips { 0%, 68% { opacity: 0; transform: translateY(14px) } 72%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 80% { opacity: 0; transform: translateY(12px) } 84%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>08 · Bonus: images · 4 / 5</small>Name what you are looking for</div>
+
+    <div class="card shot">
+      <div class="label">Two cars: which one?</div>
+      <div class="photo">
+        <img src="_shared/img/cars.jpg" alt="">
+        <div class="box"><span class="b1">the main subject</span><span class="b2">the white car on the left</span><span class="b3">the brown car on the right</span></div>
+      </div>
+    </div>
+
+    <div class="card panel">
+      <div class="label">Same photo, three prompts</div>
+
+      <div class="try t1">
+        <div class="p">"the main subject"</div>
+        <div class="row"><small>confidence</small><div class="bar"><i></i></div><span class="n">0.20</span></div>
+      </div>
+      <div class="try t2">
+        <div class="p">"the white car on the left"</div>
+        <div class="row"><small>confidence</small><div class="bar"><i></i></div><span class="n">0.86</span></div>
+      </div>
+      <div class="try t3">
+        <div class="p">"the brown car on the right"</div>
+        <div class="row"><small>confidence</small><div class="bar"><i></i></div><span class="n">0.44</span></div>
+      </div>
+
+      <div class="tips">
+        <div class="tip"><i>🎯</i><span>One box, one target: two cars, two questions.</span></div>
+        <div class="tip"><i>🔍</i><span>Small target? Crop the area first, then ask again.</span></div>
+      </div>
+    </div>
+
+    <div class="caption">Vague prompt, vague box. <span class="underline-pink">Name it precisely.</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

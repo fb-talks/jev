@@ -87,9 +87,40 @@ Legenda:
 🎙️ **VOCE**:
 > Sotto ogni tipo vedete i campi che Jev vi restituisce: `noul`, `choice` o `score`, e per choice e score anche **probabilities** e **confidence**. Tra poco vediamo cosa contengono, con un esempio vero.
 
-### 02c · Il codice del ticket
+### 02c · La chiamata più semplice
 
-🎬 **ANIMAZIONE**: [`01-intro/02c-codice.html`](./01-intro/02c-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
+🎬 **ANIMAZIONE**: [`01-intro/02c-noul-base.html`](./01-intro/02c-noul-base.html). Il client più semplice possibile: si evidenziano import e client, lo state (il commento della hook), l'unica domanda `noul`, poi `console.log` e a destra la risposta `0.80` con la barra. Finale: "One state, one question, one number." Dura 16 s.
+
+🖥️ **SCHERMO**: editor con il codice minimo (è la stessa domanda di `/1-jev/demo1`).
+
+```ts
+import { noul, TypeSafeClient } from "@typesafe-ai/sdk";
+
+const client = new TypeSafeClient();
+
+const { answers } = await client.systemOne({
+  state: "Who taught you to code? Useless post.",
+  questions: {
+    offensive: noul("The comment is offensive or insulting"),
+  },
+});
+
+console.log(answers.offensive.noul); // 0.80
+```
+
+🎙️ **VOCE**:
+> Partiamo dal caso più semplice possibile.
+> Importo il client e la funzione `noul`, e creo il client.
+> Nello state metto il testo da valutare: il commento dell'inizio, "Who taught you to code? Useless post."
+> E faccio una sola domanda, sì o no: il commento è offensivo?
+> La risposta è un numero solo: zero virgola ottanta, cioè ottanta per cento di probabilità che la risposta sia sì.
+> Tutto qui: uno state, una domanda, un numero. Adesso vediamo cosa succede con più domande insieme.
+
+✂️ Valore verificato a ottobre 2026 su `/1-jev/demo1` (0.79–0.81): ricontrollarlo prima di registrare.
+
+### 02d · Il codice del ticket
+
+🎬 **ANIMAZIONE**: [`01-intro/02d-codice.html`](./01-intro/02d-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
 
 🖥️ **SCHERMO**: editor con l'esempio del ticket di supporto. Evidenzio le parti mentre ne parlo.
 
@@ -129,9 +160,9 @@ answers.urgent.noul;         // 0.92
 > Frustrazione: uno virgola zero quattro, cioè "frustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
 > Urgente: novantadue per cento.
 
-### 02d · noul
+### 02e · noul
 
-🎬 **ANIMAZIONE**: [`01-intro/02d-noul.html`](./01-intro/02d-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
+🎬 **ANIMAZIONE**: [`01-intro/02e-noul.html`](./01-intro/02e-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
 
 🎙️ **VOCE**:
 > Ma cosa c'è esattamente dentro ogni risposta? Dipende dal tipo di domanda. Partiamo dalla più semplice.
@@ -139,9 +170,9 @@ answers.urgent.noul;         // 0.92
 > Niente probabilities, niente confidence: il numero stesso dice quanto Jev è sicuro. Vicino a uno, sicuramente sì; vicino a zero, sicuramente no; intorno a metà, non lo sa.
 > E dove inizia il "sì" lo decide il vostro codice: per esempio, sopra zero virgola otto avviso il team.
 
-### 02e · choice
+### 02f · choice
 
-🎬 **ANIMAZIONE**: [`01-intro/02e-choice.html`](./01-intro/02e-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
+🎬 **ANIMAZIONE**: [`01-intro/02f-choice.html`](./01-intro/02f-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
 
 🎙️ **VOCE**:
 > Una **choice** restituisce tre campi.
@@ -150,9 +181,9 @@ answers.urgent.noul;         // 0.92
 > **confidence**: quanto la scommessa è concentrata, da zero a uno. Qui è uno, perché è tutta su un'opzione. Ma se arriva un ticket fuori tema, "la T-shirt Acme è gratis con il piano annuale?", nessun team è quello giusto: la scommessa si divide, settantadue per cento sales e ventotto billing, e la confidence scende a zero virgola cinquantotto. Notate che non è la probabilità più alta: misura quanto è concentrata.
 > E vi dice **quando fidarvi**: se è alta, il codice può agire da solo; se è bassa, meglio chiedere a una persona. È il pattern che vediamo tra poco.
 
-### 02f · score
+### 02g · score
 
-🎬 **ANIMAZIONE**: [`01-intro/02f-score.html`](./01-intro/02f-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
+🎬 **ANIMAZIONE**: [`01-intro/02g-score.html`](./01-intro/02g-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
 
 🎙️ **VOCE**:
 > Una **score** ha le stesse probabilities e la stessa confidence della choice, più il campo **score**.
@@ -395,34 +426,91 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ---
 
-## 8. In pratica — 🚧 TODO (placeholder)
+## 8. Bonus: Jev guarda le immagini
+
+Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati a ottobre 2026: ricontrollarli prima di registrare.
+
+### 08a · Jev vede anche le immagini
+
+🎬 **ANIMAZIONE**: [`01-intro/08a-immagini.html`](./01-intro/08a-immagini.html). La foto del cane e la chiamata: l'header sperimentale, `state: image(photo)`, poi la domanda nuova `box`; il box si posa sull'occhio. Dura 14 s.
+
+🖥️ **SCHERMO**: `/3-jev-images/demo1`, clicco la foto del cane, scrivo "eye" e premo **Find it**.
+
+🎙️ **VOCE**:
+> Un bonus. Jev non legge solo testo: guarda anche le immagini.
+> La chiamata è la stessa di sempre. Cambiano due cose: un header, perché le immagini sono ancora sperimentali, e lo state, che adesso è una foto.
+> E c'è un tipo di domanda nuovo, **box**: dove si trova quello che cerco?
+
+### 08b · box: quattro numeri
+
+🎬 **ANIMAZIONE**: [`01-intro/08b-box.html`](./01-intro/08b-box.html). I quattro bordi tracciati uno alla volta sulla foto (top 0.37, bottom 0.46, left 0.48, right 0.56), il box che ne nasce, confidence 0.72, poi la conversione in percentuali CSS. Dura 16 s.
+
+🎙️ **VOCE**:
+> La risposta di un box sono quattro numeri: i bordi del rettangolo più piccolo che contiene l'oggetto.
+> Non sono pixel: sono frazioni dell'immagine, da 0 a 1, partendo dall'angolo in alto a sinistra. Top e bottom sull'altezza, left e right sulla larghezza.
+> Nella pagina basta moltiplicarli per cento e usarli come percentuali CSS: il box resta al suo posto a qualsiasi dimensione.
+> E c'è una confidence, quanto Jev è sicuro di quel rettangolo.
+
+### 08c · Un box arriva sempre
+
+🎬 **ANIMAZIONE**: [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html). Sulla foto delle auto chiedo "a cat": il box arriva lo stesso; la noul dice 0.02 e il box diventa grigio, "not found". Dura 15 s.
+
+🖥️ **SCHERMO**: nella demo, foto delle auto, scrivo "a cat".
+
+🎙️ **VOCE**:
+> Attenzione: un box risponde **sempre**. Chiedete un gatto in una foto senza gatti, e un rettangolo arriva lo stesso, da qualche parte.
+> Per questo nella stessa chiamata aggiungo una noul: l'immagine contiene un gatto? Due per cento.
+> E il codice decide: sotto il cinquanta per cento, "not found".
+
+### 08d · Descrivi quello che cerchi
+
+🎬 **ANIMAZIONE**: [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html). Tre prompt sulla stessa foto: "the main subject" (box largo, 0.20), "the white car on the left" (0.86), "the brown car on the right" (0.44); poi due consigli dalla documentazione. Dura 16 s.
+
+🎙️ **VOCE**:
+> Un box copre un solo oggetto. Se ce ne sono due simili, Jev deve indovinare quale volete.
+> "Il soggetto principale": box largo, confidenza venti per cento. "L'auto bianca a sinistra": il box si stringe, ottantasei per cento.
+> Quindi: una domanda per oggetto, descritto con precisione. E se l'oggetto è piccolo, prima si ritaglia la zona e poi si chiede di nuovo.
+
+✂️ Da evitare "the rusty car on the left": il box è giusto, ma found scende al 23%.
+
+### 08e · Quanto ci mette, e cosa sapere
+
+🎬 **ANIMAZIONE**: [`01-intro/08e-tempi-limiti.html`](./01-intro/08e-tempi-limiti.html). I tempi misurati (446–844 ms, una volta 2380 ms) e quattro cose da sapere: sperimentale, PNG o JPEG, 280–1568 px per lato, pagato come input. Dura 14 s.
+
+🎙️ **VOCE**:
+> Una foto, tre domande, una chiamata: di solito tra mezzo secondo e ottocento millisecondi. Abbastanza per un'interfaccia.
+> Ma è ancora sperimentale: TypeSafe non la consiglia in produzione. Solo PNG o JPEG, lati tra 280 e 1568 pixel, e l'immagine si paga come token di input.
+
+---
+
+## 9. In pratica — 🚧 TODO (placeholder)
 
 Slide segnaposto da completare: per ora solo il titolo di ogni passo.
 
-### 08a · 🚧 TODO — Creare account e API key
+### 09a · 🚧 TODO — Creare account e API key
 
-🎬 **ANIMAZIONE**: [`01-intro/08a-account.html`](./01-intro/08a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
-
-🎙️ **VOCE**:
-> _da scrivere_
-
-### 08b · 🚧 TODO — Esempio di codice
-
-🎬 **ANIMAZIONE**: [`01-intro/08b-codice.html`](./01-intro/08b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`01-intro/09a-account.html`](./01-intro/09a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
-### 08c · 🚧 TODO — Usiamo un gateway come Vercel
+### 09b · 🚧 TODO — Esempio di codice
 
-🎬 **ANIMAZIONE**: [`01-intro/08c-gateway.html`](./01-intro/08c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`01-intro/09b-codice.html`](./01-intro/09b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
-### 08d · 🚧 TODO — Demo time
+### 09c · 🚧 TODO — Usiamo un gateway come Vercel
 
-🎬 **ANIMAZIONE**: [`01-intro/08d-demo.html`](./01-intro/08d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`01-intro/09c-gateway.html`](./01-intro/09c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+
+🎙️ **VOCE**:
+> _da scrivere_
+
+### 09d · 🚧 TODO — Demo time
+
+🎬 **ANIMAZIONE**: [`01-intro/09d-demo.html`](./01-intro/09d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
@@ -433,6 +521,7 @@ Slide segnaposto da completare: per ora solo il titolo di ogni passo.
 
 - [ ] Crediti a pagamento attivi su Vercel AI Gateway (altrimenti le demo rispondono 403)
 - [ ] `npm run dev` avviato, tab aperte su `/1-jev/demo1` e `/1-jev/demo3`
+- [ ] Bonus immagini: tab aperta su `/3-jev-images/demo1`, ricontrollare "eye" sul cane, "a cat" e "the white car on the left" sulle auto
 - [ ] Ricontrollare in `/1-jev/demo3` "UGLY!!!" (Reject) e "you absolute muppet, great post 😂" (Needs review)
 - [x] Il valore dell'hook è quello reale di `/1-jev/demo1` (0.79–0.81, ottobre 2026): ricontrollarlo prima di registrare
 - [ ] Slide: tabella LLM vs Jev, tre tipi di domanda, pattern a tre fasce, limiti, costi
