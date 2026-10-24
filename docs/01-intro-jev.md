@@ -292,6 +292,17 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 ---
 
+## 8. In pratica — 🚧 TODO (placeholder)
+
+Sezione da scrivere. Le slide segnaposto, nell'ordine:
+
+- Creare account e API key: 🎬 [`01-intro/08a-account.html`](./01-intro/08a-account.html)
+- Esempio di codice: 🎬 [`01-intro/08b-codice.html`](./01-intro/08b-codice.html)
+- Usiamo un gateway come Vercel: 🎬 [`01-intro/08c-gateway.html`](./01-intro/08c-gateway.html)
+- Demo time: 🎬 [`01-intro/08d-demo.html`](./01-intro/08d-demo.html)
+
+---
+
 ## Fonti
 
 - [Jev (AI model) – Wikipedia](https://en.wikipedia.org/wiki/Jev_(AI_model))

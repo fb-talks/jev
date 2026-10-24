@@ -28,6 +28,10 @@ const slides = [
   "06a-limiti.html",
   "06b-costi.html",
   "07-chiusura.html",
+  "08a-account.html",
+  "08b-codice.html",
+  "08c-gateway.html",
+  "08d-demo.html",
 ];
 
 const file = location.pathname.split("/").pop();

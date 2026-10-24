@@ -395,6 +395,40 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ---
 
+## 8. In pratica — 🚧 TODO (placeholder)
+
+Slide segnaposto da completare: per ora solo il titolo di ogni passo.
+
+### 08a · 🚧 TODO — Creare account e API key
+
+🎬 **ANIMAZIONE**: [`01-intro/08a-account.html`](./01-intro/08a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
+
+🎙️ **VOCE**:
+> _da scrivere_
+
+### 08b · 🚧 TODO — Esempio di codice
+
+🎬 **ANIMAZIONE**: [`01-intro/08b-codice.html`](./01-intro/08b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
+
+🎙️ **VOCE**:
+> _da scrivere_
+
+### 08c · 🚧 TODO — Usiamo un gateway come Vercel
+
+🎬 **ANIMAZIONE**: [`01-intro/08c-gateway.html`](./01-intro/08c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+
+🎙️ **VOCE**:
+> _da scrivere_
+
+### 08d · 🚧 TODO — Demo time
+
+🎬 **ANIMAZIONE**: [`01-intro/08d-demo.html`](./01-intro/08d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
+
+🎙️ **VOCE**:
+> _da scrivere_
+
+---
+
 ## Checklist per la registrazione
 
 - [ ] Crediti a pagamento attivi su Vercel AI Gateway (altrimenti le demo rispondono 403)
