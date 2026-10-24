@@ -20,6 +20,12 @@ const groups = [
       { href: "/2-jev-and-gemini/demo5", title: "Demo 5 · CSV evaluation: Jev vs Gemini", text: "The same CSV of comments, moderated by both models: accuracy and time side by side." },
     ],
   },
+  {
+    title: "Jev and images",
+    demos: [
+      { href: "/3-jev-images/demo1", title: "Demo 1 · Where is it, and what is it?", text: "A box around the main subject of a photo, with its label and probability." },
+    ],
+  },
 ];
 
 export default function Home() {
