@@ -17,8 +17,8 @@
 
   .scene { position: absolute; inset: 0; animation-name: scene; }
 
-  .cases { position: absolute; left: 0; right: 0; top: 230px; display: flex; justify-content: center; gap: 48px; }
-  .case { width: 840px; height: 660px; padding: 34px 40px; display: flex; flex-direction: column; }
+  .cases { position: absolute; left: 0; right: 0; top: 200px; display: flex; justify-content: center; gap: 48px; }
+  .case { width: 840px; height: 610px; padding: 34px 40px; display: flex; flex-direction: column; }
   .tag { align-self: flex-start; font-size: 20px; padding: 6px 14px; }
   .tag em { font-style: normal; opacity: .5; font-weight: 400; }
 
@@ -51,9 +51,11 @@
   .case--a .verdict > * { animation-name: verdict-a; }
   .case--b .verdict > * { animation-name: verdict-b; }
 
-  .title-overlay { animation-name: title; }
-  .title-overlay .num { position: relative; }
-  .title-overlay .num::after { content: ""; position: absolute; left: 0; bottom: -18px; height: 14px; width: 0; border-radius: 7px; background: var(--pink); animation-name: underline; }
+  /* closing line under the two cards (the cards stay visible) */
+  .closing { position: absolute; left: 0; right: 0; top: 860px; text-align: center; font-family: var(--hand); font-size: 60px; opacity: 0; animation-name: title; }
+  .closing .dim { opacity: .45; }
+  .closing .num { position: relative; }
+  .closing .num::after { content: ""; position: absolute; left: 0; bottom: -12px; height: 10px; width: 0; border-radius: 5px; background: var(--pink); animation-name: underline; }
 
   /* ---------- Timeline (12s loop) ----------
      0–4%    scene appears
@@ -61,7 +63,8 @@
      24–30%  high confidence → ⛔ Reject
      32–40%  the friendly joke is typed  40–52%  the probabilities spread out
      52–58%  "they spread out"           58–64%  low confidence → 🕵️ Needs review
-     80–95%  title                       96–100% fade out, loop */
+     80–84%  closing line under the cards, underline 84–88%
+     94%     final frame                 96–100% fade out, loop */
   @keyframes scene { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
 
   @keyframes type-a { 0%, 4% { clip-path: inset(0 100% 0 0) } 12%, 100% { clip-path: inset(0 0 0 0) } }
@@ -75,7 +78,7 @@
   @keyframes spread { 0%, 52% { opacity: 0; transform: translateY(8px) rotate(-3deg) } 55%, 100% { opacity: 1; transform: rotate(-3deg) } }
   @keyframes verdict-b { 0%, 58% { opacity: 0; transform: scale(.85) } 61% { opacity: 1; transform: scale(1.06) } 64%, 100% { opacity: 1; transform: scale(1) } }
 
-  @keyframes title { 0%, 80% { opacity: 0 } 83%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+  @keyframes title { 0%, 80% { opacity: 0; transform: translateY(12px) } 84%, 100% { opacity: 1; transform: none } }
   @keyframes underline { 0%, 84% { width: 0 } 88%, 100% { width: 100% } }
 </style>
 </head>
@@ -117,10 +120,7 @@
       </section>
     </div>
 
-    <div class="title-overlay">
-      <div class="dim">When it isn't sure,</div>
-      <div class="num">it tells you with a number.</div>
-    </div>
+    <div class="closing"><span class="dim">When it isn't sure,</span> <span class="num">it tells you with a number.</span></div>
   </div>
 </div>
 <script src="_shared/anim.js"></script>

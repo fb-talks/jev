@@ -339,7 +339,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ## 6. Limiti e costi (8:15 – 9:15)
 
-🎬 **ANIMAZIONE**: [`01-intro/06-limiti-costi.html`](./01-intro/06-limiti-costi.html)
+### 06a · Limiti
+
+🎬 **ANIMAZIONE**: [`01-intro/06a-limiti.html`](./01-intro/06a-limiti.html). Le quattro card dei limiti (255 opzioni, 2–10 livelli, 64k token, scatola chiusa), poi il paper indipendente e "It doesn't replace an LLM: it works alongside it". Dura 9 s.
 
 🖥️ **SCHERMO**: slide "Limiti", un punto alla volta.
 
@@ -350,6 +352,10 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > È una **scatola chiusa**: niente pesi, niente architettura pubblicata.
 > E le prestazioni dichiarate, dai 70 ai 500 millisecondi, da 40 a 200 volte più veloce di un LLM, vengono dai test dello stesso team. Lo dicono anche loro: i numeri più alti della home page sono il caso migliore. Un paper indipendente lo trova **alla pari** con gli LLM: più veloce, ma senza grandi vantaggi oltre alle probabilità leggibili.
 
+### 06b · Costi
+
+🎬 **ANIMAZIONE**: [`01-intro/06b-costi.html`](./01-intro/06b-costi.html). Il listino (input $0.042, output $0), il calcolo fino a $1.26, poi lo state pagato una volta per tre domande. Dura 9 s.
+
 🖥️ **SCHERMO**: slide "Costi": prima il listino `input: $0,042 / milione di token` · `output: $0`, poi il calcolo.
 
 🎙️ **VOCE**:
@@ -357,6 +363,8 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Per confronto, un LLM costa da 20 centesimi a 10 dollari per milione di token in input, e l'output costa circa 5 volte di più.
 > E lo state si paga una volta per richiesta, non per domanda: conviene mettere più domande nella stessa chiamata.
 > Una chiamata piccola sono circa 300 token. Centomila commenti moderati sono trenta milioni di token: circa un dollaro e venticinque.
+
+### Vercel AI Gateway (nessuna slide)
 
 🖥️ **SCHERMO**: dashboard di Vercel AI Gateway.
 

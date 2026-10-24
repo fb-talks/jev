@@ -21,7 +21,7 @@
 
   /* ---------- The comment ---------- */
   .comment {
-    position: absolute; left: 50%; top: 110px; width: 1240px; transform: translateX(-50%);
+    position: absolute; left: 50%; top: 80px; width: 1240px; transform: translateX(-50%);
     display: flex; align-items: center; gap: 28px; padding: 30px 36px;
     background: #fff; border: 1px solid #edf0f7; border-radius: 24px;
     box-shadow: 0 20px 40px -28px rgba(0,0,0,.35);
@@ -40,9 +40,9 @@
   }
 
   /* ---------- The two panels ---------- */
-  .panels { position: absolute; left: 0; right: 0; top: 335px; display: flex; justify-content: center; gap: 48px; }
+  .panels { position: absolute; left: 0; right: 0; top: 260px; display: flex; justify-content: center; gap: 48px; }
   .panel {
-    position: relative; width: 860px; height: 600px; padding: 36px 40px;
+    position: relative; width: 860px; height: 580px; padding: 32px 40px;
     background: #fff; border-radius: 24px; border: 1px solid #edf0f7;
     display: flex; flex-direction: column; animation-name: panel;
   }
@@ -53,10 +53,10 @@
   .panel--jev .tag::after { background: var(--pink); }
   .verb { font-size: 26px; opacity: .55; }
 
-  .screen { flex: 1; border-radius: 16px; background: var(--stage); padding: 28px 30px; position: relative; overflow: hidden; }
+  .screen { flex: 1; border-radius: 16px; background: var(--stage); padding: 22px 30px; position: relative; overflow: hidden; }
 
   /* LLM: a long answer, written line by line */
-  .prose { font-size: 27px; line-height: 1.55; }
+  .prose { font-size: 27px; line-height: 1.45; }
   .prose span { display: block; white-space: nowrap; clip-path: inset(0 100% 0 0); animation-timing-function: linear; }
   .prose span:nth-child(1) { animation-name: l1; }
   .prose span:nth-child(2) { animation-name: l2; }
@@ -99,21 +99,18 @@
   /* ---------- Cursor ---------- */
   .cursor { position: absolute; left: 0; top: 0; z-index: 10; pointer-events: none; animation-name: cursor; animation-timing-function: cubic-bezier(.55,0,.35,1); }
 
-  /* ---------- Closing title ---------- */
-  .title {
-    position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
-    background: rgba(250,251,255,.92); opacity: 0; animation-name: title;
-    font-family: var(--hand); font-size: 120px; line-height: 1.1;
-  }
+  /* ---------- Closing line, under the panels (the panels stay visible) ---------- */
+  .title { position: absolute; left: 0; right: 0; top: 868px; text-align: center; font-family: var(--hand); font-size: 64px; opacity: 0; animation-name: title; }
   .title .jev { position: relative; }
-  .title .jev::after { content: ""; position: absolute; left: 0; bottom: -26px; height: 14px; width: 0; border-radius: 7px; background: var(--pink); animation-name: underline; animation-duration: var(--loop); animation-iteration-count: infinite; }
+  .title .jev::after { content: ""; position: absolute; left: 0; bottom: -12px; height: 10px; width: 0; border-radius: 5px; background: var(--pink); animation-name: underline; animation-duration: var(--loop); animation-iteration-count: infinite; }
   .title .llm { opacity: .45; }
 
   /* ---------- Timeline (12s loop) ----------
      0–3%    comment appears          3–14%  comment is typed
      14–19%  cursor clicks Analyze    19%    both models start
      20–27%  Jev answers: 80%         21–78% the LLM keeps writing
-     82–96%  title                    96–100% fade out, loop */
+     82–86%  closing line under the panels, underline 86–90%
+     94%     final frame              96–100% fade out, loop */
   @keyframes in-comment { 0% { opacity: 0; transform: translate(-50%, 20px) } 3%, 96% { opacity: 1; transform: translate(-50%, 0) } 100% { opacity: 0; transform: translate(-50%, 0) } }
   @keyframes type { 0%, 3% { clip-path: inset(0 100% 0 0) } 14%, 100% { clip-path: inset(0 0 0 0) } }
   @keyframes caret-comment { 0%, 2% { opacity: 0 } 3%, 16% { opacity: 1 } 16.1%, 100% { opacity: 0 } }
@@ -140,12 +137,12 @@
   @keyframes cursor {
     0%, 8% { transform: translate(1100px, 560px); opacity: 0 }
     10% { transform: translate(1100px, 560px); opacity: 1 }
-    16.5% { transform: translate(1480px, 205px) scale(1) }
-    17.5% { transform: translate(1480px, 205px) scale(.82) }
-    18.5% { transform: translate(1480px, 205px) scale(1); opacity: 1 }
-    24%, 100% { transform: translate(1520px, 270px); opacity: 0 }
+    16.5% { transform: translate(1480px, 175px) scale(1) }
+    17.5% { transform: translate(1480px, 175px) scale(.82) }
+    18.5% { transform: translate(1480px, 175px) scale(1); opacity: 1 }
+    24%, 100% { transform: translate(1520px, 240px); opacity: 0 }
   }
-  @keyframes title { 0%, 82% { opacity: 0 } 85%, 95% { opacity: 1 } 98%, 100% { opacity: 0 } }
+  @keyframes title { 0%, 82% { opacity: 0; transform: translateY(12px) } 86%, 100% { opacity: 1; transform: none } }
   @keyframes underline { 0%, 86% { width: 0 } 90%, 100% { width: 100% } }
 </style>
 </head>
@@ -200,10 +197,7 @@
     <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3 L4 19 L8.5 15 L11.5 21.5 L14 20.3 L11.2 14 L17 14 Z" fill="#fff" stroke="#1f1f1f" stroke-width="1.6" stroke-linejoin="round"/></svg>
   </div>
 
-  <div class="title">
-    <div class="llm">An LLM writes.</div>
-    <div class="jev">Jev chooses.</div>
-  </div>
+  <div class="title"><span class="llm">An LLM writes.</span> <span class="jev">Jev chooses.</span></div>
 </div>
 
 <script src="_shared/anim.js"></script>

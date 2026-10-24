@@ -25,7 +25,8 @@ const slides = [
   "05e-scommettere.html",
   "05f-scommessa.html",
   "05g-quando-sbaglia.html",
-  "06-limiti-costi.html",
+  "06a-limiti.html",
+  "06b-costi.html",
   "07-chiusura.html",
 ];
 

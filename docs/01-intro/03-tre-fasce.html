@@ -74,7 +74,7 @@
   .p-b { background: var(--green); animation-name: p-b, p-b-color; }
 
   /* ---------- Lanes ---------- */
-  .lane { position: absolute; top: 560px; width: 480px; height: 400px; padding: 18px 22px; }
+  .lane { position: absolute; top: 560px; width: 480px; height: 345px; padding: 18px 22px; }
   .lane h3 { margin: 0; font-family: var(--hand); font-size: 36px; line-height: 1.1; }
   .lane p { margin: 2px 0 0; font-size: 17px; opacity: .55; }
   .lane::before { content: ""; position: absolute; left: 22px; top: 0; width: 80px; height: 6px; border-radius: 0 0 4px 4px; }
@@ -84,7 +84,9 @@
 
   /* ---------- Messages ---------- */
   .note { position: absolute; left: 50%; top: 196px; transform: translateX(-50%); font-size: 30px; padding: 16px 30px; border-color: var(--pink); opacity: 0; animation-name: note; }
-  .title-overlay { animation-name: title; font-size: 96px; }
+  /* closing line under the lanes (the lanes stay visible) */
+  .closing { position: absolute; left: 0; right: 0; top: 928px; text-align: center; font-family: var(--hand); font-size: 56px; opacity: 0; animation-name: title; }
+  .closing .dim { opacity: .45; }
 
   /* ---------- Timeline (14s loop) ----------
      each item: appears in the centre (a), drops a pin on the axis (a+2..a+4), flies to its lane (a+4..a+7)
@@ -92,7 +94,7 @@
      50–60%  cursor drags the 0.8 threshold to 0.9
      60–66%  B (0.84) moves from "automatic" to "suggest", E moves up a slot
      63–82%  "no new call to Jev"
-     84–96%  closing title, 96–100% fade out */
+     84–88%  closing line under the lanes · 94% final frame · 96–100% fade out */
   @keyframes i-a { 0%, 3% { opacity: 0; transform: translate(-560px, -450px) scale(.9) } 4%, 7% { opacity: 1; transform: translate(-560px, -450px) scale(1) } 10%, 96% { opacity: 1; transform: none } 100% { opacity: 0; transform: none } }
   @keyframes i-b { 0%, 12% { opacity: 0; transform: translate(-560px, -535px) scale(.9) } 13%, 16% { opacity: 1; transform: translate(-560px, -535px) scale(1) } 19%, 60% { opacity: 1; transform: none } 66%, 96% { opacity: 1; transform: translate(-560px, 0) } 100% { opacity: 0; transform: translate(-560px, 0) } }
   @keyframes i-c { 0%, 21% { opacity: 0; transform: translate(0, -450px) scale(.9) } 22%, 25% { opacity: 1; transform: translate(0, -450px) scale(1) } 28%, 96% { opacity: 1; transform: none } 100% { opacity: 0; transform: none } }
@@ -125,7 +127,7 @@
   }
 
   @keyframes note { 0%, 63% { opacity: 0; transform: translate(-50%, 12px) } 65%, 82% { opacity: 1; transform: translate(-50%, 0) } 84%, 100% { opacity: 0; transform: translate(-50%, 0) } }
-  @keyframes title { 0%, 84% { opacity: 0 } 87%, 96% { opacity: 1 } 99%, 100% { opacity: 0 } }
+  @keyframes title { 0%, 84% { opacity: 0; transform: translateY(12px) } 88%, 100% { opacity: 1; transform: none } }
 </style>
 </head>
 <body>
@@ -172,10 +174,7 @@
     <svg width="44" height="44" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3 L4 19 L8.5 15 L11.5 21.5 L14 20.3 L11.2 14 L17 14 Z" fill="#fff" stroke="#1f1f1f" stroke-width="1.6" stroke-linejoin="round"/></svg>
   </div>
 
-  <div class="title-overlay">
-    <div class="dim">Jev gives the probabilities.</div>
-    <div><span class="underline-pink">Your code decides.</span></div>
-  </div>
+  <div class="closing"><span class="dim">Jev gives the probabilities.</span> <span class="underline-pink">Your code decides.</span></div>
 </div>
 <script src="_shared/anim.js"></script>
 </body>

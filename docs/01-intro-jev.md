@@ -251,9 +251,9 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 ## 6. Limiti e costi
 
-🎬 [`01-intro/06-limiti-costi.html`](./01-intro/06-limiti-costi.html)
-
 ### Limiti
+
+🎬 [`01-intro/06a-limiti.html`](./01-intro/06a-limiti.html)
 
 - fino a **255 opzioni** per una `choice` e **2–10 livelli** per uno `score`;
 - **64k token** in input, di cui 32k per state + domanda più lunga;
@@ -263,6 +263,8 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 **Quindi:** non sostituisce un LLM, lo **affianca** per le micro-decisioni ad alto volume, dove servono un tipo e una confidenza, non una frase.
 
 ### Costi e accesso
+
+🎬 [`01-intro/06b-costi.html`](./01-intro/06b-costi.html)
 
 - **si paga solo l'input**: **0,042 $ per milione di token**. L'output è gratis: TypeSafe lo definisce "too cheap to meter", troppo economico per misurarlo. Jev non scrive testo token per token, restituisce tutte le probabilità in un colpo solo;
 - per confronto, gli LLM costano da 0,20 a 10 $ per milione di token in input, e l'output costa circa 5 volte di più;
