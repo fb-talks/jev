@@ -2,7 +2,7 @@
 
 Appunti per capire (e rispiegare) cos'è Jev di TypeSafe AI, come ragiona e perché "sa" le cose.
 
-Le sezioni seguono l'ordine delle slide in [`01-intro/`](./01-intro/) e del [copione del video](./01-intro-jev-video-script.md): sotto ogni titolo c'è il link alla slide corrispondente.
+Le sezioni seguono l'ordine delle slide in [`01-intro/`](./01-intro/) e del [copione del video](./01-intro-jev-video-script.md): sotto ogni titolo c'è il link alla slide corrispondente. Le slide sono anche online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/).
 
 ---
 
@@ -186,7 +186,7 @@ Il significato è la posizione, e la posizione l'ha imparata dai contesti.
 "che brutto film"     → brutto guarda "film"  → critica a un'opera   → neutro
 ```
 
-Alla fine l'intera frase diventa un'unica rappresentazione: un punto che, per "SEI BRUTTO", cade nella zona delle offese.
+Da sola, "brutto" sta a metà strada. È il contesto a spostarla: vicino a "sei" finisce tra le offese, vicino a "tempo" tra il meteo, vicino a "film" tra le critiche. Stessa parola, tre posti diversi.
 
 ### Passo 4 — Anche le tue opzioni sono testo
 

@@ -21,7 +21,6 @@ const slides = [
   "05a-parola-dopo.html",
   "05b-coordinate.html",
   "05c-attention.html",
-  "05c-attention-b.html",
   "05d-opzioni.html",
   "05e-scommettere.html",
   "05f-quando-sbaglia.html",

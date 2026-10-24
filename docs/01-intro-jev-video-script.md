@@ -2,6 +2,8 @@
 
 Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **9–10 minuti**.
 
+Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra).
+
 Legenda:
 - 🎙️ **VOCE**: il parlato (in camera o fuori campo)
 - 🖥️ **SCHERMO**: cosa si vede
@@ -247,9 +249,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### Passo 3 — Il contesto cambia il significato
 
-🎬 **ANIMAZIONE**: [`01-intro/05c-attention.html`](./01-intro/05c-attention.html)
+🎬 **ANIMAZIONE**: [`01-intro/05c-attention.html`](./01-intro/05c-attention.html). A destra la mappa con tre zone (insults, weather, reviews) e "ugly" da sola al centro, in grigio: ambigua. A sinistra le tre frasi, una alla volta, con l'arco di attention: a ogni frase una copia di "ugly" vola in una zona diversa. Finale: "Same word, three places". Dura 16 s.
 
-🖥️ **SCHERMO**: tre frasi, una freccia da "brutto" alla parola che "guarda".
+🖥️ **SCHERMO**: tre frasi, una freccia da "brutto" alla parola che "guarda", e "brutto" che finisce in tre posti diversi della mappa.
 
 ```
 "SEI brutto"          → guarda "sei"   → rivolto a una persona → offesa
@@ -260,7 +262,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 🎙️ **VOCE**:
 > Ma "brutto" da solo non è offensivo. Con il meccanismo di **attention**, ogni parola guarda le altre della frase e si aggiorna.
 > "Sei brutto" è rivolto a una persona. "Il tempo è brutto" parla del meteo. "Che brutto film" è una critica.
-> Alla fine tutta la frase diventa un unico punto. E "sei brutto" cade nella zona delle offese.
+> Da sola, "brutto" sta a metà strada. È il contesto a spostarla: vicino a "sei" finisce tra le offese, vicino a "tempo" tra il meteo, vicino a "film" tra le critiche. Stessa parola, tre posti diversi.
 
 ### Passo 4 — Anche le opzioni sono testo
 
