@@ -55,12 +55,16 @@ Legenda:
 
 ## 2. Come si usa: state + domande (1:45 – 3:30)
 
+### 02a · State + domande
+
 🎙️ **VOCE**:
 > Usarlo è semplice. Gli mandate due cose.
 > Uno **state**: il testo da valutare. Può essere una stringa, un oggetto JSON o un array.
 > E una o più **domande**. Tutte a scelta multipla.
 
 🎬 **ANIMAZIONE**: [`01-intro/02a-state-domande.html`](./01-intro/02a-state-domande.html). Il ticket di supporto come flusso: state e tre domande entrano in Jev in parallelo, escono tre risposte.
+
+### 02b · I tre tipi di domanda
 
 🎬 **ANIMAZIONE**: [`01-intro/02b-tipi-domanda.html`](./01-intro/02b-tipi-domanda.html). I tre tipi, una card alla volta, ognuna con un mini esempio dal ticket.
 
@@ -82,6 +86,8 @@ Legenda:
 
 🎙️ **VOCE**:
 > Sotto ogni tipo vedete i campi che Jev vi restituisce: `noul`, `choice` o `score`, e per choice e score anche **probabilities** e **confidence**. Tra poco vediamo cosa contengono, con un esempio vero.
+
+### 02c · Il codice del ticket
 
 🎬 **ANIMAZIONE**: [`01-intro/02c-codice.html`](./01-intro/02c-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
 
@@ -123,6 +129,8 @@ answers.urgent.noul;         // 0.92
 > Frustrazione: uno virgola zero quattro, cioè "frustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
 > Urgente: novantadue per cento.
 
+### 02d · noul
+
 🎬 **ANIMAZIONE**: [`01-intro/02d-noul.html`](./01-intro/02d-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
 
 🎙️ **VOCE**:
@@ -130,6 +138,8 @@ answers.urgent.noul;         // 0.92
 > Una **noul** restituisce un solo numero: la probabilità che la risposta sia sì, da zero a uno. Per questo ticket, zero virgola novantadue. Per un ticket tranquillo, "quando avete un momento, gli abbonamenti annuali hanno uno sconto?", zero virgola diciassette.
 > Niente probabilities, niente confidence: il numero stesso dice quanto Jev è sicuro. Vicino a uno, sicuramente sì; vicino a zero, sicuramente no; intorno a metà, non lo sa.
 > E dove inizia il "sì" lo decide il vostro codice: per esempio, sopra zero virgola otto avviso il team.
+
+### 02e · choice
 
 🎬 **ANIMAZIONE**: [`01-intro/02e-choice.html`](./01-intro/02e-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
 
@@ -140,6 +150,8 @@ answers.urgent.noul;         // 0.92
 > **confidence**: quanto la scommessa è concentrata, da zero a uno. Qui è uno, perché è tutta su un'opzione. Ma se arriva un ticket fuori tema, "la T-shirt Acme è gratis con il piano annuale?", nessun team è quello giusto: la scommessa si divide, settantadue per cento sales e ventotto billing, e la confidence scende a zero virgola cinquantotto. Notate che non è la probabilità più alta: misura quanto è concentrata.
 > E vi dice **quando fidarvi**: se è alta, il codice può agire da solo; se è bassa, meglio chiedere a una persona. È il pattern che vediamo tra poco.
 
+### 02f · score
+
 🎬 **ANIMAZIONE**: [`01-intro/02f-score.html`](./01-intro/02f-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
 
 🎙️ **VOCE**:
@@ -149,6 +161,8 @@ answers.urgent.noul;         // 0.92
 > Quindi lo score è una **posizione sulla mia scala**, non una percentuale: "frustrato ma educato", appena spostato verso "molto arrabbiato". E l'intervallo dipende da quanti livelli scrivete: con tre va da zero a due, con cinque da zero a quattro. Se vi serve un valore da zero a uno, dividete per l'ultimo livello, come fa la demo 3 con la tossicità.
 > È comodo proprio perché è un numero solo: lo potete ordinare o metterci una soglia. Per esempio, sopra uno virgola cinque passo il ticket a un responsabile.
 > E la confidence, zero virgola ottantadue, funziona come nella choice: la scommessa è concentrata, posso fidarmi.
+
+### Due dettagli (in camera)
 
 🎙️ **VOCE** (in camera):
 > Due dettagli importanti.
@@ -217,7 +231,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Premessa onesta: TypeSafe non ha pubblicato architettura né paper tecnico. Quella che vi racconto è la ricostruzione più probabile, coerente con come funzionano i modelli di questo tipo. Cinque passi.
 > I primi quattro non riguardano Jev in sé, ma il **modello linguistico di base** su cui Jev è costruito: è lì che nasce la conoscenza. Solo il quinto è l'addestramento specifico di Jev.
 
-### Passo 1 — Indovinare la parola dopo
+### 05a · Passo 1 — Indovinare la parola dopo
 
 🎬 **ANIMAZIONE**: [`01-intro/05a-parola-dopo.html`](./01-intro/05a-parola-dopo.html)
 
@@ -234,7 +248,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Nessuno gli scrive mai "brutto uguale offensivo". Ma per indovinare bene deve imparare **in che situazioni compaiono le parole**. E "sei brutto" compare quasi sempre vicino a litigi, persone ferite, scuse.
 > Jev parte da un modello che ha già fatto questo lavoro, quindi **eredita** tutto quello che ha imparato. Ecco perché sa che "sei brutto" è un'offesa senza che nessuno gliel'abbia insegnato.
 
-### Passo 2 — Le parole diventano coordinate
+### 05b · Passo 2 — Le parole diventano coordinate
 
 🎬 **ANIMAZIONE**: [`01-intro/05b-coordinate.html`](./01-intro/05b-coordinate.html)
 
@@ -247,7 +261,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > E "you're ugly" finisce vicino a "insulto" e lontano da "complimenti": ecco perché Jev la riconosce come un'offesa.
 > **Il significato è la posizione.**
 
-### Passo 3 — Il contesto cambia il significato
+### 05c · Passo 3 — Il contesto cambia il significato
 
 🎬 **ANIMAZIONE**: [`01-intro/05c-attention.html`](./01-intro/05c-attention.html). A destra la mappa con tre zone (insults, weather, reviews) e "ugly" da sola al centro, in grigio: ambigua. A sinistra le tre frasi, una alla volta, con l'arco di attention: a ogni frase una copia di "ugly" vola in una zona diversa. Finale: "Same word, three places". Dura 16 s.
 
@@ -264,7 +278,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > "Sei brutto" è rivolto a una persona. "Il tempo è brutto" parla del meteo. "Che brutto film" è una critica.
 > Da sola, "brutto" sta a metà strada. È il contesto a spostarla: vicino a "sei" finisce tra le offese, vicino a "tempo" tra il meteo, vicino a "film" tra le critiche. Stessa parola, tre posti diversi.
 
-### Passo 4 — Anche le opzioni sono testo
+### 05d · Passo 4 — Anche le opzioni sono testo
 
 🎬 **ANIMAZIONE**: [`01-intro/05d-opzioni.html`](./01-intro/05d-opzioni.html)
 
@@ -277,7 +291,21 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### Passo 5 — Imparare a scommettere
 
-🎬 **ANIMAZIONE**: [`01-intro/05e-scommettere.html`](./01-intro/05e-scommettere.html)
+#### 05e · L'addestramento e le due lezioni
+
+🎬 **ANIMAZIONE**: [`01-intro/05e-scommettere.html`](./01-intro/05e-scommettere.html). Il badge dell'addestramento (dati sintetici + RLCD), poi le due lezioni: rispondere solo scegliendo (la matita scrive, viene cancellata, diventa una casella) e probabilità oneste ("se dice 80%" → 10 prove, 8 giuste).
+
+🖥️ **SCHERMO**: l'addestramento e le due lezioni.
+
+🎙️ **VOCE**:
+> Qui entra la parte specifica di TypeSafe. Addestrano Jev solo con **dati sintetici** e con un metodo che chiamano **RLCD**: Reinforcement Learning for Calibrated Decisions.
+> Questo addestramento non gli insegna cosa è offensivo: lo sa già. Gli insegna due cose.
+> A rispondere **solo** scegliendo tra le opzioni, invece di scrivere.
+> E a dare probabilità **oneste**: se dice ottanta per cento, deve avere ragione circa otto volte su dieci.
+
+#### 05f · Un esempio reale: "UGLY!!!"
+
+🎬 **ANIMAZIONE**: [`01-intro/05f-scommessa.html`](./01-intro/05f-scommessa.html). L'esempio reale: le quattro barre di "UGLY!!!" che si riempiono, poi "An honest bet on every option." Dura 8 s.
 
 🖥️ **SCHERMO**: le barre che si riempiono.
 
@@ -290,16 +318,11 @@ else                          codaManuale();  // o escalation a un LLM più gran
 ```
 
 🎙️ **VOCE**:
-> Qui entra la parte specifica di TypeSafe. Addestrano Jev solo con **dati sintetici** e con un metodo che chiamano **RLCD**: Reinforcement Learning for Calibrated Decisions.
-> Questo addestramento non gli insegna cosa è offensivo: lo sa già. Gli insegna due cose.
-> A rispondere **solo** scegliendo tra le opzioni, invece di scrivere.
-> E a dare probabilità **oneste**: se dice ottanta per cento, deve avere ragione circa otto volte su dieci.
->
 > Un esempio reale. Su "you're ugly" Jev è sicuro al cento per cento: nessun dubbio. Su "UGLY!!!", che non dice a chi è rivolto, lascia un po' di margine: ottantasei per cento insulti, dieci polemico, quattro critico. Non risponde sempre "sicurissimo": scommette in proporzione a quanto è chiaro il testo.
 
-### E quando sbaglia?
+### 05g · E quando sbaglia?
 
-🎬 **ANIMAZIONE**: [`01-intro/05f-quando-sbaglia.html`](./01-intro/05f-quando-sbaglia.html)
+🎬 **ANIMAZIONE**: [`01-intro/05g-quando-sbaglia.html`](./01-intro/05g-quando-sbaglia.html)
 
 🖥️ **SCHERMO**: `/1-jev/demo3`. Prima "UGLY!!!": Insults 86%, badge **Reject**. Poi "you absolute muppet, great post 😂": le barre si distribuiscono (6 · 7 · 34 · 53), confidenza 0.32, badge **Needs review**.
 

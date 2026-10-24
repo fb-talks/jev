@@ -23,7 +23,8 @@ const slides = [
   "05c-attention.html",
   "05d-opzioni.html",
   "05e-scommettere.html",
-  "05f-quando-sbaglia.html",
+  "05f-scommessa.html",
+  "05g-quando-sbaglia.html",
   "06-limiti-costi.html",
   "07-chiusura.html",
 ];

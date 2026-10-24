@@ -6,14 +6,13 @@
 <title>05e · Step 5 — Learning to bet</title>
 <link rel="stylesheet" href="_shared/anim.css">
 <!--
-  Animation for "Step 5 — Jev's training teaches it to bet" (docs/01-intro-jev.md, section 7).
+  Animation for "Step 5 — Jev's training teaches it to bet" (docs/01-intro-jev.md, section 7), first part:
+  the training and its two lessons. The bets on "UGLY!!!" follow in 05f-scommessa.html.
   Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
   The 10 trials (8 right, 2 wrong) illustrate what "calibrated" means: they are not real data.
-  The bets on "UGLY!!!" are a real Jev answer (October 2026, toxicity question of /1-jev/demo3): 0 · 4 · 10 · 86.
-  ("you're ugly" and similar direct insults give 100% Insults.)
 -->
 <style>
-  :root { --loop: 14s; }
+  :root { --loop: 12s; }
 
   .scene { position: absolute; inset: 0; animation-name: scene; }
 
@@ -27,7 +26,7 @@
   .already { margin-top: 18px; font-family: var(--hand); font-size: 30px; opacity: 0; animation-name: already; }
 
   /* ---------- The two lessons ---------- */
-  .lessons { position: absolute; left: 0; right: 0; top: 400px; display: flex; justify-content: center; gap: 48px; animation-name: lessons; }
+  .lessons { position: absolute; left: 0; right: 0; top: 400px; display: flex; justify-content: center; gap: 48px; }
   .lesson { width: 840px; height: 540px; padding: 34px 38px; display: flex; flex-direction: column; opacity: 0; }
   .lesson:nth-child(1) { animation-name: lesson1; }
   .lesson:nth-child(2) { animation-name: lesson2; }
@@ -61,46 +60,28 @@
   .hit { margin-top: 26px; font-size: 28px; opacity: 0; animation-name: hit; }
   .hit b { color: var(--green); }
 
-  /* ---------- Result: the bets on "UGLY!!!" ---------- */
-  .result { position: absolute; left: 50%; top: 290px; width: 1180px; padding: 44px 56px; transform: translateX(-50%); opacity: 0; animation-name: result; }
-  .result h3 { margin: 0 0 30px; font-family: var(--hand); font-size: 64px; font-weight: 400; }
-  .bet { display: flex; align-items: center; gap: 26px; margin-bottom: 22px; font-size: 30px; }
-  .bet .lbl { width: 300px; }
-  .bet .bar { flex: 1; height: 34px; }
-  .bet .bar > i { width: 0; animation-name: fill; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
-  .bet .pct { width: 110px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; opacity: 0; animation-name: pct; }
-  .bet--top .lbl, .bet--top .pct { font-weight: 700; }
-  .bet--top .pct { color: var(--pink); }
-  .note { position: absolute; left: 0; right: 0; top: 820px; text-align: center; font-family: var(--hand); font-size: 46px; opacity: 0; animation-name: note; }
+  /* ---------- Timeline (12s loop) ----------
+     0–3.5%  scene appears              3.5–8% training badge: synthetic data + RLCD
+     9–14%   "it doesn't learn what's offensive: it already knows"
+     14–42%  lesson 1: the pencil writes, gets crossed out, becomes a checkbox
+     42–78%  lesson 2: "says 80%" → 10 trials, 8 right and 2 wrong (staggered 0.28 s each)
+     78–94%  final frame: badge + both lessons · 96–100% fade out, loop */
+  @keyframes scene { 0% { opacity: 0 } 3.5%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes training { 0%, 3.5% { opacity: 0; transform: translate(-50%, 14px) } 8%, 100% { opacity: 1; transform: translate(-50%, 0) } }
+  @keyframes already { 0%, 9% { opacity: 0 } 14%, 100% { opacity: .7 } }
+  @keyframes lesson1 { 0%, 14% { opacity: 0; transform: translateY(16px) } 17.5%, 100% { opacity: 1; transform: none } }
+  @keyframes lesson2 { 0%, 42% { opacity: 0; transform: translateY(16px) } 45.5%, 100% { opacity: 1; transform: none } }
 
-  /* ---------- Timeline (14s loop) ----------
-     0–3%    scene appears              3–8%   training badge: synthetic data + RLCD
-     8–14%   "it doesn't learn what's offensive: it already knows"
-     14–38%  lesson 1: the pencil writes, gets crossed out, becomes a checkbox
-     38–66%  lesson 2: "says 80%" → 10 trials, 8 right and 2 wrong
-     70–94%  the bets on "UGLY!!!": 0% · 4% · 10% · 86%
-     96–100% fade out, loop */
-  @keyframes scene { 0% { opacity: 0 } 3%, 96% { opacity: 1 } 100% { opacity: 0 } }
-  @keyframes training { 0%, 3% { opacity: 0; transform: translate(-50%, 14px) } 7%, 68% { opacity: 1; transform: translate(-50%, 0) } 72%, 100% { opacity: 0; transform: translate(-50%, 0) } }
-  @keyframes already { 0%, 8% { opacity: 0 } 12%, 100% { opacity: .7 } }
-  @keyframes lessons { 0%, 68% { opacity: 1 } 72%, 100% { opacity: 0 } }
-  @keyframes lesson1 { 0%, 12% { opacity: 0; transform: translateY(16px) } 15%, 100% { opacity: 1; transform: none } }
-  @keyframes lesson2 { 0%, 36% { opacity: 0; transform: translateY(16px) } 39%, 100% { opacity: 1; transform: none } }
+  @keyframes write { 0%, 17.5% { clip-path: inset(0 100% 0 0) } 28%, 100% { clip-path: inset(0 0 0 0) } }
+  @keyframes pencil { 0%, 17.5% { transform: translateX(0); opacity: 1 } 28% { transform: translateX(520px); opacity: 1 } 30.5%, 100% { transform: translateX(520px); opacity: 0 } }
+  @keyframes strike { 0%, 29% { width: 0 } 32.5%, 100% { width: calc(100% + 12px) } }
+  @keyframes nope { 0%, 31.5% { opacity: 0; transform: scale(.4) } 34%, 100% { opacity: 1; transform: scale(1) } }
+  @keyframes choice { 0%, 34% { opacity: 0; transform: translateX(-12px) } 37.5%, 100% { opacity: 1; transform: none } }
+  @keyframes tick { 0%, 39.5% { background: #fff } 42%, 100% { background: var(--pink); border-color: var(--pink) } }
 
-  @keyframes write { 0%, 15% { clip-path: inset(0 100% 0 0) } 24%, 100% { clip-path: inset(0 0 0 0) } }
-  @keyframes pencil { 0%, 15% { transform: translateX(0); opacity: 1 } 24% { transform: translateX(520px); opacity: 1 } 26%, 100% { transform: translateX(520px); opacity: 0 } }
-  @keyframes strike { 0%, 25% { width: 0 } 28%, 100% { width: calc(100% + 12px) } }
-  @keyframes nope { 0%, 27% { opacity: 0; transform: scale(.4) } 29%, 100% { opacity: 1; transform: scale(1) } }
-  @keyframes choice { 0%, 29% { opacity: 0; transform: translateX(-12px) } 32%, 100% { opacity: 1; transform: none } }
-  @keyframes tick { 0%, 34% { background: #fff } 36%, 100% { background: var(--pink); border-color: var(--pink) } }
-
-  @keyframes trial { 0%, 42% { opacity: 0; transform: scale(.4) } 44% { opacity: 1; transform: scale(1.15) } 46%, 80% { opacity: 1; transform: scale(1) } 84%, 100% { opacity: 0 } }
-  @keyframes hit { 0%, 62% { opacity: 0 } 65%, 100% { opacity: 1 } }
-
-  @keyframes result { 0%, 70% { opacity: 0; transform: translate(-50%, 20px) } 73%, 100% { opacity: 1; transform: translate(-50%, 0) } }
-  @keyframes fill { 0%, 73% { width: 0 } 83%, 100% { width: var(--w) } }
-  @keyframes pct { 0%, 81% { opacity: 0 } 84%, 100% { opacity: 1 } }
-  @keyframes note { 0%, 85% { opacity: 0; transform: translateY(12px) } 88%, 100% { opacity: 1; transform: none } }
+  /* each trial is delayed by --i × 0.28 s: the last one (i = 9) pops at ~72% */
+  @keyframes trial { 0%, 49% { opacity: 0; transform: scale(.4) } 51% { opacity: 1; transform: scale(1.15) } 53%, 100% { opacity: 1; transform: scale(1) } }
+  @keyframes hit { 0%, 74% { opacity: 0 } 78%, 100% { opacity: 1 } }
 </style>
 </head>
 <body>
@@ -158,15 +139,6 @@
         </div>
       </section>
     </div>
-
-    <section class="card result">
-      <h3>"UGLY!!!"</h3>
-      <div class="bet"><span class="lbl">0 · Polite</span><div class="bar bar--grey"><i style="--w: 0%"></i></div><span class="pct">0%</span></div>
-      <div class="bet"><span class="lbl">1 · Critical</span><div class="bar bar--grey"><i style="--w: 4%"></i></div><span class="pct">4%</span></div>
-      <div class="bet"><span class="lbl">2 · Combative</span><div class="bar bar--grey"><i style="--w: 10%"></i></div><span class="pct">10%</span></div>
-      <div class="bet bet--top"><span class="lbl">3 · Insults</span><div class="bar"><i style="--w: 86%"></i></div><span class="pct">86%</span></div>
-    </section>
-    <div class="note">An honest bet on every option.</div>
   </div>
 </div>
 <script src="_shared/anim.js"></script>

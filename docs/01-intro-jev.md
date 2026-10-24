@@ -212,6 +212,8 @@ Qui entra la parte specifica di TypeSafe: **solo dati sintetici** (generati arti
 - a rispondere **solo** scegliendo tra le opzioni date, invece di scrivere;
 - a dare probabilità **oneste** (calibrate): se dice 80%, deve avere ragione circa 8 volte su 10.
 
+🎬 [`01-intro/05f-scommessa.html`](./01-intro/05f-scommessa.html)
+
 ```
 "UGLY!!!"
   0 Cortese         ▏ 0%
@@ -224,7 +226,7 @@ Valori reali (ottobre 2026, domanda di tossicità di `/1-jev/demo3`). Un insulto
 
 ### E quando sbaglia?
 
-🎬 [`01-intro/05f-quando-sbaglia.html`](./01-intro/05f-quando-sbaglia.html)
+🎬 [`01-intro/05g-quando-sbaglia.html`](./01-intro/05g-quando-sbaglia.html)
 
 Proprio perché ha imparato dai contesti, va in difficoltà quando il contesto è ambiguo:
 
