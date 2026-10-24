@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09e · How long, and what to know</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "9. Bonus: Jev looks at images" in the video script (docs/01-intro-jev-video-script.md):
+  how long one call takes (one photo, three questions: noul + box + choice) and the limits of images.
+  Times are real, measured by /3-jev-images/demo1 around Jev's call through Vercel AI Gateway (October 2026):
+  446, 484, 728, 844 ms, and one 2380 ms outlier on the cars photo.
+  Limits from docs.typesafe.ai/images and docs.typesafe.ai/primitives/box.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+
+  /* ---------- Left: the times ---------- */
+  .times { position: absolute; left: 80px; top: 200px; width: 860px; height: 702px; padding: 28px 36px; }
+  .big { margin-top: 14px; font-family: var(--hand); font-size: 96px; line-height: 1; color: var(--pink); opacity: 0; animation-name: big; }
+  .big small { margin-left: 16px; font-size: 34px; color: var(--ink); opacity: .7; }
+  .runs { margin-top: 36px; display: flex; flex-direction: column; gap: 20px; }
+  .run { display: flex; align-items: center; gap: 18px; opacity: 0; }
+  .run span { width: 200px; font-size: 22px; }
+  .run .bar { flex: 1; }
+  .run .bar > i { width: 0; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .run b { width: 110px; text-align: right; font-family: var(--mono); font-size: 26px; font-weight: 500; }
+  .run.slow .bar > i { background: var(--muted); }
+  .run.slow b { opacity: .5; }
+  .r1 { animation-name: r1; } .r2 { animation-name: r2; } .r3 { animation-name: r3; } .r4 { animation-name: r4; } .r5 { animation-name: r5; }
+  .r1 .bar > i { animation-name: w1; } .r2 .bar > i { animation-name: w2; } .r3 .bar > i { animation-name: w3; } .r4 .bar > i { animation-name: w4; } .r5 .bar > i { animation-name: w5; }
+  .times .note { position: absolute; left: 36px; right: 36px; bottom: 28px; font-size: 20px; line-height: 1.45; opacity: .6; }
+
+  /* ---------- Right: what to know ---------- */
+  .know { position: absolute; left: 980px; top: 200px; width: 860px; height: 702px; padding: 28px 36px; }
+  .item { display: flex; align-items: center; gap: 24px; margin-top: 44px; opacity: 0; }
+  .item i { flex: none; display: grid; place-items: center; width: 88px; height: 88px; border-radius: 20px; background: var(--stage); font-style: normal; font-size: 44px; }
+  .item .t { font-size: 32px; font-weight: 700; }
+  .item .d { margin-top: 6px; font-size: 24px; opacity: .65; }
+  .item code { font-family: var(--mono); font-size: 21px; }
+  .item.warn i { background: var(--amber-bg); }
+  .i1 { animation-name: i1; } .i2 { animation-name: i2; } .i3 { animation-name: i3; } .i4 { animation-name: i4; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font-family: var(--hand); font-size: 50px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in: both cards
+     6–26%   five runs, one every 4%, each bar fills in 6%
+     28–32%  the range, 0.5–0.8 s
+     40–58%  what to know, one item every 6%
+     78–82%  caption
+     94%     final frame (playback stops here)        96–100% fade out
+     Bar widths: ms / 2400 */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes r1 { 0%, 6% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes r2 { 0%, 10% { opacity: 0 } 12%, 100% { opacity: 1 } }
+  @keyframes r3 { 0%, 14% { opacity: 0 } 16%, 100% { opacity: 1 } }
+  @keyframes r4 { 0%, 18% { opacity: 0 } 20%, 100% { opacity: 1 } }
+  @keyframes r5 { 0%, 22% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes w1 { 0%, 6% { width: 0 } 12%, 100% { width: 18.6% } }
+  @keyframes w2 { 0%, 10% { width: 0 } 16%, 100% { width: 20.2% } }
+  @keyframes w3 { 0%, 14% { width: 0 } 20%, 100% { width: 30.3% } }
+  @keyframes w4 { 0%, 18% { width: 0 } 24%, 100% { width: 35.2% } }
+  @keyframes w5 { 0%, 22% { width: 0 } 30%, 100% { width: 99.2% } }
+  @keyframes big { 0%, 28% { opacity: 0; transform: translateY(14px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes i1 { 0%, 40% { opacity: 0; transform: translateY(14px) } 44%, 100% { opacity: 1; transform: none } }
+  @keyframes i2 { 0%, 46% { opacity: 0; transform: translateY(14px) } 50%, 100% { opacity: 1; transform: none } }
+  @keyframes i3 { 0%, 52% { opacity: 0; transform: translateY(14px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes i4 { 0%, 58% { opacity: 0; transform: translateY(14px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 78% { opacity: 0; transform: translateY(12px) } 82%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>09 · Bonus: images · 6 / 6</small>How long, and what to know</div>
+
+    <div class="card times">
+      <div class="label">One photo, three questions, one call</div>
+      <div class="big">0.5–0.8 s<small>usually</small></div>
+      <div class="runs">
+        <div class="run r1"><span>dog · nose</span><div class="bar"><i></i></div><b>446 ms</b></div>
+        <div class="run r2"><span>dog · main subject</span><div class="bar"><i></i></div><b>484 ms</b></div>
+        <div class="run r3"><span>dog · eye</span><div class="bar"><i></i></div><b>728 ms</b></div>
+        <div class="run r4"><span>pug · main subject</span><div class="bar"><i></i></div><b>844 ms</b></div>
+        <div class="run r5 slow"><span>cars · once</span><div class="bar"><i></i></div><b>2380 ms</b></div>
+      </div>
+      <div class="note">Measured in our demo, through Vercel AI Gateway, October 2026.<br>Network included: try it again before you rely on it.</div>
+    </div>
+
+    <div class="card know">
+      <div class="label">Before you use it</div>
+      <div class="item warn i1"><i>🧪</i><div><div class="t">Experimental</div><div class="d">Opt in with <code>TypeSafe-Danger-Zone-Images</code>.<br>Not recommended for production yet.</div></div></div>
+      <div class="item i2"><i>🖼️</i><div><div class="t">PNG or JPEG only</div><div class="d">WebP and GIF are rejected. Rotate the pixels upright.</div></div></div>
+      <div class="item i3"><i>📐</i><div><div class="t">280–1568 px per side</div><div class="d">Resize phone photos first. Up to 16 MiB per image.</div></div></div>
+      <div class="item i4"><i>💰</i><div><div class="t">Billed as input tokens</div><div class="d">Same price as text. Output is still free.</div></div></div>
+    </div>
+
+    <div class="caption">Fast enough for a UI. <span class="underline-pink">Still experimental.</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

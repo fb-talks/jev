@@ -1,6 +1,6 @@
 # 01 · Intro a Jev — script del video
 
-Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **9–10 minuti**.
+Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **11 minuti**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
 
 Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra).
 
@@ -11,7 +11,36 @@ Legenda:
 
 ---
 
-## 0. Hook (0:00 – 0:30)
+## 1. Apertura (0:00 – 1:30)
+
+### 01a · Titolo
+
+🎬 **ANIMAZIONE**: [`01-intro/01a-titolo.html`](./01-intro/01a-titolo.html). "Jev" scritto a mano, sotto una barra che si riempie fino a 0.92, intorno arrivano i quattro tipi di domanda (noul, choice, score, box), poi "It doesn't write. It decides." Dura 9 s.
+
+🎙️ **VOCE**:
+> _(titolo: nessun parlato, oppure il saluto iniziale)_
+
+### 01b · Speaker
+
+🎬 **ANIMAZIONE**: [`01-intro/01b-speaker.html`](./01-intro/01b-speaker.html). Le due foto dentro cerchi disegnati a mano (rosa a sinistra, blu a destra), una "&" in mezzo, i nomi con una freccia a mano verso ogni cerchio, poi ruolo e competenze sotto le foto. Dura 12 s.
+
+✂️ 🚧 Segnaposto da completare: nomi, ruoli, competenze, e le foto in `01-intro/_shared/img/speaker-left.jpg` e `speaker-right.jpg` (quadrate, almeno 400×400). Finché mancano, nei cerchi compaiono le iniziali.
+
+🎙️ **VOCE**:
+> _da scrivere: chi siamo, in due frasi_
+
+### 01c · Cos'è Jev, e a cosa serve
+
+🎬 **ANIMAZIONE**: [`01-intro/01c-jev.html`](./01-intro/01c-jev.html). Uno schema disegnato, quasi senza testo. Sopra: dati → LLM → un paragrafo (righe grigie) → va bene per una persona ✓, ma per il codice è un "?". Sotto: dati → Jev → un numero, 0.92 → il codice lo usa ✓ → branch, sort, route. Poi "An LLM writes for people. Jev answers your code." Dura 14 s.
+
+🎙️ **VOCE**:
+> Gli LLM sono fatti per scrivere testo, testo che legge una persona.
+> Ma quando è il vostro **codice** a dover usare un giudizio, c'è un disallineamento: forzate un generatore di testo a produrre una decisione, e poi dovete fare il parsing della risposta e sperare che sia nel formato giusto.
+> Jev è il primo modello **System One** di TypeSafe: fatto per decisioni veloci e strutturate, che il software usa direttamente.
+> Gli passate uno state, i vostri dati, e delle domande tipizzate. Vi restituisce valori tipizzati e distribuzioni di probabilità. Niente testo da generare, niente parsing.
+> Con quei valori il codice fa branch, ordina, smista. E alcune domande restituiscono anche una **confidence**: quanto è sicuro, per decidere se agire da soli o chiedere a una persona.
+
+### 01d · Hook (1:00 – 1:30)
 
 🖥️ **SCHERMO**: `/1-jev/demo1`. Scrivo "Who taught you to code? Useless post." e clicco **Analyze**. Compare "Offensive: 80%" circa (valore reale: 79–81%).
 
@@ -22,13 +51,15 @@ Legenda:
 
 ✂️ Titolo a schermo: **"Un LLM scrive. Jev sceglie."**
 
-🎬 **ANIMAZIONE**: [`01-intro/00-hook.html`](./01-intro/00-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
+✂️ Con l'apertura, Jev è già presentato in 01c: "Si chiama Jev" si può accorciare in "Ecco Jev in azione".
+
+🎬 **ANIMAZIONE**: [`01-intro/01d-hook.html`](./01-intro/01d-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
 
 ---
 
-## 1. Cos'è Jev (0:30 – 1:45)
+## 2. Cos'è Jev (1:30 – 2:45)
 
-🎬 **ANIMAZIONE**: [`01-intro/01-cos-e.html`](./01-intro/01-cos-e.html)
+🎬 **ANIMAZIONE**: [`01-intro/02-cos-e.html`](./01-intro/02-cos-e.html)
 
 🎙️ **VOCE** (in camera):
 > Jev è un modello di **TypeSafe AI**, una startup di San Francisco nata nel 2024. È uscito in early access a settembre 2026.
@@ -53,20 +84,20 @@ Legenda:
 
 ---
 
-## 2. Come si usa: state + domande (1:45 – 3:30)
+## 3. Come si usa: state + domande (2:45 – 4:30)
 
-### 02a · State + domande
+### 03a · State + domande
 
 🎙️ **VOCE**:
 > Usarlo è semplice. Gli mandate due cose.
 > Uno **state**: il testo da valutare. Può essere una stringa, un oggetto JSON o un array.
 > E una o più **domande**. Tutte a scelta multipla.
 
-🎬 **ANIMAZIONE**: [`01-intro/02a-state-domande.html`](./01-intro/02a-state-domande.html). Il ticket di supporto come flusso: state e tre domande entrano in Jev in parallelo, escono tre risposte.
+🎬 **ANIMAZIONE**: [`01-intro/03a-state-domande.html`](./01-intro/03a-state-domande.html). Il ticket di supporto come flusso: state e tre domande entrano in Jev in parallelo, escono tre risposte.
 
-### 02b · I tre tipi di domanda
+### 03b · I tre tipi di domanda
 
-🎬 **ANIMAZIONE**: [`01-intro/02b-tipi-domanda.html`](./01-intro/02b-tipi-domanda.html). I tre tipi, una card alla volta, ognuna con un mini esempio dal ticket.
+🎬 **ANIMAZIONE**: [`01-intro/03b-tipi-domanda.html`](./01-intro/03b-tipi-domanda.html). I tre tipi, una card alla volta, ognuna con un mini esempio dal ticket.
 
 🖥️ **SCHERMO**: tabella dei tre tipi, che appare una riga alla volta.
 
@@ -87,9 +118,9 @@ Legenda:
 🎙️ **VOCE**:
 > Sotto ogni tipo vedete i campi che Jev vi restituisce: `noul`, `choice` o `score`, e per choice e score anche **probabilities** e **confidence**. Tra poco vediamo cosa contengono, con un esempio vero.
 
-### 02c · La chiamata più semplice
+### 03c · La chiamata più semplice
 
-🎬 **ANIMAZIONE**: [`01-intro/02c-noul-base.html`](./01-intro/02c-noul-base.html). Il client più semplice possibile: si evidenziano import e client, lo state (il commento della hook), l'unica domanda `noul`, poi `console.log` e a destra la risposta `0.80` con la barra. Finale: "One state, one question, one number." Dura 16 s.
+🎬 **ANIMAZIONE**: [`01-intro/03c-noul-base.html`](./01-intro/03c-noul-base.html). Il client più semplice possibile: si evidenziano import e client, lo state (il commento della hook), l'unica domanda `noul`, poi `console.log` e a destra la risposta `0.80` con la barra. Finale: "One state, one question, one number." Dura 16 s.
 
 🖥️ **SCHERMO**: editor con il codice minimo (è la stessa domanda di `/1-jev/demo1`).
 
@@ -118,9 +149,9 @@ console.log(answers.offensive.noul); // 0.80
 
 ✂️ Valore verificato a ottobre 2026 su `/1-jev/demo1` (0.79–0.81): ricontrollarlo prima di registrare.
 
-### 02d · Il codice del ticket
+### 03d · Il codice del ticket
 
-🎬 **ANIMAZIONE**: [`01-intro/02d-codice.html`](./01-intro/02d-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
+🎬 **ANIMAZIONE**: [`01-intro/03d-codice.html`](./01-intro/03d-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
 
 🖥️ **SCHERMO**: editor con l'esempio del ticket di supporto. Evidenzio le parti mentre ne parlo.
 
@@ -160,9 +191,9 @@ answers.urgent.noul;         // 0.92
 > Frustrazione: uno virgola zero quattro, cioè "frustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
 > Urgente: novantadue per cento.
 
-### 02e · noul
+### 03e · noul
 
-🎬 **ANIMAZIONE**: [`01-intro/02e-noul.html`](./01-intro/02e-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
+🎬 **ANIMAZIONE**: [`01-intro/03e-noul.html`](./01-intro/03e-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
 
 🎙️ **VOCE**:
 > Ma cosa c'è esattamente dentro ogni risposta? Dipende dal tipo di domanda. Partiamo dalla più semplice.
@@ -170,9 +201,9 @@ answers.urgent.noul;         // 0.92
 > Niente probabilities, niente confidence: il numero stesso dice quanto Jev è sicuro. Vicino a uno, sicuramente sì; vicino a zero, sicuramente no; intorno a metà, non lo sa.
 > E dove inizia il "sì" lo decide il vostro codice: per esempio, sopra zero virgola otto avviso il team.
 
-### 02f · choice
+### 03f · choice
 
-🎬 **ANIMAZIONE**: [`01-intro/02f-choice.html`](./01-intro/02f-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
+🎬 **ANIMAZIONE**: [`01-intro/03f-choice.html`](./01-intro/03f-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
 
 🎙️ **VOCE**:
 > Una **choice** restituisce tre campi.
@@ -181,9 +212,9 @@ answers.urgent.noul;         // 0.92
 > **confidence**: quanto la scommessa è concentrata, da zero a uno. Qui è uno, perché è tutta su un'opzione. Ma se arriva un ticket fuori tema, "la T-shirt Acme è gratis con il piano annuale?", nessun team è quello giusto: la scommessa si divide, settantadue per cento sales e ventotto billing, e la confidence scende a zero virgola cinquantotto. Notate che non è la probabilità più alta: misura quanto è concentrata.
 > E vi dice **quando fidarvi**: se è alta, il codice può agire da solo; se è bassa, meglio chiedere a una persona. È il pattern che vediamo tra poco.
 
-### 02g · score
+### 03g · score
 
-🎬 **ANIMAZIONE**: [`01-intro/02g-score.html`](./01-intro/02g-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
+🎬 **ANIMAZIONE**: [`01-intro/03g-score.html`](./01-intro/03g-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
 
 🎙️ **VOCE**:
 > Una **score** ha le stesse probabilities e la stessa confidence della choice, più il campo **score**.
@@ -202,9 +233,9 @@ answers.urgent.noul;         // 0.92
 
 ---
 
-## 3. Il pattern a tre fasce (3:30 – 4:45)
+## 4. Il pattern a tre fasce (4:30 – 5:45)
 
-🎬 **ANIMAZIONE**: [`01-intro/03-tre-fasce.html`](./01-intro/03-tre-fasce.html)
+🎬 **ANIMAZIONE**: [`01-intro/04-tre-fasce.html`](./01-intro/04-tre-fasce.html)
 
 🎙️ **VOCE**:
 > E adesso la parte che secondo me rende Jev interessante per le app vere.
@@ -231,9 +262,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ---
 
-## 4. Dove usarlo (4:45 – 5:30)
+## 5. Dove usarlo (5:45 – 6:30)
 
-🎬 **ANIMAZIONE**: [`01-intro/04-casi-uso.html`](./01-intro/04-casi-uso.html)
+🎬 **ANIMAZIONE**: [`01-intro/05-casi-uso.html`](./01-intro/05-casi-uso.html)
 
 🖥️ **SCHERMO**: due colonne di icone che compaiono una alla volta.
 
@@ -248,9 +279,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ---
 
-## 5. Come fa a "sapere" le cose? (5:30 – 8:15)
+## 6. Come fa a "sapere" le cose? (6:30 – 9:15)
 
-🎬 **ANIMAZIONE**: [`01-intro/05-come-sa.html`](./01-intro/05-come-sa.html). Slide titolo: si disegna un punto interrogativo, poi "How does Jev know things?" e lo spoiler "the knowledge comes from before Jev" (passi 1–4: il modello di base; passo 5: l'addestramento di Jev). Dura 10 s.
+🎬 **ANIMAZIONE**: [`01-intro/06-come-sa.html`](./01-intro/06-come-sa.html). Slide titolo: si disegna un punto interrogativo, poi "How does Jev know things?" e lo spoiler "the knowledge comes from before Jev" (passi 1–4: il modello di base; passo 5: l'addestramento di Jev). Dura 10 s.
 
 🎙️ **VOCE** (in camera):
 > La domanda che mi fanno sempre è questa: come fa a sapere che "sei brutto" è offensivo? Nessuno gliel'ha insegnato.
@@ -262,9 +293,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Premessa onesta: TypeSafe non ha pubblicato architettura né paper tecnico. Quella che vi racconto è la ricostruzione più probabile, coerente con come funzionano i modelli di questo tipo. Cinque passi.
 > I primi quattro non riguardano Jev in sé, ma il **modello linguistico di base** su cui Jev è costruito: è lì che nasce la conoscenza. Solo il quinto è l'addestramento specifico di Jev.
 
-### 05a · Passo 1 — Indovinare la parola dopo
+### 06a · Passo 1 — Indovinare la parola dopo
 
-🎬 **ANIMAZIONE**: [`01-intro/05a-parola-dopo.html`](./01-intro/05a-parola-dopo.html)
+🎬 **ANIMAZIONE**: [`01-intro/06a-parola-dopo.html`](./01-intro/06a-parola-dopo.html)
 
 🖥️ **SCHERMO**: le tre frasi, la parola mancante appare dopo un attimo.
 
@@ -279,9 +310,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Nessuno gli scrive mai "brutto uguale offensivo". Ma per indovinare bene deve imparare **in che situazioni compaiono le parole**. E "sei brutto" compare quasi sempre vicino a litigi, persone ferite, scuse.
 > Jev parte da un modello che ha già fatto questo lavoro, quindi **eredita** tutto quello che ha imparato. Ecco perché sa che "sei brutto" è un'offesa senza che nessuno gliel'abbia insegnato.
 
-### 05b · Passo 2 — Le parole diventano coordinate
+### 06b · Passo 2 — Le parole diventano coordinate
 
-🎬 **ANIMAZIONE**: [`01-intro/05b-coordinate.html`](./01-intro/05b-coordinate.html)
+🎬 **ANIMAZIONE**: [`01-intro/06b-coordinate.html`](./01-intro/06b-coordinate.html)
 
 🖥️ **SCHERMO**: animazione dei punti che si raggruppano in "zona offese" e "zona cortesia".
 
@@ -292,9 +323,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > E "you're ugly" finisce vicino a "insulto" e lontano da "complimenti": ecco perché Jev la riconosce come un'offesa.
 > **Il significato è la posizione.**
 
-### 05c · Passo 3 — Il contesto cambia il significato
+### 06c · Passo 3 — Il contesto cambia il significato
 
-🎬 **ANIMAZIONE**: [`01-intro/05c-attention.html`](./01-intro/05c-attention.html). A destra la mappa con tre zone (insults, weather, reviews) e "ugly" da sola al centro, in grigio: ambigua. A sinistra le tre frasi, una alla volta, con l'arco di attention: a ogni frase una copia di "ugly" vola in una zona diversa. Finale: "Same word, three places". Dura 16 s.
+🎬 **ANIMAZIONE**: [`01-intro/06c-attention.html`](./01-intro/06c-attention.html). A destra la mappa con tre zone (insults, weather, reviews) e "ugly" da sola al centro, in grigio: ambigua. A sinistra le tre frasi, una alla volta, con l'arco di attention: a ogni frase una copia di "ugly" vola in una zona diversa. Finale: "Same word, three places". Dura 16 s.
 
 🖥️ **SCHERMO**: tre frasi, una freccia da "brutto" alla parola che "guarda", e "brutto" che finisce in tre posti diversi della mappa.
 
@@ -309,9 +340,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > "Sei brutto" è rivolto a una persona. "Il tempo è brutto" parla del meteo. "Che brutto film" è una critica.
 > Da sola, "brutto" sta a metà strada. È il contesto a spostarla: vicino a "sei" finisce tra le offese, vicino a "tempo" tra il meteo, vicino a "film" tra le critiche. Stessa parola, tre posti diversi.
 
-### 05d · Passo 4 — Anche le opzioni sono testo
+### 06d · Passo 4 — Anche le opzioni sono testo
 
-🎬 **ANIMAZIONE**: [`01-intro/05d-opzioni.html`](./01-intro/05d-opzioni.html)
+🎬 **ANIMAZIONE**: [`01-intro/06d-opzioni.html`](./01-intro/06d-opzioni.html)
 
 🖥️ **SCHERMO**: i quattro livelli di tossicità; una linea collega "SEI BRUTTO" al livello 3.
 
@@ -322,9 +353,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### Passo 5 — Imparare a scommettere
 
-#### 05e · L'addestramento e le due lezioni
+#### 06e · L'addestramento e le due lezioni
 
-🎬 **ANIMAZIONE**: [`01-intro/05e-scommettere.html`](./01-intro/05e-scommettere.html). Il badge dell'addestramento (dati sintetici + RLCD), poi le due lezioni: rispondere solo scegliendo (la matita scrive, viene cancellata, diventa una casella) e probabilità oneste ("se dice 80%" → 10 prove, 8 giuste).
+🎬 **ANIMAZIONE**: [`01-intro/06e-scommettere.html`](./01-intro/06e-scommettere.html). Il badge dell'addestramento (dati sintetici + RLCD), poi le due lezioni: rispondere solo scegliendo (la matita scrive, viene cancellata, diventa una casella) e probabilità oneste ("se dice 80%" → 10 prove, 8 giuste).
 
 🖥️ **SCHERMO**: l'addestramento e le due lezioni.
 
@@ -334,9 +365,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > A rispondere **solo** scegliendo tra le opzioni, invece di scrivere.
 > E a dare probabilità **oneste**: se dice ottanta per cento, deve avere ragione circa otto volte su dieci.
 
-#### 05f · Un esempio reale: "UGLY!!!"
+#### 06f · Un esempio reale: "UGLY!!!"
 
-🎬 **ANIMAZIONE**: [`01-intro/05f-scommessa.html`](./01-intro/05f-scommessa.html). L'esempio reale: le quattro barre di "UGLY!!!" che si riempiono, poi "An honest bet on every option." Dura 8 s.
+🎬 **ANIMAZIONE**: [`01-intro/06f-scommessa.html`](./01-intro/06f-scommessa.html). L'esempio reale: le quattro barre di "UGLY!!!" che si riempiono, poi "An honest bet on every option." Dura 8 s.
 
 🖥️ **SCHERMO**: le barre che si riempiono.
 
@@ -351,9 +382,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 🎙️ **VOCE**:
 > Un esempio reale. Su "you're ugly" Jev è sicuro al cento per cento: nessun dubbio. Su "UGLY!!!", che non dice a chi è rivolto, lascia un po' di margine: ottantasei per cento insulti, dieci polemico, quattro critico. Non risponde sempre "sicurissimo": scommette in proporzione a quanto è chiaro il testo.
 
-### 05g · E quando sbaglia?
+### 06g · E quando sbaglia?
 
-🎬 **ANIMAZIONE**: [`01-intro/05g-quando-sbaglia.html`](./01-intro/05g-quando-sbaglia.html)
+🎬 **ANIMAZIONE**: [`01-intro/06g-quando-sbaglia.html`](./01-intro/06g-quando-sbaglia.html)
 
 🖥️ **SCHERMO**: `/1-jev/demo3`. Prima "UGLY!!!": Insults 86%, badge **Reject**. Poi "you absolute muppet, great post 😂": le barre si distribuiscono (6 · 7 · 34 · 53), confidenza 0.32, badge **Needs review**.
 
@@ -368,11 +399,11 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ---
 
-## 6. Limiti e costi (8:15 – 9:15)
+## 7. Limiti e costi (9:15 – 10:15)
 
-### 06a · Limiti
+### 07a · Limiti
 
-🎬 **ANIMAZIONE**: [`01-intro/06a-limiti.html`](./01-intro/06a-limiti.html). Le quattro card dei limiti (255 opzioni, 2–10 livelli, 64k token, scatola chiusa), poi il paper indipendente e "It doesn't replace an LLM: it works alongside it". Dura 9 s.
+🎬 **ANIMAZIONE**: [`01-intro/07a-limiti.html`](./01-intro/07a-limiti.html). Le quattro card dei limiti (255 opzioni, 2–10 livelli, 64k token, scatola chiusa), poi il paper indipendente e "It doesn't replace an LLM: it works alongside it". Dura 9 s.
 
 🖥️ **SCHERMO**: slide "Limiti", un punto alla volta.
 
@@ -383,9 +414,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > È una **scatola chiusa**: niente pesi, niente architettura pubblicata.
 > E le prestazioni dichiarate, dai 70 ai 500 millisecondi, da 40 a 200 volte più veloce di un LLM, vengono dai test dello stesso team. Lo dicono anche loro: i numeri più alti della home page sono il caso migliore. Un paper indipendente lo trova **alla pari** con gli LLM: più veloce, ma senza grandi vantaggi oltre alle probabilità leggibili.
 
-### 06b · Costi
+### 07b · Costi
 
-🎬 **ANIMAZIONE**: [`01-intro/06b-costi.html`](./01-intro/06b-costi.html). Il listino (input $0.042, output $0), il calcolo fino a $1.26, poi lo state pagato una volta per tre domande. Dura 9 s.
+🎬 **ANIMAZIONE**: [`01-intro/07b-costi.html`](./01-intro/07b-costi.html). Il listino (input $0.042, output $0), il calcolo fino a $1.26, poi lo state pagato una volta per tre domande. Dura 9 s.
 
 🖥️ **SCHERMO**: slide "Costi": prima il listino `input: $0,042 / milione di token` · `output: $0`, poi il calcolo.
 
@@ -406,9 +437,9 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ---
 
-## 7. Chiusura (9:15 – 9:45)
+## 8. Chiusura (10:15 – 10:45)
 
-🎬 **ANIMAZIONE**: [`01-intro/07-chiusura.html`](./01-intro/07-chiusura.html)
+🎬 **ANIMAZIONE**: [`01-intro/08-chiusura.html`](./01-intro/08-chiusura.html)
 
 🎙️ **VOCE** (in camera):
 > Riassumendo in trenta secondi.
@@ -416,23 +447,23 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Poi la allenate a fare solo test a crocette, scommettendo onestamente su ogni risposta. Quello è l'addestramento di Jev.
 > **Un LLM vi risponde con un tema. Jev vi dice: risposta D, sicuro all'ottantasei per cento.**
 
-🖥️ **SCHERMO**: la home del progetto con le tre demo.
+🖥️ **SCHERMO**: la home del progetto con i tre gruppi di demo: Jev, Jev e Gemini, Jev e le immagini.
 
 🎙️ **VOCE**:
 > Non sostituisce un LLM: lo affianca, per le micro-decisioni ad alto volume.
 > Nel prossimo video partiamo da zero: configuriamo Vercel AI Gateway e scriviamo la prima demo, con una sola domanda. Il link al codice è in descrizione.
 
-✂️ End screen: link al repository e al prossimo video.
+✂️ End screen: link al repository e al prossimo video. Il bonus sulle immagini (sezione 9) viene dopo: in montaggio va dopo l'end screen, oppure la frase "Nel prossimo video…" si sposta alla fine della sezione 9.
 
 ---
 
-## 8. Bonus: Jev guarda le immagini
+## 9. Bonus: Jev guarda le immagini (10:45 – 13:15)
 
 Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati a ottobre 2026: ricontrollarli prima di registrare.
 
-### 08 · Prompt vuoto: cos'è, e dov'è?
+### 09 · Prompt vuoto: cos'è, e dov'è?
 
-🎬 **ANIMAZIONE**: [`01-intro/08-soggetto.html`](./01-intro/08-soggetto.html). Il codice della route della demo (tre domande sulla stessa foto: `found`, `where`, `what`) e la risposta di Jev sulla foto del cane: il box sul cane, "dog" con probabilità 1 e tutte le altre etichette a 0. Dura 16 s.
+🎬 **ANIMAZIONE**: [`01-intro/09-soggetto.html`](./01-intro/09-soggetto.html). Il codice della route della demo (tre domande sulla stessa foto: `found`, `where`, `what`) e la risposta di Jev sulla foto del cane: il box sul cane, "dog" con probabilità 1 e tutte le altre etichette a 0. Dura 16 s.
 
 🖥️ **SCHERMO**: `/3-jev-images/demo1`, foto del cane, campo vuoto, **Find it**: compare "dog · 100%" sul box.
 
@@ -442,9 +473,9 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 > Risposta: un rettangolo intorno al cane, e "dog", probabilità uno. Tutte le altre etichette a zero.
 > Attenzione: Jev non inventa il nome. Sceglie dalla **vostra** lista, come una choice qualsiasi.
 
-### 08a · Jev vede anche le immagini
+### 09a · Jev vede anche le immagini
 
-🎬 **ANIMAZIONE**: [`01-intro/08a-immagini.html`](./01-intro/08a-immagini.html). La foto del cane e la chiamata: l'header sperimentale, `state: image(photo)`, poi la domanda nuova `box`; il box si posa sull'occhio. Dura 14 s.
+🎬 **ANIMAZIONE**: [`01-intro/09a-immagini.html`](./01-intro/09a-immagini.html). La foto del cane e la chiamata: l'header sperimentale, `state: image(photo)`, poi la domanda nuova `box`; il box si posa sull'occhio. Dura 14 s.
 
 🖥️ **SCHERMO**: `/3-jev-images/demo1`, clicco la foto del cane, scrivo "eye" e premo **Find it**.
 
@@ -452,9 +483,9 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 > Vediamo la chiamata. È la stessa di sempre. Cambiano due cose: un header, perché le immagini sono ancora sperimentali, e lo state, che adesso è una foto.
 > E c'è un tipo di domanda nuovo, **box**: dove si trova quello che cerco?
 
-### 08b · box: quattro numeri
+### 09b · box: quattro numeri
 
-🎬 **ANIMAZIONE**: [`01-intro/08b-box.html`](./01-intro/08b-box.html). I quattro bordi tracciati uno alla volta sulla foto (top 0.37, bottom 0.46, left 0.48, right 0.56), il box che ne nasce, confidence 0.72, poi la conversione in percentuali CSS. Dura 16 s.
+🎬 **ANIMAZIONE**: [`01-intro/09b-box.html`](./01-intro/09b-box.html). I quattro bordi tracciati uno alla volta sulla foto (top 0.37, bottom 0.46, left 0.48, right 0.56), il box che ne nasce, confidence 0.72, poi la conversione in percentuali CSS. Dura 16 s.
 
 🎙️ **VOCE**:
 > La risposta di un box sono quattro numeri: i bordi del rettangolo più piccolo che contiene l'oggetto.
@@ -462,9 +493,9 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 > Nella pagina basta moltiplicarli per cento e usarli come percentuali CSS: il box resta al suo posto a qualsiasi dimensione.
 > E c'è una confidence, quanto Jev è sicuro di quel rettangolo.
 
-### 08c · C'è? Dov'è?
+### 09c · C'è? Dov'è?
 
-🎬 **ANIMAZIONE**: [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html). Un'immagine con decine di oggetti di casa, scrivo "A clock": il box si posa sull'orologio (confidence 0.93) e il resto si scurisce; la noul dice 0.99; poi l'`if` del codice e il controesempio "a cat" (0.01, not found). Dura 15 s.
+🎬 **ANIMAZIONE**: [`01-intro/09c-sempre-box.html`](./01-intro/09c-sempre-box.html). Un'immagine con decine di oggetti di casa, scrivo "A clock": il box si posa sull'orologio (confidence 0.93) e il resto si scurisce; la noul dice 0.99; poi l'`if` del codice e il controesempio "a cat" (0.01, not found). Dura 15 s.
 
 🖥️ **SCHERMO**: nella demo, l'immagine degli oggetti (quarta miniatura), scrivo "A clock". Poi "a cat".
 
@@ -476,9 +507,9 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 > Perché chiederlo, se il box l'ha già trovato? Perché un box risponde **sempre**. Chiedete un gatto in questa immagine, e un rettangolo arriva lo stesso, da qualche parte. La noul invece dice uno per cento.
 > E il codice decide: sotto il cinquanta per cento, "not found".
 
-### 08d · Descrivi quello che cerchi
+### 09d · Descrivi quello che cerchi
 
-🎬 **ANIMAZIONE**: [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html). Tre prompt sulla stessa foto: "the main subject of the image" (box largo, 0.20), "the white car" (0.82), "the brown car" (0.43); poi due consigli dalla documentazione. Dura 16 s.
+🎬 **ANIMAZIONE**: [`01-intro/09d-descrivi.html`](./01-intro/09d-descrivi.html). Tre prompt sulla stessa foto: "the main subject of the image" (box largo, 0.20), "the white car" (0.82), "the brown car" (0.43); poi due consigli dalla documentazione. Dura 16 s.
 
 🖥️ **SCHERMO**: nella demo, foto delle auto: prima campo vuoto (soggetto principale), poi "the white car", poi "the brown car".
 
@@ -489,9 +520,9 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ✂️ Non serve "on the left / on the right": il colore basta. "The main subject" senza "of the image" dà un box già stretto (0.32–0.42), meno efficace. Da evitare "the rusty car": found scende sotto il 50%.
 
-### 08e · Quanto ci mette, e cosa sapere
+### 09e · Quanto ci mette, e cosa sapere
 
-🎬 **ANIMAZIONE**: [`01-intro/08e-tempi-limiti.html`](./01-intro/08e-tempi-limiti.html). I tempi misurati (446–844 ms, una volta 2380 ms) e quattro cose da sapere: sperimentale, PNG o JPEG, 280–1568 px per lato, pagato come input. Dura 14 s.
+🎬 **ANIMAZIONE**: [`01-intro/09e-tempi-limiti.html`](./01-intro/09e-tempi-limiti.html). I tempi misurati (446–844 ms, una volta 2380 ms) e quattro cose da sapere: sperimentale, PNG o JPEG, 280–1568 px per lato, pagato come input. Dura 14 s.
 
 🎙️ **VOCE**:
 > Una foto, tre domande, una chiamata: di solito tra mezzo secondo e ottocento millisecondi. Abbastanza per un'interfaccia.
@@ -499,34 +530,34 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ---
 
-## 9. In pratica — 🚧 TODO (placeholder)
+## 10. In pratica — 🚧 TODO (placeholder)
 
 Slide segnaposto da completare: per ora solo il titolo di ogni passo.
 
-### 09a · 🚧 TODO — Creare account e API key
+### 10a · 🚧 TODO — Creare account e API key
 
-🎬 **ANIMAZIONE**: [`01-intro/09a-account.html`](./01-intro/09a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
-
-🎙️ **VOCE**:
-> _da scrivere_
-
-### 09b · 🚧 TODO — Esempio di codice
-
-🎬 **ANIMAZIONE**: [`01-intro/09b-codice.html`](./01-intro/09b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`01-intro/10a-account.html`](./01-intro/10a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
-### 09c · 🚧 TODO — Usiamo un gateway come Vercel
+### 10b · 🚧 TODO — Esempio di codice
 
-🎬 **ANIMAZIONE**: [`01-intro/09c-gateway.html`](./01-intro/09c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`01-intro/10b-codice.html`](./01-intro/10b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
-### 09d · 🚧 TODO — Demo time
+### 10c · 🚧 TODO — Usiamo un gateway come Vercel
 
-🎬 **ANIMAZIONE**: [`01-intro/09d-demo.html`](./01-intro/09d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`01-intro/10c-gateway.html`](./01-intro/10c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+
+🎙️ **VOCE**:
+> _da scrivere_
+
+### 10d · 🚧 TODO — Demo time
+
+🎬 **ANIMAZIONE**: [`01-intro/10d-demo.html`](./01-intro/10d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
@@ -537,6 +568,8 @@ Slide segnaposto da completare: per ora solo il titolo di ogni passo.
 
 - [ ] Crediti a pagamento attivi su Vercel AI Gateway (altrimenti le demo rispondono 403)
 - [ ] `npm run dev` avviato, tab aperte su `/1-jev/demo1` e `/1-jev/demo3`
+- [ ] Slide speaker (01b): nomi, ruoli, competenze e foto al posto dei segnaposto
+- [ ] Prima di pubblicare: verificare la licenza dell'immagine degli oggetti di casa (09c, demo immagini)
 - [ ] Bonus immagini: tab aperta su `/3-jev-images/demo1`, ricontrollare "eye" sul cane, "A clock" e "a cat" sugli oggetti, "the white car" sulle auto
 - [ ] Ricontrollare in `/1-jev/demo3` "UGLY!!!" (Reject) e "you absolute muppet, great post 😂" (Needs review)
 - [x] Il valore dell'hook è quello reale di `/1-jev/demo1` (0.79–0.81, ottobre 2026): ricontrollarlo prima di registrare

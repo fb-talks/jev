@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09a · Jev sees images too</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "9. Bonus: Jev looks at images" in the video script (docs/01-intro-jev-video-script.md):
+  the same call as always, but the state is a photo, plus a new question type, box.
+  Code and photo are the ones of /3-jev-images/demo1. The box drawn on the eye is a real Jev answer
+  (October 2026): top 0.37, bottom 0.46, left 0.48, right 0.56.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; --lh: 40px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+
+  /* ---------- Left: the photo, with the box drawn by Jev ---------- */
+  .shot { position: absolute; left: 80px; top: 200px; height: 702px; padding: 16px; opacity: 0; animation-name: shot; }
+  .shot .label { margin: 4px 4px 12px; }
+  .photo { position: relative; width: 840px; height: 630px; border-radius: 16px; overflow: hidden; outline: 6px solid transparent; outline-offset: -6px; animation-name: glow; }
+  .photo img { display: block; width: 100%; height: 100%; }
+  /* the edges are fractions of the image: as percentages they work at any size */
+  .box { position: absolute; top: 37%; left: 48%; width: 8%; height: 9%; border: 5px solid var(--pink); border-radius: 8px; opacity: 0; transform: scale(3); animation-name: box; }
+  .box span { position: absolute; left: -5px; bottom: calc(100% + 10px); padding: 4px 16px; border-radius: 999px; background: var(--pink); color: #fff; font-size: 24px; font-weight: 600; white-space: nowrap; }
+
+  /* ---------- Right: the call ---------- */
+  .call { position: absolute; left: 1000px; top: 200px; width: 840px; height: 702px; padding: 28px 36px; opacity: 0; animation-name: call; }
+  .code { margin-top: 14px; font-family: var(--mono); font-size: 24px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .k { color: var(--indigo); }
+  .s { color: #9a3412; }
+  .c { opacity: .4; }
+  .grp { position: relative; margin: 0 -14px; padding: 0 14px; border-radius: 10px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; }
+  .tag { position: absolute; right: 14px; top: 6px; padding: 4px 14px; border-radius: 999px; font-family: var(--sans); font-size: 18px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; opacity: 0; }
+  .tag--amber { background: var(--amber-bg); color: #b54708; animation-name: t1; }
+  .tag--pink { background: var(--pink); color: #fff; animation-name: t3; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font-family: var(--hand); font-size: 50px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in               4–10%   photo card
+     8–14%   code card
+     18–22%  header line highlighted, "experimental" tag
+     34–38%  state: image(photo) highlighted, the photo gets a pink outline
+     50–54%  box(...) highlighted, "new" tag
+     58–66%  the box lands on the eye, with its label
+     78–82%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes shot { 0%, 4% { opacity: 0; transform: translateY(20px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes call { 0%, 8% { opacity: 0; transform: translateY(20px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 18% { background: transparent; box-shadow: inset 4px 0 0 transparent } 22%, 100% { background: var(--amber-bg); box-shadow: inset 4px 0 0 var(--amber) } }
+  @keyframes t1 { 0%, 18% { opacity: 0 } 22%, 100% { opacity: 1 } }
+  @keyframes g2 { 0%, 34% { background: transparent; box-shadow: inset 4px 0 0 transparent } 38%, 100% { background: var(--pink-bg); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes glow { 0%, 34% { outline-color: transparent } 38%, 100% { outline-color: var(--pink) } }
+  @keyframes g3 { 0%, 50% { background: transparent; box-shadow: inset 4px 0 0 transparent } 54%, 100% { background: var(--pink-bg); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes t3 { 0%, 50% { opacity: 0 } 54%, 100% { opacity: 1 } }
+  @keyframes box { 0%, 58% { opacity: 0; transform: scale(3) } 64% { opacity: 1; transform: scale(.92) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 78% { opacity: 0; transform: translateY(12px) } 82%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>09 · Bonus: images · 2 / 6</small>Jev sees images too</div>
+
+    <div class="card shot">
+      <div class="label">The state: a photo</div>
+      <div class="photo">
+        <img src="_shared/img/dog.jpg" alt="">
+        <div class="box"><span>eye</span></div>
+      </div>
+    </div>
+
+    <div class="card call">
+      <div class="label">The call</div>
+      <div class="code">
+        <div class="l"><span class="k">const</span> jev = <span class="k">new</span> TypeSafeClient({</div>
+        <div class="l">  <span class="c">// ...the gateway, as always</span></div>
+        <div class="grp g1"><div class="l">  defaultHeaders: {</div>
+          <div class="l">    <span class="s">"TypeSafe-Danger-Zone-Images"</span>: <span class="s">"true"</span>,</div>
+          <div class="l">  },</div><span class="tag tag--amber">experimental</span></div>
+        <div class="l">});</div>
+        <div class="l"> </div>
+        <div class="l"><span class="k">await</span> jev.systemOne({</div>
+        <div class="grp g2"><div class="l">  state: <span class="k">image</span>(photo),</div></div>
+        <div class="l">  questions: {</div>
+        <div class="l">    found: <span class="k">noul</span>(<span class="s">"The image contains: eye"</span>),</div>
+        <div class="grp g3"><div class="l">    where: <span class="k">box</span>(<span class="s">"eye"</span>),</div><span class="tag tag--pink">new</span></div>
+        <div class="l">  },</div>
+        <div class="l">});</div>
+      </div>
+    </div>
+
+    <div class="caption">Same call, same questions. <span class="underline-pink">The state is a photo.</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01b · Speakers</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Speakers slide, right after the title (docs/01-intro-jev-video-script.md, "Apertura").
+  Two photos inside hand-drawn circles (pink on the left, blue on the right); a hand-drawn arrow from
+  each name to its circle; then the job and a few skills under each photo.
+  PLACEHOLDERS: names, jobs, skills and initials are to be replaced. Photos: _shared/img/speaker-left.jpg
+  and _shared/img/speaker-right.jpg (square, at least 400×400); until they exist the initials show.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- The photos ---------- */
+  .photo { position: absolute; top: 230px; width: 380px; height: 380px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; font-family: var(--hand); font-size: 130px; color: #fff; transform: scale(0); }
+  .photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .p-left { left: 370px; background: linear-gradient(135deg, #ff7ad9, var(--pink)); animation-name: pl; }
+  .p-right { left: 1170px; background: linear-gradient(135deg, #7cc4ff, var(--blue)); animation-name: pr; }
+
+  /* ---------- Hand-drawn circles and arrows (SVG, drawn with the dash offset) ---------- */
+  svg { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: visible; pointer-events: none; }
+  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .ring { stroke-width: 9; }
+  .ring2 { stroke-width: 4; opacity: .55; }
+  .arrow { stroke-width: 6; }
+  .left path { stroke: var(--pink); }
+  .right path { stroke: var(--blue); }
+  .left .ring { animation-name: ringL; } .left .ring2 { animation-name: ring2L; } .left .arrow { animation-name: arrowL; }
+  .right .ring { animation-name: ringR; } .right .ring2 { animation-name: ring2R; } .right .arrow { animation-name: arrowR; }
+
+  /* ---------- Names, at the start of the arrows ---------- */
+  /* written by hand: the pen draws the outline, a soft edge uncovers it left to right, then the ink fills it */
+  .name { position: absolute; inset: auto; top: 70px; width: 800px; height: 110px; overflow: visible;
+    -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%); mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
+    -webkit-mask-size: 240% 100%; mask-size: 240% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+    -webkit-mask-position: 100% 0; mask-position: 100% 0; animation-timing-function: cubic-bezier(.45,.05,.55,.95); }
+  .name text { font-family: var(--hand); font-size: 64px; fill-opacity: 0; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 420; stroke-dashoffset: 420; animation-timing-function: ease-in-out, ease-out; }
+  .n-left { left: 80px; animation-name: nameL; }
+  .n-left text { fill: var(--pink); stroke: var(--pink); animation-name: penL, inkL; }
+  .n-right { left: auto; right: 80px; animation-name: nameR; }
+  .n-right text { fill: var(--blue); stroke: var(--blue); animation-name: penR, inkR; }
+
+  .amp { position: absolute; left: 0; right: 0; top: 360px; text-align: center; font-family: var(--hand); font-size: 110px; opacity: 0; animation-name: amp; }
+
+  /* ---------- Job and skills, under each photo ---------- */
+  .who { position: absolute; top: 690px; width: 700px; text-align: center; }
+  .w-left { left: 210px; } .w-right { left: 1010px; }
+  .job { font-family: var(--hand); font-size: 44px; opacity: 0; }
+  .w-left .job { animation-name: jobL; } .w-right .job { animation-name: jobR; }
+  .skills { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 26px; }
+  .skills .chip { font-size: 24px; opacity: 0; }
+  .w-left .chip { border-color: var(--pink); }
+  .w-right .chip { border-color: var(--blue); }
+  .k1 { animation-name: k1; } .k2 { animation-name: k2; } .k3 { animation-name: k3; } .k4 { animation-name: k4; }
+  .k5 { animation-name: k5; } .k6 { animation-name: k6; } .k7 { animation-name: k7; } .k8 { animation-name: k8; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in        4–10%  left photo pops      8–14%  right photo pops
+     10–26%  left circle drawn (second pass 18–30%)     16–32% right circle (second pass 24–36%)
+     26–30%  "&" between the two
+     32–42%  left name written by hand (outline + left-to-right reveal), ink 38–45%; 36–46% its arrow drawn
+     42–52%  right name written the same way, ink 48–55%; 46–56% its arrow drawn
+     56–62%  left job        60–66%  right job
+     64–82%  skills, alternating left and right, one every ~2.5%
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes pl { 0%, 4% { transform: scale(0) } 8% { transform: scale(1.08) } 10%, 100% { transform: scale(1) } }
+  @keyframes pr { 0%, 8% { transform: scale(0) } 12% { transform: scale(1.08) } 14%, 100% { transform: scale(1) } }
+  @keyframes ringL { 0%, 10% { stroke-dashoffset: 1 } 26%, 100% { stroke-dashoffset: 0 } }
+  @keyframes ring2L { 0%, 18% { stroke-dashoffset: 1 } 30%, 100% { stroke-dashoffset: 0 } }
+  @keyframes ringR { 0%, 16% { stroke-dashoffset: 1 } 32%, 100% { stroke-dashoffset: 0 } }
+  @keyframes ring2R { 0%, 24% { stroke-dashoffset: 1 } 36%, 100% { stroke-dashoffset: 0 } }
+  @keyframes amp { 0%, 26% { opacity: 0; transform: scale(.6) rotate(-10deg) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes nameL { 0%, 32% { -webkit-mask-position: 100% 0; mask-position: 100% 0 } 42%, 100% { -webkit-mask-position: 0 0; mask-position: 0 0 } }
+  @keyframes penL { 0%, 32% { stroke-dashoffset: 420 } 43%, 100% { stroke-dashoffset: 0 } }
+  @keyframes inkL { 0%, 38% { fill-opacity: 0; stroke-width: 2 } 45%, 100% { fill-opacity: 1; stroke-width: 0 } }
+  @keyframes arrowL { 0%, 36% { stroke-dashoffset: 1 } 46%, 100% { stroke-dashoffset: 0 } }
+  @keyframes nameR { 0%, 42% { -webkit-mask-position: 100% 0; mask-position: 100% 0 } 52%, 100% { -webkit-mask-position: 0 0; mask-position: 0 0 } }
+  @keyframes penR { 0%, 42% { stroke-dashoffset: 420 } 53%, 100% { stroke-dashoffset: 0 } }
+  @keyframes inkR { 0%, 48% { fill-opacity: 0; stroke-width: 2 } 55%, 100% { fill-opacity: 1; stroke-width: 0 } }
+  @keyframes arrowR { 0%, 46% { stroke-dashoffset: 1 } 56%, 100% { stroke-dashoffset: 0 } }
+  @keyframes jobL { 0%, 56% { opacity: 0; transform: translateY(14px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes jobR { 0%, 60% { opacity: 0; transform: translateY(14px) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes k1 { 0%, 64% { opacity: 0; transform: translateY(12px) scale(.9) } 67%, 100% { opacity: 1; transform: none } }
+  @keyframes k2 { 0%, 66% { opacity: 0; transform: translateY(12px) scale(.9) } 69%, 100% { opacity: 1; transform: none } }
+  @keyframes k3 { 0%, 68.5% { opacity: 0; transform: translateY(12px) scale(.9) } 71.5%, 100% { opacity: 1; transform: none } }
+  @keyframes k4 { 0%, 70.5% { opacity: 0; transform: translateY(12px) scale(.9) } 73.5%, 100% { opacity: 1; transform: none } }
+  @keyframes k5 { 0%, 73% { opacity: 0; transform: translateY(12px) scale(.9) } 76%, 100% { opacity: 1; transform: none } }
+  @keyframes k6 { 0%, 75% { opacity: 0; transform: translateY(12px) scale(.9) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes k7 { 0%, 77.5% { opacity: 0; transform: translateY(12px) scale(.9) } 80.5%, 100% { opacity: 1; transform: none } }
+  @keyframes k8 { 0%, 79.5% { opacity: 0; transform: translateY(12px) scale(.9) } 82.5%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <!-- PLACEHOLDER: initials under the photo, shown until the image file exists -->
+    <div class="photo p-left">AB<img src="_shared/img/speaker-left.jpg" alt="" onerror="this.remove()"></div>
+    <div class="photo p-right">CD<img src="_shared/img/speaker-right.jpg" alt="" onerror="this.remove()"></div>
+
+    <svg viewBox="0 0 1920 1080">
+      <!-- left: the circle around the photo (center 560,420), drawn twice like a pen, and the arrow from the name -->
+      <g class="left">
+        <path class="ring" pathLength="1" d="M 640 208 C 765 240, 792 372, 770 456 C 748 560, 652 640, 546 636 C 430 632, 342 548, 342 428 C 342 306, 432 208, 560 202 C 614 200, 656 214, 694 236"/>
+        <path class="ring2" pathLength="1" d="M 470 220 C 560 186, 700 200, 752 300 C 800 392, 784 520, 700 590 C 610 664, 470 660, 400 580 C 330 500, 336 360, 410 270"/>
+        <path class="arrow" pathLength="1" d="M 210 180 C 230 250, 280 290, 372 300 M 372 300 L 336 280 M 372 300 L 342 326"/>
+      </g>
+      <!-- right: the same strokes, mirrored -->
+      <g class="right" transform="translate(1920 0) scale(-1 1)">
+        <path class="ring" pathLength="1" d="M 640 208 C 765 240, 792 372, 770 456 C 748 560, 652 640, 546 636 C 430 632, 342 548, 342 428 C 342 306, 432 208, 560 202 C 614 200, 656 214, 694 236"/>
+        <path class="ring2" pathLength="1" d="M 470 220 C 560 186, 700 200, 752 300 C 800 392, 784 520, 700 590 C 610 664, 470 660, 400 580 C 330 500, 336 360, 410 270"/>
+        <path class="arrow" pathLength="1" d="M 210 180 C 230 250, 280 290, 372 300 M 372 300 L 336 280 M 372 300 L 342 326"/>
+      </g>
+    </svg>
+
+    <!-- PLACEHOLDER: names -->
+    <svg class="name n-left" viewBox="0 0 800 110"><text x="0" y="78">Name Surname</text></svg>
+    <svg class="name n-right" viewBox="0 0 800 110"><text x="0" y="78">Name Surname</text></svg>
+
+    <div class="amp">&amp;</div>
+
+    <!-- PLACEHOLDER: jobs and skills -->
+    <div class="who w-left">
+      <div class="job">Job title · Company</div>
+      <div class="skills"><span class="chip k1">Skill one</span><span class="chip k3">Skill two</span><span class="chip k5">Skill three</span><span class="chip k7">Skill four</span></div>
+    </div>
+    <div class="who w-right">
+      <div class="job">Job title · Company</div>
+      <div class="skills"><span class="chip k2">Skill one</span><span class="chip k4">Skill two</span><span class="chip k6">Skill three</span><span class="chip k8">Skill four</span></div>
+    </div>
+  </div>
+</div>
+<script>
+  // each name box as wide as its name, so the left-to-right reveal follows the text whatever its length
+  document.fonts.ready.then(() => {
+    for (const svg of document.querySelectorAll("svg.name")) {
+      const w = Math.ceil(svg.querySelector("text").getComputedTextLength()) + 12;
+      svg.setAttribute("viewBox", `0 0 ${w} 110`);
+      svg.style.width = `${w}px`;
+    }
+  });
+</script>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

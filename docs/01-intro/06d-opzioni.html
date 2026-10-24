@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06d · Step 4 — Your options are text too</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "Step 4 — Your options are text too" (docs/01-intro-jev.md, section 8).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  Positions in the space are illustrative: the real space has thousands of dimensions.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .scene { position: absolute; inset: 0; animation-name: scene; }
+
+  /* ---------- Left: the four option descriptions ---------- */
+  .options { position: absolute; left: 80px; top: 230px; width: 640px; height: 690px; padding: 36px 36px; }
+  .options h2 { margin: 0 0 8px; font-size: 26px; font-weight: 600; opacity: .55; }
+  .options .code { display: block; margin-bottom: 28px; font-size: 20px; white-space: nowrap; }
+  .options .code b { color: var(--pink); font-weight: 500; }
+  .row {
+    display: flex; align-items: center; gap: 18px; padding: 18px 20px; margin-bottom: 14px;
+    border-radius: 14px; background: var(--stage); border: 2px solid transparent; font-size: 25px;
+    opacity: 0;
+  }
+  .row .n { width: 44px; height: 44px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 700; color: #fff; }
+  .row:nth-of-type(1) { animation-name: row0; }
+  .row:nth-of-type(2) { animation-name: row1; }
+  .row:nth-of-type(3) { animation-name: row2; }
+  .row:nth-of-type(4) { animation-name: row3; }
+
+  .c0 { background: var(--green); }
+  .c1 { background: var(--blue); }
+  .c2 { background: #ff7ad9; }
+  .c3 { background: var(--pink); }
+
+  /* ---------- Right: the meaning space ---------- */
+  .space { position: absolute; left: 780px; top: 230px; width: 1060px; height: 690px; overflow: hidden; }
+  .space h2 { position: absolute; left: 36px; top: 28px; margin: 0; font-size: 26px; font-weight: 600; opacity: .55; }
+  .space svg { position: absolute; inset: 0; }
+
+  .zone { position: absolute; border-radius: 50%; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 18px; font-family: var(--hand); font-size: 28px; }
+  .zone--off { left: 560px; top: 60px; width: 470px; height: 330px; background: var(--pink-bg); color: #b0007f; align-items: flex-start; padding-top: 18px; }
+  .zone--ok { left: 40px; top: 400px; width: 470px; height: 270px; background: var(--green-bg); color: #067647; }
+
+  .dot { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 3px solid var(--ink); opacity: 0; transform: scale(.4); }
+  .dot span { position: absolute; left: 44px; top: 50%; transform: translateY(-50%); white-space: nowrap; font-size: 22px; font-weight: 600; }
+  .dot.d0 { left: 240px; top: 540px; animation-name: dot0; }
+  .dot.d1 { left: 450px; top: 430px; animation-name: dot1; }
+  .dot.d2 { left: 640px; top: 300px; animation-name: dot2; }
+  .dot.d3 { left: 800px; top: 190px; animation-name: dot3; }
+  .dot.d3 span { left: auto; right: 44px; }
+  .dot.d2 span { left: 50%; top: -24px; transform: translateX(-50%); }
+
+  .me { position: absolute; left: 860px; top: 300px; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 8px rgba(255,0,191,.25); opacity: 0; animation-name: me; }
+  .me span { position: absolute; right: -20px; top: 40px; white-space: nowrap; font-family: var(--hand); font-size: 40px; }
+
+  .ln { fill: none; stroke: #9aa4b8; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .ln0 { animation-name: ln0; }
+  .ln1 { animation-name: ln1; }
+  .ln2 { animation-name: ln2; }
+  .ln3 { animation-name: ln3; }
+
+  .verdict { position: absolute; left: 610px; top: 620px; opacity: 0; animation-name: verdict; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 962px; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
+  .caption b { font-weight: inherit; background: linear-gradient(transparent 62%, var(--pink-soft) 62%); }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene appears
+     4–24%   options 0→3 appear, each one becomes a dot in the space
+     26–32%  "YOU'RE UGLY" lands near the "insult zone"
+     34–58%  distance from every option is measured, one line at a time
+     60–68%  the closest one (3 · Insults) wins: line turns pink, row 3 lights up
+     70–94%  caption
+     96–100% fade out, loop */
+  @keyframes scene { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+
+  @keyframes row0 { 0%, 4% { opacity: 0; transform: translateX(-16px) } 8%, 60% { opacity: 1; transform: none } 66%, 100% { opacity: .35; transform: none } }
+  @keyframes row1 { 0%, 9% { opacity: 0; transform: translateX(-16px) } 13%, 60% { opacity: 1; transform: none } 66%, 100% { opacity: .35; transform: none } }
+  @keyframes row2 { 0%, 14% { opacity: 0; transform: translateX(-16px) } 18%, 60% { opacity: 1; transform: none } 66%, 100% { opacity: .35; transform: none } }
+  @keyframes row3 {
+    0%, 19% { opacity: 0; transform: translateX(-16px) }
+    23%, 60% { opacity: 1; transform: none; background: var(--stage); border-color: transparent }
+    64% { transform: scale(1.04) }
+    68%, 100% { opacity: 1; transform: none; background: var(--pink-bg); border-color: var(--pink) }
+  }
+
+  @keyframes dot0 { 0%, 6% { opacity: 0; transform: scale(.4) } 9%, 60% { opacity: 1; transform: scale(1) } 66%, 100% { opacity: .35; transform: scale(1) } }
+  @keyframes dot1 { 0%, 11% { opacity: 0; transform: scale(.4) } 14%, 60% { opacity: 1; transform: scale(1) } 66%, 100% { opacity: .35; transform: scale(1) } }
+  @keyframes dot2 { 0%, 16% { opacity: 0; transform: scale(.4) } 19%, 60% { opacity: 1; transform: scale(1) } 66%, 100% { opacity: .35; transform: scale(1) } }
+  @keyframes dot3 {
+    0%, 21% { opacity: 0; transform: scale(.4) }
+    24%, 60% { opacity: 1; transform: scale(1); box-shadow: none }
+    64% { transform: scale(1.35) }
+    68%, 100% { opacity: 1; transform: scale(1.15); box-shadow: 0 0 0 10px rgba(255,0,191,.25) }
+  }
+  @keyframes me { 0%, 26% { opacity: 0; transform: translateY(-60px) scale(.5) } 30% { opacity: 1; transform: scale(1.1) } 32%, 100% { opacity: 1; transform: scale(1) } }
+
+  @keyframes ln0 { 0%, 34% { stroke-dashoffset: 1; opacity: 1 } 40%, 60% { stroke-dashoffset: 0; opacity: 1 } 66%, 100% { stroke-dashoffset: 0; opacity: .2 } }
+  @keyframes ln1 { 0%, 40% { stroke-dashoffset: 1; opacity: 1 } 46%, 60% { stroke-dashoffset: 0; opacity: 1 } 66%, 100% { stroke-dashoffset: 0; opacity: .2 } }
+  @keyframes ln2 { 0%, 46% { stroke-dashoffset: 1; opacity: 1 } 52%, 60% { stroke-dashoffset: 0; opacity: 1 } 66%, 100% { stroke-dashoffset: 0; opacity: .2 } }
+  @keyframes ln3 {
+    0%, 52% { stroke-dashoffset: 1; stroke: #9aa4b8; stroke-width: 3 }
+    58%, 60% { stroke-dashoffset: 0; stroke: #9aa4b8; stroke-width: 3 }
+    66%, 100% { stroke-dashoffset: 0; stroke: #FF00BF; stroke-width: 9 }
+  }
+  @keyframes verdict { 0%, 62% { opacity: 0; transform: translateY(10px) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 70% { opacity: 0; transform: translateY(14px) } 74%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="scene">
+    <div class="kicker"><small>Step 4</small>Your options are text too</div>
+
+    <section class="card options">
+      <h2>The options you pass in</h2>
+      <span class="code"><b>score</b>("How offensive is the tone?", [ … ])</span>
+      <div class="row"><span class="n c0">0</span>Polite or neutral</div>
+      <div class="row"><span class="n c1">1</span>Critical but respectful</div>
+      <div class="row"><span class="n c2">2</span>Combative or sarcastic toward people</div>
+      <div class="row"><span class="n c3">3</span>Insults, hate or personal attacks</div>
+    </section>
+
+    <section class="card space">
+      <div class="zone zone--off">insult zone</div>
+      <div class="zone zone--ok">politeness zone</div>
+      <h2>The meaning space</h2>
+
+      <svg viewBox="0 0 1060 690" width="1060" height="690" aria-hidden="true">
+        <line class="ln ln0" pathLength="1" x1="860" y1="300" x2="240" y2="540" />
+        <line class="ln ln1" pathLength="1" x1="860" y1="300" x2="450" y2="430" />
+        <line class="ln ln2" pathLength="1" x1="860" y1="300" x2="640" y2="300" />
+        <line class="ln ln3" pathLength="1" x1="860" y1="300" x2="800" y2="190" />
+      </svg>
+
+      <div class="dot d0 c0"><span>0 · Polite</span></div>
+      <div class="dot d1 c1"><span>1 · Critical</span></div>
+      <div class="dot d2 c2"><span>2 · Combative</span></div>
+      <div class="dot d3 c3"><span>3 · Insults</span></div>
+      <div class="me"><span>YOU'RE UGLY</span></div>
+
+      <div class="verdict chip chip--pink">closest = most compatible → 3</div>
+    </section>
+
+    <div class="caption">Descriptions are <b>half of the comparison</b>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

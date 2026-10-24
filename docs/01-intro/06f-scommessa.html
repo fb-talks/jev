@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06f · Step 5 — An honest bet on "UGLY!!!"</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "Step 5 — Jev's training teaches it to bet" (docs/01-intro-jev.md, section 8), second part:
+  the real example. The training and its two lessons are in 06e-scommettere.html.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  The bets on "UGLY!!!" are a real Jev answer (October 2026, toxicity question of /1-jev/demo3): 0 · 4 · 10 · 86.
+  ("you're ugly" and similar direct insults give 100% Insults.)
+-->
+<style>
+  :root { --loop: 8s; }
+
+  .scene { position: absolute; inset: 0; animation-name: scene; }
+
+  /* ---------- The bets on "UGLY!!!" ---------- */
+  .result { position: absolute; left: 50%; top: 260px; width: 1180px; padding: 44px 56px; transform: translateX(-50%); opacity: 0; animation-name: result; }
+  .result h3 { margin: 0 0 30px; font-family: var(--hand); font-size: 64px; font-weight: 400; }
+  .bet { display: flex; align-items: center; gap: 26px; margin-bottom: 22px; font-size: 30px; }
+  .bet .lbl { width: 300px; }
+  .bet .bar { flex: 1; height: 34px; }
+  .bet .bar > i { width: 0; animation-name: fill; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .bet .pct { width: 110px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; opacity: 0; animation-name: pct; }
+  .bet--top .lbl, .bet--top .pct { font-weight: 700; }
+  .bet--top .pct { color: var(--pink); }
+  .note { position: absolute; left: 0; right: 0; top: 800px; text-align: center; font-family: var(--hand); font-size: 56px; opacity: 0; animation-name: note; }
+
+  /* ---------- Timeline (8s loop) ----------
+     0–4%    scene appears              4–10%  the "UGLY!!!" card
+     12–36%  the four bars fill: 0% · 4% · 10% · 86%
+     34–40%  the percentages
+     50–58%  "An honest bet on every option."
+     94%     final frame · 96–100% fade out, loop */
+  @keyframes scene { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes result { 0%, 4% { opacity: 0; transform: translate(-50%, 20px) } 10%, 100% { opacity: 1; transform: translate(-50%, 0) } }
+  @keyframes fill { 0%, 12% { width: 0 } 36%, 100% { width: var(--w) } }
+  @keyframes pct { 0%, 34% { opacity: 0 } 40%, 100% { opacity: 1 } }
+  @keyframes note { 0%, 50% { opacity: 0; transform: translateY(12px) } 58%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="scene">
+    <div class="kicker"><small>Step 5</small>A real bet</div>
+
+    <section class="card result">
+      <h3>"UGLY!!!"</h3>
+      <div class="bet"><span class="lbl">0 · Polite</span><div class="bar bar--grey"><i style="--w: 0%"></i></div><span class="pct">0%</span></div>
+      <div class="bet"><span class="lbl">1 · Critical</span><div class="bar bar--grey"><i style="--w: 4%"></i></div><span class="pct">4%</span></div>
+      <div class="bet"><span class="lbl">2 · Combative</span><div class="bar bar--grey"><i style="--w: 10%"></i></div><span class="pct">10%</span></div>
+      <div class="bet bet--top"><span class="lbl">3 · Insults</span><div class="bar"><i style="--w: 86%"></i></div><span class="pct">86%</span></div>
+    </section>
+    <div class="note">An honest bet on <span class="underline-pink">every option</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09b · box: four numbers</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "9. Bonus: Jev looks at images" in the video script (docs/01-intro-jev-video-script.md):
+  what a box answer is. Four edges as fractions of the image (top/bottom of the height, left/right of
+  the width, from the top-left corner), drawn one at a time on the photo, then turned into CSS percentages
+  as in /3-jev-images/demo1.
+  Values are a real Jev answer for box("eye") on this photo (October 2026).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 38px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; }
+
+  /* ---------- Left: the photo, with the four edges ---------- */
+  .shot { position: absolute; left: 80px; top: 200px; height: 702px; padding: 16px; }
+  .shot .label { margin: 4px 4px 12px; }
+  .photo { position: relative; width: 840px; height: 630px; border-radius: 16px; overflow: hidden; }
+  .photo img { display: block; width: 100%; height: 100%; filter: brightness(.85); }
+
+  /* one dashed line per edge, across the whole image */
+  .edge { position: absolute; opacity: 0; }
+  .edge.h { left: 0; right: 0; border-top: 3px dashed #fff; }
+  .edge.v { top: 0; bottom: 0; border-left: 3px dashed #fff; }
+  .edge span { position: absolute; padding: 2px 12px; border-radius: 999px; background: #fff; color: var(--ink); font-family: var(--mono); font-size: 22px; white-space: nowrap; }
+  .edge.h span { left: 12px; translate: 0 -50%; }
+  .edge.v span { top: 12px; translate: -50% 0; }
+  .e-top { top: 37%; animation-name: e1; }
+  .e-bottom { top: 46%; animation-name: e2; }
+  .e-left { left: 48%; animation-name: e3; }
+  .e-right { left: 56%; animation-name: e4; }
+  /* labels on the outer side of each pair of lines, so they never overlap */
+  .edge.e-top span { translate: 0 calc(-100% - 4px); }
+  .edge.e-bottom span { translate: 0 4px; }
+  .edge.e-left span { translate: calc(-100% - 6px) 0; }
+  .edge.e-right span { translate: 6px 0; }
+
+  .box { position: absolute; top: 37%; left: 48%; width: 8%; height: 9%; border: 5px solid var(--pink); border-radius: 6px; background: rgba(255,0,191,.18); opacity: 0; animation-name: box; }
+
+  /* ---------- Right: the answer, then the CSS ---------- */
+  .panel { position: absolute; left: 1000px; top: 200px; width: 840px; height: 702px; padding: 28px 36px; }
+  .code { margin: 12px 0 26px; font-family: var(--mono); font-size: 26px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .v { color: var(--pink); }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 10px; }
+  .r1 { animation-name: r1; } .r2 { animation-name: r2; } .r3 { animation-name: r3; } .r4 { animation-name: r4; } .r5 { animation-name: r5; }
+  .css { opacity: 0; animation-name: css; }
+  .css .code { margin-bottom: 0; padding: 14px 22px; border-radius: 14px; background: var(--stage); font-size: 24px; }
+  .css .c { opacity: .45; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 950px; text-align: center; font-family: var(--hand); font-size: 50px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in: photo and empty answer card (rows dimmed)
+     12–16%  top: row lit, horizontal line at 37%
+     20–24%  bottom: row lit, line at 46%
+     28–32%  left: row lit, vertical line at 48%
+     36–40%  right: row lit, line at 56%
+     44–50%  the box fills the rectangle the four lines make
+     52–56%  confidence row lit
+     62–68%  the CSS: × 100 = percentages
+     78–82%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes e1 { 0%, 12% { opacity: 0 } 16%, 100% { opacity: 1 } }
+  @keyframes e2 { 0%, 20% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes e3 { 0%, 28% { opacity: 0 } 32%, 100% { opacity: 1 } }
+  @keyframes e4 { 0%, 36% { opacity: 0 } 40%, 100% { opacity: 1 } }
+  @keyframes r1 { 0%, 12% { opacity: .3; background: transparent } 16%, 100% { opacity: 1; background: var(--pink-bg) } }
+  @keyframes r2 { 0%, 20% { opacity: .3; background: transparent } 24%, 100% { opacity: 1; background: var(--pink-bg) } }
+  @keyframes r3 { 0%, 28% { opacity: .3; background: transparent } 32%, 100% { opacity: 1; background: var(--pink-bg) } }
+  @keyframes r4 { 0%, 36% { opacity: .3; background: transparent } 40%, 100% { opacity: 1; background: var(--pink-bg) } }
+  @keyframes r5 { 0%, 52% { opacity: .3 } 56%, 100% { opacity: 1 } }
+  @keyframes box { 0%, 44% { opacity: 0; transform: scale(.4) } 50%, 100% { opacity: 1; transform: none } }
+  @keyframes css { 0%, 62% { opacity: 0; transform: translateY(16px) } 68%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 78% { opacity: 0; transform: translateY(12px) } 82%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>09 · Bonus: images · 3 / 6</small>box: four numbers</div>
+
+    <div class="card shot">
+      <div class="label">box("eye") · from 0 to 1, from the top-left corner</div>
+      <div class="photo">
+        <img src="_shared/img/dog.jpg" alt="">
+        <div class="edge h e-top"><span>top 0.37</span></div>
+        <div class="edge h e-bottom"><span>bottom 0.46</span></div>
+        <div class="edge v e-left"><span>left 0.48</span></div>
+        <div class="edge v e-right"><span>right 0.56</span></div>
+        <div class="box"></div>
+      </div>
+    </div>
+
+    <div class="card panel">
+      <div class="label">What Jev returns</div>
+      <div class="code">
+        <div class="l">answers.where = {</div>
+        <div class="l">  box: {</div>
+        <div class="grp r1"><div class="l">    top:    <span class="v">0.37</span>,  <span class="c">// of the height</span></div></div>
+        <div class="grp r2"><div class="l">    bottom: <span class="v">0.46</span>,</div></div>
+        <div class="grp r3"><div class="l">    left:   <span class="v">0.48</span>,  <span class="c">// of the width</span></div></div>
+        <div class="grp r4"><div class="l">    right:  <span class="v">0.56</span>,</div></div>
+        <div class="l">  },</div>
+        <div class="grp r5"><div class="l">  confidence: <span class="v">0.72</span>,</div></div>
+        <div class="l">}</div>
+      </div>
+      <div class="css">
+        <div class="label">In the page: × 100, and it's CSS</div>
+        <div class="code">
+          <div class="l">top: <span class="v">37%</span>;  left: <span class="v">48%</span>;</div>
+          <div class="l">width: <span class="v">8%</span>;   <span class="c">/* right − left */</span></div>
+          <div class="l">height: <span class="v">9%</span>;  <span class="c">/* bottom − top */</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="caption">Not pixels: <span class="underline-pink">fractions of the image</span>. Any size works.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

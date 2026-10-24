@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06c · Step 3 — Context changes meaning</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "Step 3" of section 6 of the video script (docs/01-intro-jev-video-script.md): alone, "ugly" sits between the zones; each sentence's context
+  (attention) moves it to a different place. Positions on the map are illustrative, not measured.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .scene { position: absolute; inset: 0; animation-name: scene; }
+  .kicker .chip { margin-left: 18px; vertical-align: 8px; font-family: var(--mono); font-size: 20px; font-weight: 500; }
+
+  /* ---------- Sentences (left) ---------- */
+  .row { position: absolute; left: 80px; width: 700px; height: 120px; opacity: 0; }
+  .row--1 { top: 230px; animation-name: row1; }
+  .row--2 { top: 410px; animation-name: row2; }
+  .row--3 { top: 590px; animation-name: row3; }
+  /* fixed-width word boxes, so the arcs can point at exact coordinates */
+  .wd { position: absolute; top: 18px; height: 84px; display: grid; place-items: center; font-family: var(--hand); font-size: 46px; border-radius: 14px; border: 3px solid transparent; }
+  .row--1 .ugly { animation-name: hl1; }
+  .row--2 .ugly { animation-name: hl2; }
+  .row--3 .ugly { animation-name: hl3; }
+  .row--1 .target { animation-name: tg1; }
+  .row--2 .target { animation-name: tg2; }
+  .row--3 .target { animation-name: tg3; }
+
+  .arcs { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; overflow: visible; }
+  .arcs .arc { fill: none; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  .arcs .a1 { stroke: var(--pink); animation-name: arc1; }
+  .arcs .a2 { stroke: var(--blue); animation-name: arc2; }
+  .arcs .a3 { stroke: var(--amber); animation-name: arc3; }
+
+  /* ---------- Map (right) ---------- */
+  .plot { position: absolute; left: 840px; top: 180px; width: 1000px; height: 700px; opacity: 0; animation-name: plot; }
+  .zone { position: absolute; border-radius: 50%; opacity: 0; animation-name: plot; }
+  .zone--ins { left: 890px; top: 230px; width: 380px; height: 280px; background: radial-gradient(closest-side, rgba(255,0,191,.20), rgba(255,0,191,.06) 75%, transparent); }
+  .zone--wea { left: 1460px; top: 270px; width: 360px; height: 280px; background: radial-gradient(closest-side, rgba(13,153,255,.22), rgba(13,153,255,.06) 75%, transparent); }
+  .zone--rev { left: 1150px; top: 650px; width: 420px; height: 220px; background: radial-gradient(closest-side, rgba(247,144,9,.24), rgba(247,144,9,.07) 75%, transparent); }
+  .zone-label { position: absolute; font-family: var(--hand); font-size: 38px; opacity: 0; animation-name: plot; }
+  .zone-label--ins { left: 910px; top: 215px; color: var(--pink); }
+  .zone-label--wea { left: 1650px; top: 255px; color: var(--blue); }
+  .zone-label--rev { left: 1180px; top: 820px; color: var(--amber); }
+  .pt { position: absolute; display: flex; align-items: center; gap: 8px; transform: translate(-8px, -50%); font-size: 22px; color: #6b7385; opacity: 0; animation-name: plot; }
+  .pt i { width: 14px; height: 14px; border-radius: 50%; opacity: .55; }
+  .pt--ins i { background: var(--pink); }
+  .pt--wea i { background: var(--blue); }
+  .pt--rev i { background: var(--amber); }
+
+  /* "ugly" alone: grey, between the zones */
+  .origin { position: absolute; left: 1345px; top: 505px; width: 30px; height: 30px; border-radius: 50%; background: var(--muted); border: 3px solid #8a93a6; transform: scale(0); animation-name: origin; }
+  .origin-label { position: absolute; left: 1360px; top: 548px; transform: translateX(-50%); text-align: center; white-space: nowrap; opacity: 0; animation-name: origin-label; }
+  .origin-label .hand { display: block; font-size: 40px; line-height: 1; }
+  .origin-label small { font-size: 22px; color: #6b7385; }
+
+  /* the three copies of "ugly", each flying to the place its context gives it */
+  .dot { position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; opacity: 0; offset-rotate: 0deg; offset-distance: 0%; animation-timing-function: cubic-bezier(.5,0,.3,1); }
+  .d1 { background: var(--pink); box-shadow: 0 0 0 6px rgba(255,0,191,.2); offset-path: path("M1360 520 Q1190 380 1060 390"); animation-name: dot1; }
+  .d2 { background: var(--blue); box-shadow: 0 0 0 6px rgba(13,153,255,.2); offset-path: path("M1360 520 Q1520 390 1640 420"); animation-name: dot2; }
+  .d3 { background: var(--amber); box-shadow: 0 0 0 6px rgba(247,144,9,.22); offset-path: path("M1360 520 Q1600 600 1370 760"); animation-name: dot3; }
+  .ring { position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; border: 3px solid; opacity: 0; }
+  .r1 { left: 1060px; top: 390px; border-color: var(--pink); animation-name: ring1; }
+  .r2 { left: 1640px; top: 420px; border-color: var(--blue); animation-name: ring2; }
+  .r3 { left: 1370px; top: 760px; border-color: var(--amber); animation-name: ring3; }
+  .landed { position: absolute; transform: translateY(-50%); font-family: var(--hand); font-size: 30px; padding: 4px 14px; opacity: 0; }
+  .l1 { left: 920px; top: 440px; border-color: var(--pink); animation-name: land1; }
+  .l2 { left: 1530px; top: 470px; border-color: var(--blue); animation-name: land2; }
+  .l3 { left: 1410px; top: 760px; border-color: var(--amber); animation-name: land3; }
+
+  /* finale: dashed links back to the common starting point */
+  .links { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; opacity: 0; animation-name: links; }
+  .links path { fill: none; stroke: #8a93a6; stroke-width: 3; stroke-dasharray: 8 10; }
+
+  /* ---------- Caption (left, under the sentences) ---------- */
+  .caption { position: absolute; left: 80px; top: 760px; width: 700px; opacity: 0; animation-name: caption; }
+  .caption .hand { font-size: 54px; line-height: 1.15; }
+  .caption .hand b { font-weight: 400; }
+  .caption p { margin: 14px 0 0; font-size: 26px; line-height: 1.4; color: #6b7385; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in                  3–8%    map and its three zones
+     8–11%   grey "ugly" in the middle: "alone: ambiguous"
+     12–32%  "YOU'RE ugly": arc to YOU'RE (16–20) → pink copy flies to insults (21–28), ring + label
+     34–54%  "the weather is ugly": arc to weather (38–42) → blue copy flies to weather (43–50)
+     56–76%  "what an ugly movie": arc to movie (60–64) → amber copy flies to reviews (65–72)
+     80–84%  dashed links back to the common start
+     84–88%  caption · 94% final frame · 96–100% fade out */
+  @keyframes scene { 0% { opacity: 0 } 2%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes plot { 0%, 3% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes origin { 0%, 8% { transform: scale(0) } 10% { transform: scale(1.3) } 11%, 100% { transform: scale(1) } }
+  @keyframes origin-label { 0%, 9% { opacity: 0 } 11%, 100% { opacity: 1 } }
+
+  @keyframes row1 { 0%, 12% { opacity: 0; transform: translateX(-20px) } 15%, 100% { opacity: 1; transform: none } }
+  @keyframes row2 { 0%, 34% { opacity: 0; transform: translateX(-20px) } 37%, 100% { opacity: 1; transform: none } }
+  @keyframes row3 { 0%, 56% { opacity: 0; transform: translateX(-20px) } 59%, 100% { opacity: 1; transform: none } }
+  @keyframes hl1 { 0%, 15% { border-color: transparent; background: none } 16%, 100% { border-color: var(--ink); background: #fff } }
+  @keyframes hl2 { 0%, 37% { border-color: transparent; background: none } 38%, 100% { border-color: var(--ink); background: #fff } }
+  @keyframes hl3 { 0%, 59% { border-color: transparent; background: none } 60%, 100% { border-color: var(--ink); background: #fff } }
+  @keyframes arc1 { 0%, 16% { stroke-dashoffset: 1 } 20%, 100% { stroke-dashoffset: 0 } }
+  @keyframes arc2 { 0%, 38% { stroke-dashoffset: 1 } 42%, 100% { stroke-dashoffset: 0 } }
+  @keyframes arc3 { 0%, 60% { stroke-dashoffset: 1 } 64%, 100% { stroke-dashoffset: 0 } }
+  @keyframes tg1 { 0%, 19.5% { background: none; border-color: transparent } 20%, 100% { background: var(--pink-bg); border-color: var(--pink) } }
+  @keyframes tg2 { 0%, 41.5% { background: none; border-color: transparent } 42%, 100% { background: var(--blue-bg); border-color: var(--blue) } }
+  @keyframes tg3 { 0%, 63.5% { background: none; border-color: transparent } 64%, 100% { background: var(--amber-bg); border-color: var(--amber) } }
+
+  @keyframes dot1 { 0%, 20.5% { opacity: 0; offset-distance: 0% } 21% { opacity: 1; offset-distance: 0% } 28%, 100% { opacity: 1; offset-distance: 100% } }
+  @keyframes dot2 { 0%, 42.5% { opacity: 0; offset-distance: 0% } 43% { opacity: 1; offset-distance: 0% } 50%, 100% { opacity: 1; offset-distance: 100% } }
+  @keyframes dot3 { 0%, 64.5% { opacity: 0; offset-distance: 0% } 65% { opacity: 1; offset-distance: 0% } 72%, 100% { opacity: 1; offset-distance: 100% } }
+  @keyframes ring1 { 0%, 28% { opacity: 0; transform: scale(1) } 28.5% { opacity: 1; transform: scale(1) } 32%, 100% { opacity: 0; transform: scale(3.5) } }
+  @keyframes ring2 { 0%, 50% { opacity: 0; transform: scale(1) } 50.5% { opacity: 1; transform: scale(1) } 54%, 100% { opacity: 0; transform: scale(3.5) } }
+  @keyframes ring3 { 0%, 72% { opacity: 0; transform: scale(1) } 72.5% { opacity: 1; transform: scale(1) } 76%, 100% { opacity: 0; transform: scale(3.5) } }
+  @keyframes land1 { 0%, 29% { opacity: 0 } 32%, 100% { opacity: 1 } }
+  @keyframes land2 { 0%, 51% { opacity: 0 } 54%, 100% { opacity: 1 } }
+  @keyframes land3 { 0%, 73% { opacity: 0 } 76%, 100% { opacity: 1 } }
+
+  @keyframes links { 0%, 80% { opacity: 0 } 84%, 100% { opacity: 1 } }
+  @keyframes caption { 0%, 84% { opacity: 0; transform: translateY(14px) } 88%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="scene">
+    <div class="kicker"><small>Step 3</small>Context changes meaning<span class="chip">attention</span></div>
+
+    <!-- map first, so the sentences and arcs sit on top -->
+    <div class="plot card"></div>
+    <div class="zone zone--ins"></div>
+    <div class="zone zone--wea"></div>
+    <div class="zone zone--rev"></div>
+    <span class="zone-label zone-label--ins">insults</span>
+    <span class="zone-label zone-label--wea">weather</span>
+    <span class="zone-label zone-label--rev">reviews</span>
+
+    <span class="pt pt--ins" style="left: 1120px; top: 300px"><i></i>idiot</span>
+    <span class="pt pt--ins" style="left: 940px; top: 340px"><i></i>insult</span>
+    <span class="pt pt--wea" style="left: 1540px; top: 330px"><i></i>rain</span>
+    <span class="pt pt--wea" style="left: 1700px; top: 360px"><i></i>cloudy</span>
+    <span class="pt pt--rev" style="left: 1200px; top: 720px"><i></i>boring</span>
+    <span class="pt pt--rev" style="left: 1480px; top: 700px"><i></i>plot</span>
+
+    <svg class="links" viewBox="0 0 1920 1080" aria-hidden="true">
+      <path d="M1360 520 Q1190 380 1060 390" />
+      <path d="M1360 520 Q1520 390 1640 420" />
+      <path d="M1360 520 Q1600 600 1370 760" />
+    </svg>
+
+    <div class="origin"></div>
+    <div class="origin-label"><span class="hand">ugly</span><small>alone: ambiguous</small></div>
+
+    <div class="dot d1"></div>
+    <div class="dot d2"></div>
+    <div class="dot d3"></div>
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+    <span class="landed chip l1">YOU'RE ugly</span>
+    <span class="landed chip l2">weather is ugly</span>
+    <span class="landed chip l3">ugly movie</span>
+
+    <!-- sentences: row x offset 80px, word tops at row top + 18px -->
+    <div class="row card row--1">
+      <span class="wd target" style="left: 30px; width: 200px">YOU'RE</span>
+      <span class="wd ugly" style="left: 250px; width: 140px">ugly</span>
+    </div>
+    <div class="row card row--2">
+      <span class="wd" style="left: 30px; width: 80px">the</span>
+      <span class="wd target" style="left: 125px; width: 210px">weather</span>
+      <span class="wd" style="left: 350px; width: 50px">is</span>
+      <span class="wd ugly" style="left: 415px; width: 140px">ugly</span>
+    </div>
+    <div class="row card row--3">
+      <span class="wd" style="left: 30px; width: 120px">what</span>
+      <span class="wd" style="left: 165px; width: 70px">an</span>
+      <span class="wd ugly" style="left: 250px; width: 140px">ugly</span>
+      <span class="wd target" style="left: 405px; width: 170px">movie</span>
+    </div>
+
+    <svg class="arcs" viewBox="0 0 1920 1080" aria-hidden="true">
+      <path class="arc a1" pathLength="1" d="M400 248 Q305 180 210 248" />
+      <path class="arc a2" pathLength="1" d="M565 428 Q437 360 310 428" />
+      <path class="arc a3" pathLength="1" d="M400 608 Q485 540 570 608" />
+    </svg>
+
+    <div class="caption">
+      <div class="hand">Same word, <b class="underline-pink">three places</b>.</div>
+      <p>Alone, "ugly" is ambiguous: the words around it decide where it lands.</p>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

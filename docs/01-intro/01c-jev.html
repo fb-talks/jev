@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01c · What is Jev, and what is it for?</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Opening of the talk, before the hook (docs/01-intro-jev-video-script.md, "1. Opening"), after the first
+  part of docs.typesafe.ai/introduction, as a drawing with very little text:
+    top    your data → LLM → a paragraph (grey lines) → fine for a person, a question mark for code
+    bottom your data → Jev → one number → code uses it: branch, sort, route
+  0.92 is the urgent ticket of 03e, used here only as a symbol.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  @property --n { syntax: "<integer>"; inherits: false; initial-value: 0; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .row { position: absolute; left: 0; right: 0; height: 300px; }
+  .r1 { top: 190px; animation-name: dim; }
+  .r2 { top: 560px; }
+  .row > * { position: absolute; }
+
+  /* your data: a small sheet with three lines */
+  .doc { left: 120px; top: 70px; width: 130px; height: 160px; padding: 26px 20px; border-radius: 14px; background: #fff; border: 3px solid var(--ink); opacity: 0; }
+  .doc i { display: block; height: 10px; margin-bottom: 18px; border-radius: 5px; background: var(--muted); }
+  .doc i:nth-child(2) { width: 70%; } .doc i:nth-child(3) { width: 85%; }
+  .r1 .doc { animation-name: d1; } .r2 .doc { animation-name: d2; }
+
+  .arrow { height: 4px; border-radius: 2px; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+  .arrow::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
+  .arrow.dash { background: repeating-linear-gradient(90deg, var(--ink) 0 12px, transparent 12px 22px); }
+
+  .model { display: grid; place-items: center; border-radius: 50%; color: #fff; font-family: var(--hand); transform: scale(0); }
+  .llm { left: 340px; top: 60px; width: 180px; height: 180px; background: var(--muted); font-size: 52px; animation-name: m1; }
+  .jev { left: 340px; top: 60px; width: 180px; height: 180px; background: var(--pink); font-size: 60px; animation-name: m2; }
+
+  /* ---------- Row 1: a paragraph, for people ---------- */
+  .r1 .a1 { left: 266px; top: 148px; width: 60px; animation-name: a11; }
+  .r1 .a2 { left: 536px; top: 148px; width: 60px; animation-name: a12; }
+  .bubble { left: 612px; top: 40px; width: 420px; height: 220px; padding: 34px 32px; border-radius: 28px; background: var(--stage); }
+  .bubble::after { content: ""; position: absolute; left: -22px; top: 92px; border: 18px solid transparent; border-right: 26px solid var(--stage); border-left: 0; }
+  .bubble i { display: block; height: 12px; margin-bottom: 18px; border-radius: 6px; background: #c5cddc; transform-origin: left; transform: scaleX(0); }
+  .bubble i:nth-child(1) { animation-name: t1; } .bubble i:nth-child(2) { width: 92%; animation-name: t2; }
+  .bubble i:nth-child(3) { width: 97%; animation-name: t3; } .bubble i:nth-child(4) { width: 88%; animation-name: t4; }
+  .bubble i:nth-child(5) { width: 60%; animation-name: t5; }
+  .r1 .a3 { left: 1048px; top: 148px; width: 60px; animation-name: a13; }
+  .person { left: 1124px; top: 70px; width: 160px; height: 160px; display: grid; place-items: center; border-radius: 50%; background: var(--green-bg); font-size: 84px; transform: scale(0); animation-name: person; }
+  .r1 .a4 { left: 1300px; top: 148px; width: 90px; animation-name: a14; }
+  .code { width: 200px; height: 160px; display: grid; place-items: center; border-radius: 22px; background: var(--ink); color: #fff; font-family: var(--mono); font-size: 64px; transform: scale(0); }
+  .r1 .code { left: 1406px; top: 70px; animation-name: c1; }
+  .mark { width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-size: 44px; font-weight: 700; transform: scale(0); }
+  .r1 .mark { left: 1566px; top: 40px; background: var(--red); animation-name: k1; }
+  .r1 .person + .mark { left: 1250px; top: 46px; width: 56px; height: 56px; font-size: 32px; background: var(--green); animation-name: k0; }
+
+  /* ---------- Row 2: one number, for code ---------- */
+  .r2 .a1 { left: 266px; top: 148px; width: 60px; animation-name: a21; }
+  .r2 .a2 { left: 536px; top: 148px; width: 60px; animation-name: a22; }
+  .num { left: 612px; top: 52px; width: 420px; text-align: center; font-family: var(--hand); font-size: 150px; line-height: 1; color: var(--pink); opacity: 0; --n: 0; counter-reset: n var(--n); animation-name: num, count; animation-timing-function: ease-out, cubic-bezier(.2,.8,.2,1); }
+  .num::before { content: "0." counter(n, decimal-leading-zero); }
+  .numbar { left: 652px; top: 222px; width: 340px; height: 16px; opacity: 0; animation-name: num; }
+  .numbar > i { width: 0; animation-name: fill; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .r2 .a3 { left: 1048px; top: 148px; width: 342px; animation-name: a23; }
+  .r2 .code { left: 1406px; top: 70px; animation-name: c2; }
+  .r2 .mark { left: 1566px; top: 40px; background: var(--green); animation-name: k2; }
+
+  /* what the code does with it: three short arrows fanning out */
+  .fan { left: 1650px; top: 20px; width: 220px; height: 260px; }
+  .fan span { position: absolute; left: 0; display: flex; align-items: center; gap: 12px; font-size: 36px; font-weight: 700; opacity: 0; }
+  .fan span::before { content: "→"; font-size: 44px; color: var(--pink); }
+  .fan .f1 { top: 30px; animation-name: f1; } .fan .f2 { top: 110px; animation-name: f2; } .fan .f3 { top: 190px; animation-name: f3; }
+
+  .caption { position: absolute; left: 0; right: 0; top: 920px; text-align: center; font-family: var(--hand); font-size: 54px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in
+     row 1   4–7% data · 7–9% arrow · 9–12% LLM · 12–14% arrow · 14–26% five lines of text, one every ~2.5%
+             26–28% arrow · 28–31% a person reads it, ✓ 31–33% · 34–36% dashed arrow · 36–39% code · 39–42% ✗ "?"
+             44–48% row 1 dims
+     row 2   46–49% data · 49–51% arrow · 51–54% Jev · 54–56% arrow · 56–66% 0.92 counts up, bar fills
+             66–69% arrow · 69–72% code · 72–75% ✓ · 75–84% branch, sort, route
+     84–88%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes dim { 0%, 44% { opacity: 1 } 48%, 100% { opacity: .4 } }
+  @keyframes d1 { 0%, 4% { opacity: 0; transform: translateY(16px) } 7%, 100% { opacity: 1; transform: none } }
+  @keyframes a11 { 0%, 7% { transform: scaleX(0) } 9%, 100% { transform: scaleX(1) } }
+  @keyframes m1 { 0%, 9% { transform: scale(0) } 11% { transform: scale(1.1) } 12%, 100% { transform: scale(1) } }
+  @keyframes a12 { 0%, 12% { transform: scaleX(0) } 14%, 100% { transform: scaleX(1) } }
+  @keyframes t1 { 0%, 14% { transform: scaleX(0) } 16.5%, 100% { transform: scaleX(1) } }
+  @keyframes t2 { 0%, 16.5% { transform: scaleX(0) } 19%, 100% { transform: scaleX(1) } }
+  @keyframes t3 { 0%, 19% { transform: scaleX(0) } 21.5%, 100% { transform: scaleX(1) } }
+  @keyframes t4 { 0%, 21.5% { transform: scaleX(0) } 24%, 100% { transform: scaleX(1) } }
+  @keyframes t5 { 0%, 24% { transform: scaleX(0) } 26%, 100% { transform: scaleX(1) } }
+  @keyframes a13 { 0%, 26% { transform: scaleX(0) } 28%, 100% { transform: scaleX(1) } }
+  @keyframes person { 0%, 28% { transform: scale(0) } 30% { transform: scale(1.1) } 31%, 100% { transform: scale(1) } }
+  @keyframes k0 { 0%, 31% { transform: scale(0) } 32.5% { transform: scale(1.2) } 33%, 100% { transform: scale(1) } }
+  @keyframes a14 { 0%, 34% { transform: scaleX(0) } 36%, 100% { transform: scaleX(1) } }
+  @keyframes c1 { 0%, 36% { transform: scale(0) } 38% { transform: scale(1.08) } 39%, 100% { transform: scale(1) } }
+  @keyframes k1 { 0%, 39% { transform: scale(0) rotate(0) } 41% { transform: scale(1.25) rotate(-12deg) } 42%, 100% { transform: scale(1) rotate(0) } }
+  @keyframes d2 { 0%, 46% { opacity: 0; transform: translateY(16px) } 49%, 100% { opacity: 1; transform: none } }
+  @keyframes a21 { 0%, 49% { transform: scaleX(0) } 51%, 100% { transform: scaleX(1) } }
+  @keyframes m2 { 0%, 51% { transform: scale(0) } 53% { transform: scale(1.12) } 54%, 100% { transform: scale(1) } }
+  @keyframes a22 { 0%, 54% { transform: scaleX(0) } 56%, 100% { transform: scaleX(1) } }
+  @keyframes num { 0%, 56% { opacity: 0 } 58%, 100% { opacity: 1 } }
+  @keyframes count { 0%, 56% { --n: 0 } 66%, 100% { --n: 92 } }
+  @keyframes fill { 0%, 56% { width: 0 } 66%, 100% { width: 92% } }
+  @keyframes a23 { 0%, 66% { transform: scaleX(0) } 69%, 100% { transform: scaleX(1) } }
+  @keyframes c2 { 0%, 69% { transform: scale(0) } 71% { transform: scale(1.08) } 72%, 100% { transform: scale(1) } }
+  @keyframes k2 { 0%, 72% { transform: scale(0) } 74% { transform: scale(1.25) } 75%, 100% { transform: scale(1) } }
+  @keyframes f1 { 0%, 75% { opacity: 0; transform: translateX(-14px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes f2 { 0%, 78% { opacity: 0; transform: translateX(-14px) } 81%, 100% { opacity: 1; transform: none } }
+  @keyframes f3 { 0%, 81% { opacity: 0; transform: translateX(-14px) } 84%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 84% { opacity: 0; transform: translateY(12px) } 88%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Intro</small>What is Jev?</div>
+
+    <div class="row r1">
+      <div class="doc"><i></i><i></i><i></i></div>
+      <div class="arrow a1"></div>
+      <div class="model llm">LLM</div>
+      <div class="arrow a2"></div>
+      <div class="bubble"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="arrow a3"></div>
+      <div class="person">🧑</div>
+      <div class="mark">✓</div>
+      <div class="arrow a4 dash"></div>
+      <div class="code">{ }</div>
+      <div class="mark">?</div>
+    </div>
+
+    <div class="row r2">
+      <div class="doc"><i></i><i></i><i></i></div>
+      <div class="arrow a1"></div>
+      <div class="model jev">Jev</div>
+      <div class="arrow a2"></div>
+      <div class="num"></div>
+      <div class="bar numbar"><i></i></div>
+      <div class="arrow a3"></div>
+      <div class="code">{ }</div>
+      <div class="mark">✓</div>
+      <div class="fan"><span class="f1">branch</span><span class="f2">sort</span><span class="f3">route</span></div>
+    </div>
+
+    <div class="caption">An LLM writes for people. <span class="underline-pink">Jev answers your code.</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

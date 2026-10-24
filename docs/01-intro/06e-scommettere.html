@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06e · Step 5 — Learning to bet</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "Step 5 — Jev's training teaches it to bet" (docs/01-intro-jev.md, section 8), first part:
+  the training and its two lessons. The bets on "UGLY!!!" follow in 06f-scommessa.html.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  The 10 trials (8 right, 2 wrong) illustrate what "calibrated" means: they are not real data.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .scene { position: absolute; inset: 0; animation-name: scene; }
+
+  /* ---------- Training badge ---------- */
+  .training { position: absolute; left: 50%; top: 170px; transform: translateX(-50%); text-align: center; opacity: 0; animation-name: training; }
+  .training .card { display: inline-flex; align-items: center; gap: 22px; padding: 20px 34px; }
+  .training .ico { font-size: 44px; }
+  .training strong { display: block; font-size: 32px; }
+  .training strong b { color: var(--pink); }
+  .training span { display: block; font-size: 20px; opacity: .55; margin-top: 4px; text-align: left; }
+  .already { margin-top: 18px; font-family: var(--hand); font-size: 30px; opacity: 0; animation-name: already; }
+
+  /* ---------- The two lessons ---------- */
+  .lessons { position: absolute; left: 0; right: 0; top: 400px; display: flex; justify-content: center; gap: 48px; }
+  .lesson { width: 840px; height: 540px; padding: 34px 38px; display: flex; flex-direction: column; opacity: 0; }
+  .lesson:nth-child(1) { animation-name: lesson1; }
+  .lesson:nth-child(2) { animation-name: lesson2; }
+  .lesson h2 { margin: 0 0 22px; font-family: var(--hand); font-size: 40px; font-weight: 400; }
+  .lesson h2 i { font-style: normal; color: var(--pink); }
+  .lesson .screen { flex: 1; padding: 28px 32px; position: relative; }
+
+  /* (a) writing → choosing */
+  .write { position: relative; display: inline-block; font-size: 30px; white-space: nowrap; }
+  .write .txt { display: inline-block; clip-path: inset(0 100% 0 0); animation-name: write; animation-timing-function: linear; }
+  .pencil { position: absolute; top: -18px; left: 0; font-size: 40px; animation-name: pencil; animation-timing-function: linear; }
+  .strike { position: absolute; left: -6px; top: 52%; height: 5px; width: 0; border-radius: 3px; background: var(--red); animation-name: strike; }
+  .nope { position: absolute; right: -58px; top: -10px; font-size: 44px; color: var(--red); font-weight: 700; opacity: 0; animation-name: nope; }
+  .choices { margin-top: 40px; display: grid; gap: 12px; }
+  .choice { display: flex; align-items: center; gap: 16px; font-size: 26px; opacity: 0; animation-name: choice; }
+  .box { width: 32px; height: 32px; flex: none; border: 2.5px solid var(--ink); border-radius: 7px; background: #fff; display: grid; place-items: center; font-weight: 700; color: #fff; }
+  .choice--on .box { animation-name: tick; }
+  .choice--on { font-weight: 600; }
+
+  /* (b) honest probabilities */
+  .says { font-size: 30px; }
+  .says b { font-size: 76px; color: var(--pink); vertical-align: -10px; margin-left: 10px; }
+  .trials { margin-top: 26px; display: grid; grid-template-columns: repeat(5, 64px); gap: 18px; }
+  .trial {
+    width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 32px; font-weight: 700; color: #fff; opacity: 0;
+    animation-name: trial; animation-delay: calc(var(--i) * 0.28s);
+  }
+  .ok { background: var(--green); }
+  .ko { background: var(--red); }
+  .hit { margin-top: 26px; font-size: 28px; opacity: 0; animation-name: hit; }
+  .hit b { color: var(--green); }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–3.5%  scene appears              3.5–8% training badge: synthetic data + RLCD
+     9–14%   "it doesn't learn what's offensive: it already knows"
+     14–42%  lesson 1: the pencil writes, gets crossed out, becomes a checkbox
+     42–78%  lesson 2: "says 80%" → 10 trials, 8 right and 2 wrong (staggered 0.28 s each)
+     78–94%  final frame: badge + both lessons · 96–100% fade out, loop */
+  @keyframes scene { 0% { opacity: 0 } 3.5%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes training { 0%, 3.5% { opacity: 0; transform: translate(-50%, 14px) } 8%, 100% { opacity: 1; transform: translate(-50%, 0) } }
+  @keyframes already { 0%, 9% { opacity: 0 } 14%, 100% { opacity: .7 } }
+  @keyframes lesson1 { 0%, 14% { opacity: 0; transform: translateY(16px) } 17.5%, 100% { opacity: 1; transform: none } }
+  @keyframes lesson2 { 0%, 42% { opacity: 0; transform: translateY(16px) } 45.5%, 100% { opacity: 1; transform: none } }
+
+  @keyframes write { 0%, 17.5% { clip-path: inset(0 100% 0 0) } 28%, 100% { clip-path: inset(0 0 0 0) } }
+  @keyframes pencil { 0%, 17.5% { transform: translateX(0); opacity: 1 } 28% { transform: translateX(520px); opacity: 1 } 30.5%, 100% { transform: translateX(520px); opacity: 0 } }
+  @keyframes strike { 0%, 29% { width: 0 } 32.5%, 100% { width: calc(100% + 12px) } }
+  @keyframes nope { 0%, 31.5% { opacity: 0; transform: scale(.4) } 34%, 100% { opacity: 1; transform: scale(1) } }
+  @keyframes choice { 0%, 34% { opacity: 0; transform: translateX(-12px) } 37.5%, 100% { opacity: 1; transform: none } }
+  @keyframes tick { 0%, 39.5% { background: #fff } 42%, 100% { background: var(--pink); border-color: var(--pink) } }
+
+  /* each trial is delayed by --i × 0.28 s: the last one (i = 9) pops at ~72% */
+  @keyframes trial { 0%, 49% { opacity: 0; transform: scale(.4) } 51% { opacity: 1; transform: scale(1.15) } 53%, 100% { opacity: 1; transform: scale(1) } }
+  @keyframes hit { 0%, 74% { opacity: 0 } 78%, 100% { opacity: 1 } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="scene">
+    <div class="kicker"><small>Step 5</small>Training teaches it to bet</div>
+
+    <div class="training">
+      <div class="card">
+        <span class="ico">🧪</span>
+        <div>
+          <strong>Synthetic data only + <b>RLCD</b></strong>
+          <span>Reinforcement Learning for Calibrated Decisions</span>
+        </div>
+      </div>
+      <div class="already">It doesn't teach it that "ugly" is offensive: it already knows.</div>
+    </div>
+
+    <div class="lessons">
+      <section class="card lesson">
+        <h2><i>1.</i> Answer only by choosing</h2>
+        <div class="screen">
+          <div class="write">
+            <span class="txt">The comment seems offensive because…</span>
+            <span class="strike"></span>
+            <span class="nope">✗</span>
+            <span class="pencil">✏️</span>
+          </div>
+          <div class="choices">
+            <div class="choice"><span class="box"></span>0 · Polite or neutral</div>
+            <div class="choice"><span class="box"></span>1 · Critical but respectful</div>
+            <div class="choice"><span class="box"></span>2 · Combative or sarcastic</div>
+            <div class="choice choice--on"><span class="box">✓</span>3 · Insults, hate or attacks</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card lesson">
+        <h2><i>2.</i> Honest probabilities</h2>
+        <div class="screen">
+          <div class="says">If it says <b>80%</b></div>
+          <div class="trials">
+            <span class="trial ok" style="--i:0">✓</span>
+            <span class="trial ok" style="--i:1">✓</span>
+            <span class="trial ko" style="--i:2">✗</span>
+            <span class="trial ok" style="--i:3">✓</span>
+            <span class="trial ok" style="--i:4">✓</span>
+            <span class="trial ok" style="--i:5">✓</span>
+            <span class="trial ok" style="--i:6">✓</span>
+            <span class="trial ko" style="--i:7">✗</span>
+            <span class="trial ok" style="--i:8">✓</span>
+            <span class="trial ok" style="--i:9">✓</span>
+          </div>
+          <div class="hit">…it should be right <b>about 8 times out of 10</b>.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

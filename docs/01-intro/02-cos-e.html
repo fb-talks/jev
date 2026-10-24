@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 · What is Jev</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "2. What is Jev" in the video script (docs/01-intro-jev-video-script.md).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+  The percentages are real Jev answers (October 2026). The second set is measured on a blog comment
+  with the category question of /1-jev/demo2/api: 100% · 0% · 0% on three calls out of three.
+-->
+<style>
+  :root { --loop: 13s; }
+
+  @property --p1 { syntax: "<integer>"; inherits: false; initial-value: 0; }
+  @property --p2 { syntax: "<integer>"; inherits: false; initial-value: 0; }
+  @property --p3 { syntax: "<integer>"; inherits: false; initial-value: 0; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Input ---------- */
+  .input { position: absolute; left: 80px; top: 380px; width: 520px; height: 240px; padding: 30px 34px; }
+  .label { font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; opacity: .45; margin-bottom: 12px; }
+  .input-text { position: relative; font-family: var(--hand); font-size: 42px; line-height: 1.25; }
+  .input-text span { position: absolute; left: 0; top: 0; }
+  .input-text .t1 { animation-name: set1; }
+  .input-text .t2 { opacity: 0; animation-name: set2; }
+
+  /* ---------- Jev ---------- */
+  .jev { position: absolute; left: 760px; top: 360px; width: 400px; height: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; border: 2.5px solid var(--ink); animation-name: pulse; }
+  .jev-name { font-family: var(--hand); font-size: 100px; line-height: 1; }
+  .jev-sub { font-size: 24px; opacity: .55; }
+  .system-one { position: absolute; left: 50%; top: -34px; transform: translateX(-50%) scale(.8); background: var(--pink-bg); border-color: var(--pink); opacity: 0; animation-name: system-one; }
+
+  /* ---------- Options ---------- */
+  .options { position: absolute; left: 1240px; top: 300px; width: 600px; height: 400px; padding: 30px 34px; animation-name: swap-border; border-width: 2.5px; border-style: dashed; }
+  .options-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+  .new { background: var(--pink-bg); border-color: var(--pink); opacity: 0; animation-name: new-tag; }
+  .row { display: flex; align-items: center; gap: 20px; height: 90px; }
+  .lab { position: relative; width: 210px; height: 40px; font-size: 30px; font-weight: 600; }
+  .lab b { position: absolute; left: 0; top: 0; white-space: nowrap; font-weight: 600; }
+  .lab .s1 { animation-name: set1; }
+  .lab .s2 { opacity: 0; animation-name: set2; }
+  .row .bar { flex: 1; }
+  .row .bar > i { width: 0; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .r1 .bar > i { animation-name: b1; }
+  .r2 .bar > i { animation-name: b2; }
+  .r3 .bar > i { animation-name: b3; }
+  .pct { width: 96px; text-align: right; font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .r1 .pct { counter-reset: p var(--p1); animation-name: p1; }
+  .r2 .pct { counter-reset: p var(--p2); animation-name: p2; }
+  .r3 .pct { counter-reset: p var(--p3); animation-name: p3; }
+  .pct::after { content: counter(p) "%"; }
+
+  /* ---------- Wires and traveller ---------- */
+  .wires { position: absolute; inset: 0; pointer-events: none; }
+  .wires path { fill: none; stroke: #c7cfdd; stroke-width: 3; stroke-dasharray: 8 10; }
+  .dot { position: absolute; left: 0; top: 0; width: 22px; height: 22px; border-radius: 50%; background: var(--pink); box-shadow: 0 0 0 6px rgba(255,0,191,.2); opacity: 0; }
+  .dot--in { offset-path: path("M600 500 L760 500"); animation-name: travel-in; }
+  .dot--out { offset-path: path("M1160 500 L1240 500"); animation-name: travel-out; }
+
+  /* ---------- Captions ---------- */
+  .caption { position: absolute; left: 50%; top: 790px; width: 1600px; transform: translateX(-50%); text-align: center; font-family: var(--hand); font-size: 46px; line-height: 1.25; opacity: 0; }
+  .caption b { font-weight: inherit; background: linear-gradient(transparent 62%, var(--pink-soft) 62%); padding: 0 6px; }
+  .c1 { animation-name: c1; }
+  .c2 { animation-name: c2; }
+  .c3 { animation-name: c3; }
+
+  /* ---------- Timeline (13s loop) ----------
+     0–4%    input, Jev and options appear     5–13%  the text travels into Jev
+     13–17%  Jev "thinks"                       16–26% bars fill: 0% · 55% · 45%
+     18–47%  caption 1 (not text, probabilities)
+     48–54%  new text (a blog comment) and new option labels   54–60% the text goes in
+     60–70%  bars recompute: 100% · 0% · 0%      56–80% caption 2 (zero-shot)
+     83–95%  System One chip + caption 3        96–100% fade out, loop */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes pulse { 0%, 13% { transform: scale(1) } 15% { transform: scale(1.04) } 17%, 59% { transform: scale(1) } 61% { transform: scale(1.04) } 63%, 100% { transform: scale(1) } }
+  @keyframes travel-in {
+    0%, 5% { offset-distance: 0%; opacity: 0 } 6% { opacity: 1 } 13% { offset-distance: 100%; opacity: 1 } 14% { offset-distance: 100%; opacity: 0 }
+    14.1%, 54% { offset-distance: 0%; opacity: 0 } 55% { opacity: 1 } 60% { offset-distance: 100%; opacity: 1 } 61%, 100% { offset-distance: 100%; opacity: 0 }
+  }
+  @keyframes travel-out {
+    0%, 15% { offset-distance: 0%; opacity: 0 } 16% { opacity: 1 } 19% { offset-distance: 100%; opacity: 1 } 20% { offset-distance: 100%; opacity: 0 }
+    20.1%, 60% { offset-distance: 0%; opacity: 0 } 61% { opacity: 1 } 64% { offset-distance: 100%; opacity: 1 } 65%, 100% { offset-distance: 100%; opacity: 0 }
+  }
+
+  @keyframes set1 { 0%, 48% { opacity: 1; transform: translateY(0) } 51%, 100% { opacity: 0; transform: translateY(-20px) } }
+  @keyframes set2 { 0%, 50% { opacity: 0; transform: translateY(20px) } 53%, 100% { opacity: 1; transform: translateY(0) } }
+  @keyframes new-tag { 0%, 49% { opacity: 0; transform: scale(.8) } 52% { opacity: 1; transform: scale(1.08) } 54%, 82% { opacity: 1; transform: scale(1) } 85%, 100% { opacity: 0 } }
+  @keyframes swap-border { 0%, 48% { border-color: #edf0f7 } 50%, 82% { border-color: var(--pink) } 85%, 100% { border-color: #edf0f7 } }
+
+  @keyframes b1 { 0%, 18% { width: 0 } 26%, 47% { width: 0% } 50%, 62% { width: 0 } 70%, 100% { width: 100% } }
+  @keyframes b2 { 0%, 18% { width: 0 } 26%, 47% { width: 55% } 50%, 62% { width: 0 } 70%, 100% { width: 0% } }
+  @keyframes b3 { 0%, 18% { width: 0 } 26%, 47% { width: 45% } 50%, 62% { width: 0 } 70%, 100% { width: 0% } }
+  @keyframes p1 { 0%, 18% { --p1: 0 } 26%, 47% { --p1: 0 } 50%, 62% { --p1: 0 } 70%, 100% { --p1: 100 } }
+  @keyframes p2 { 0%, 18% { --p2: 0 } 26%, 47% { --p2: 55 } 50%, 62% { --p2: 0 } 70%, 100% { --p2: 0 } }
+  @keyframes p3 { 0%, 18% { --p3: 0 } 26%, 47% { --p3: 45 } 50%, 62% { --p3: 0 } 70%, 100% { --p3: 0 } }
+
+  @keyframes c1 { 0%, 18% { opacity: 0; transform: translate(-50%, 12px) } 21%, 45% { opacity: 1; transform: translate(-50%, 0) } 48%, 100% { opacity: 0; transform: translate(-50%, 0) } }
+  @keyframes c2 { 0%, 55% { opacity: 0; transform: translate(-50%, 12px) } 58%, 79% { opacity: 1; transform: translate(-50%, 0) } 82%, 100% { opacity: 0; transform: translate(-50%, 0) } }
+  @keyframes c3 { 0%, 83% { opacity: 0; transform: translate(-50%, 12px) } 86%, 95% { opacity: 1; transform: translate(-50%, 0) } 97%, 100% { opacity: 0; transform: translate(-50%, 0) } }
+  @keyframes system-one { 0%, 82% { opacity: 0; transform: translateX(-50%) scale(.8) } 85% { opacity: 1; transform: translateX(-50%) scale(1.08) } 87%, 100% { opacity: 1; transform: translateX(-50%) scale(1) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Intro to Jev · 2</small>What is Jev</div>
+
+    <svg class="wires" width="1920" height="1080" aria-hidden="true">
+      <path d="M600 500 L760 500"/>
+      <path d="M1160 500 L1240 500"/>
+    </svg>
+
+    <div class="card input">
+      <div class="label">The text</div>
+      <div class="input-text"><span class="t1">Who taught you to code? Useless post.</span><span class="t2">Great post! Does it work with Next.js?</span></div>
+    </div>
+
+    <div class="card jev">
+      <span class="chip system-one">⚡ System One</span>
+      <span class="jev-name">Jev</span>
+      <span class="jev-sub">discriminative model</span>
+    </div>
+
+    <div class="card options">
+      <div class="options-head">
+        <span class="label" style="margin: 0">Options · you pick them</span>
+        <span class="chip new">new options</span>
+      </div>
+      <div class="row r1">
+        <span class="lab"><b class="s1">Polite</b><b class="s2">On topic</b></span>
+        <div class="bar"><i></i></div><span class="pct"></span>
+      </div>
+      <div class="row r2">
+        <span class="lab"><b class="s1">Critical</b><b class="s2">Spam</b></span>
+        <div class="bar"><i></i></div><span class="pct"></span>
+      </div>
+      <div class="row r3">
+        <span class="lab"><b class="s1">Offensive</b><b class="s2">Off topic</b></span>
+        <div class="bar"><i></i></div><span class="pct"></span>
+      </div>
+    </div>
+
+    <div class="dot dot--in"></div>
+    <div class="dot dot--out"></div>
+
+    <div class="caption c1">It doesn't write text: it gives <b>a probability</b> for every option you pass.</div>
+    <div class="caption c2">New options on every request, <b>no training</b> on your data.</div>
+    <div class="caption c3">"System One": Kahneman's <b>fast</b>, intuitive thinking.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -6,11 +6,22 @@ Le sezioni seguono l'ordine delle slide in [`01-intro/`](./01-intro/) e del [cop
 
 ---
 
-## 1. Cos'è, in una frase
+## 1. Apertura
+
+Dalla [introduzione di TypeSafe](https://docs.typesafe.ai/introduction): Jev è il primo modello "System One", fatto per decisioni veloci e strutturate che il software usa direttamente. Gli LLM producono testo per persone: usarli per decisioni che il codice consuma vuol dire forzarli a scrivere una risposta strutturata e poi fare il parsing. Si manda invece uno state (i dati) e una o più domande tipizzate; tornano valori tipizzati con le probabilità. Le domande sono valutate in parallelo e in isolamento, quindi aggiungerne non rallenta e non peggiora le altre. "No text generation, no parsing."
+
+- Titolo: 🎬 [`01-intro/01a-titolo.html`](./01-intro/01a-titolo.html)
+- Speaker: 🎬 [`01-intro/01b-speaker.html`](./01-intro/01b-speaker.html)
+- Cos'è Jev, e a cosa serve (LLM vs System One): 🎬 [`01-intro/01c-jev.html`](./01-intro/01c-jev.html)
+- Hook: 🎬 [`01-intro/01d-hook.html`](./01-intro/01d-hook.html)
+
+---
+
+## 2. Cos'è, in una frase
 
 **Un LLM scrive, Jev sceglie.**
 
-🎬 [`01-intro/00-hook.html`](./01-intro/00-hook.html) · 🎬 [`01-intro/01-cos-e.html`](./01-intro/01-cos-e.html)
+🎬 [`01-intro/01d-hook.html`](./01-intro/01d-hook.html) · 🎬 [`01-intro/02-cos-e.html`](./01-intro/02-cos-e.html)
 
 Jev è un modello di TypeSafe AI, startup di San Francisco fondata nel 2024 e uscita in early access il 15 settembre 2026. Il nome viene dall'economista William Stanley Jevons e dal suo "paradosso": se una risorsa diventa più efficiente, se ne usa di più. L'idea è che un'intelligenza artificiale molto più economica verrà usata ovunque.
 
@@ -22,18 +33,18 @@ TypeSafe lo chiama un modello **"System One"**, richiamando il "Sistema 1" di Ka
 
 ---
 
-## 2. Come si usa: state + domande
+## 3. Come si usa: state + domande
 
 Gli mandi due cose:
 
 - uno **state**, cioè l'input da valutare: una stringa, un oggetto JSON o un array di stringhe;
 - una o più **questions**, tutte a scelta multipla.
 
-🎬 [`01-intro/02a-state-domande.html`](./01-intro/02a-state-domande.html)
+🎬 [`01-intro/03a-state-domande.html`](./01-intro/03a-state-domande.html)
 
 ### I tre tipi di domanda
 
-🎬 [`01-intro/02b-tipi-domanda.html`](./01-intro/02b-tipi-domanda.html)
+🎬 [`01-intro/03b-tipi-domanda.html`](./01-intro/03b-tipi-domanda.html)
 
 | Tipo | Cosa fa | Restituisce |
 |---|---|---|
@@ -52,7 +63,7 @@ Cosa contengono i campi della risposta:
 
 ### L'esempio più semplice: una sola domanda
 
-🎬 [`01-intro/02c-noul-base.html`](./01-intro/02c-noul-base.html)
+🎬 [`01-intro/03c-noul-base.html`](./01-intro/03c-noul-base.html)
 
 ```ts
 import { noul, TypeSafeClient } from "@typesafe-ai/sdk";
@@ -73,7 +84,7 @@ Uno state, una domanda, un numero. È la stessa domanda di `/1-jev/demo1` (valor
 
 ### Esempio: un ticket di supporto
 
-🎬 [`01-intro/02d-codice.html`](./01-intro/02d-codice.html) · 🎬 [`01-intro/02e-noul.html`](./01-intro/02e-noul.html) · 🎬 [`01-intro/02f-choice.html`](./01-intro/02f-choice.html) · 🎬 [`01-intro/02g-score.html`](./01-intro/02g-score.html)
+🎬 [`01-intro/03d-codice.html`](./01-intro/03d-codice.html) · 🎬 [`01-intro/03e-noul.html`](./01-intro/03e-noul.html) · 🎬 [`01-intro/03f-choice.html`](./01-intro/03f-choice.html) · 🎬 [`01-intro/03g-score.html`](./01-intro/03g-score.html)
 
 ```ts
 import { choice, noul, score, TypeSafeClient } from "@typesafe-ai/sdk";
@@ -115,9 +126,9 @@ Due dettagli importanti:
 
 ---
 
-## 3. Il pattern a tre fasce
+## 4. Il pattern a tre fasce
 
-🎬 [`01-intro/03-tre-fasce.html`](./01-intro/03-tre-fasce.html)
+🎬 [`01-intro/04-tre-fasce.html`](./01-intro/04-tre-fasce.html)
 
 Il modello dà le probabilità, **la decisione la prende il tuo codice**:
 
@@ -131,9 +142,9 @@ La confidenza diventa una leva di prodotto: puoi tarare le soglie nel tempo guar
 
 ---
 
-## 4. Esempi di utilizzo
+## 5. Esempi di utilizzo
 
-🎬 [`01-intro/04-casi-uso.html`](./01-intro/04-casi-uso.html)
+🎬 [`01-intro/05-casi-uso.html`](./01-intro/05-casi-uso.html)
 
 **CMS**
 - moderazione dei commenti (spam, tossicità, dati personali) → la demo di questo progetto
@@ -150,13 +161,13 @@ La confidenza diventa una leva di prodotto: puoi tarare le soglie nel tempo guar
 
 ---
 
-## 5. È un LLM? Come fa a "sapere" le cose?
+## 6. È un LLM? Come fa a "sapere" le cose?
 
 **Non è un LLM nel senso classico, ma è parente stretto.** TypeSafe dice che è basato su transformer, e alcuni osservatori ipotizzano che sia costruito sopra un LLM open-weight o su un'architettura tipo BERT.
 
 Domanda tipica: *come fa a sapere che "SEI BRUTTO" è offensivo, o che il pane ha la mollica?*
 
-🎬 [`01-intro/05-come-sa.html`](./01-intro/05-come-sa.html)
+🎬 [`01-intro/06-come-sa.html`](./01-intro/06-come-sa.html)
 
 La risposta è che **la conoscenza non viene dall'addestramento specifico di Jev, ma da prima**. Ecco i 5 passi, sempre con lo stesso esempio: i passi 1–4 riguardano il **modello linguistico di base** su cui Jev è costruito, solo il passo 5 è l'addestramento di Jev.
 
@@ -164,7 +175,7 @@ La risposta è che **la conoscenza non viene dall'addestramento specifico di Jev
 
 ### Passo 1 — Leggere tantissimo testo per indovinare la parola dopo
 
-🎬 [`01-intro/05a-parola-dopo.html`](./01-intro/05a-parola-dopo.html)
+🎬 [`01-intro/06a-parola-dopo.html`](./01-intro/06a-parola-dopo.html)
 
 Il modello di base viene addestrato su un'enorme quantità di testo reale: forum, libri, chat, articoli. Il compito è sempre lo stesso: **indovinare la parola successiva**.
 
@@ -180,7 +191,7 @@ Jev parte da un modello che ha già fatto questo lavoro, e ne **eredita** le con
 
 ### Passo 2 — Le parole diventano coordinate
 
-🎬 [`01-intro/05b-coordinate.html`](./01-intro/05b-coordinate.html)
+🎬 [`01-intro/06b-coordinate.html`](./01-intro/06b-coordinate.html)
 
 Dentro il modello ogni parola (in realtà ogni pezzo di parola) diventa una lista di numeri: un punto in uno spazio con migliaia di dimensioni. Le parole usate in contesti simili finiscono **vicine**:
 
@@ -197,7 +208,7 @@ Il significato è la posizione, e la posizione l'ha imparata dai contesti.
 
 ### Passo 3 — Il contesto cambia il significato (attention)
 
-🎬 [`01-intro/05c-attention.html`](./01-intro/05c-attention.html)
+🎬 [`01-intro/06c-attention.html`](./01-intro/06c-attention.html)
 
 "Brutto" da solo non è offensivo. Con il meccanismo di **attention** del transformer, ogni parola "guarda" le altre della frase e si aggiorna di conseguenza:
 
@@ -211,7 +222,7 @@ Da sola, "brutto" sta a metà strada. È il contesto a spostarla: vicino a "sei"
 
 ### Passo 4 — Anche le tue opzioni sono testo
 
-🎬 [`01-intro/05d-opzioni.html`](./01-intro/05d-opzioni.html)
+🎬 [`01-intro/06d-opzioni.html`](./01-intro/06d-opzioni.html)
 
 Quando chiedi lo score di tossicità, passi delle descrizioni:
 
@@ -226,14 +237,14 @@ Anche queste frasi vengono "comprese" con lo stesso meccanismo. Il lavoro divent
 
 ### Passo 5 — L'addestramento di Jev insegna a scommettere, non cosa è offensivo
 
-🎬 [`01-intro/05e-scommettere.html`](./01-intro/05e-scommettere.html)
+🎬 [`01-intro/06e-scommettere.html`](./01-intro/06e-scommettere.html)
 
 Qui entra la parte specifica di TypeSafe: **solo dati sintetici** (generati artificialmente) e un metodo che chiama **RLCD**, *Reinforcement Learning for Calibrated Decisions*. Questo addestramento **non insegna che "brutto" è offensivo**, perché il modello lo sa già dal passo 1. Gli insegna:
 
 - a rispondere **solo** scegliendo tra le opzioni date, invece di scrivere;
 - a dare probabilità **oneste** (calibrate): se dice 80%, deve avere ragione circa 8 volte su 10.
 
-🎬 [`01-intro/05f-scommessa.html`](./01-intro/05f-scommessa.html)
+🎬 [`01-intro/06f-scommessa.html`](./01-intro/06f-scommessa.html)
 
 ```
 "UGLY!!!"
@@ -247,7 +258,7 @@ Valori reali (ottobre 2026, domanda di tossicità di `/1-jev/demo3`). Un insulto
 
 ### E quando sbaglia?
 
-🎬 [`01-intro/05g-quando-sbaglia.html`](./01-intro/05g-quando-sbaglia.html)
+🎬 [`01-intro/06g-quando-sbaglia.html`](./01-intro/06g-quando-sbaglia.html)
 
 Proprio perché ha imparato dai contesti, va in difficoltà quando il contesto è ambiguo:
 
@@ -270,11 +281,11 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 ---
 
-## 6. Limiti e costi
+## 7. Limiti e costi
 
 ### Limiti
 
-🎬 [`01-intro/06a-limiti.html`](./01-intro/06a-limiti.html)
+🎬 [`01-intro/07a-limiti.html`](./01-intro/07a-limiti.html)
 
 - fino a **255 opzioni** per una `choice` e **2–10 livelli** per uno `score`;
 - **64k token** in input, di cui 32k per state + domanda più lunga;
@@ -285,7 +296,7 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 ### Costi e accesso
 
-🎬 [`01-intro/06b-costi.html`](./01-intro/06b-costi.html)
+🎬 [`01-intro/07b-costi.html`](./01-intro/07b-costi.html)
 
 - **si paga solo l'input**: **0,042 $ per milione di token**. L'output è gratis: TypeSafe lo definisce "too cheap to meter", troppo economico per misurarlo. Jev non scrive testo token per token, restituisce tutte le probabilità in un colpo solo;
 - per confronto, gli LLM costano da 0,20 a 10 $ per milione di token in input, e l'output costa circa 5 volte di più;
@@ -305,37 +316,37 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 ---
 
-## 7. Chiusura: la versione da 30 secondi
+## 8. Chiusura: la versione da 30 secondi
 
-🎬 [`01-intro/07-chiusura.html`](./01-intro/07-chiusura.html)
+🎬 [`01-intro/08-chiusura.html`](./01-intro/08-chiusura.html)
 
 > Immaginate una persona che ha letto miliardi di conversazioni. Nessuno le ha mai spiegato cos'è un'offesa, ma ne ha viste talmente tante che la riconosce dal contesto: è il pre-addestramento del transformer. Poi la si allena a fare solo test a crocette, scommettendo onestamente su ogni risposta: è l'addestramento specifico di Jev. Un LLM vi risponde con un tema, Jev vi dice "risposta D, sicuro all'86%".
 
 ---
 
-## 8. Bonus: Jev guarda le immagini
+## 9. Bonus: Jev guarda le immagini
 
 Le immagini sono sperimentali ("Dreamer-ready", non consigliate in produzione): si attivano con l'header `TypeSafe-Danger-Zone-Images: true`. Possono stare nello state, nelle istruzioni di una domanda o nei criteri. Solo PNG o JPEG, lati tra 280 e 1568 px, fino a 16 MiB per immagine; si pagano come token di input.
 
 La domanda `box` restituisce il rettangolo più piccolo che contiene l'oggetto: quattro bordi (`top`, `bottom`, `left`, `right`) come frazioni da 0 a 1 dell'immagine, dall'angolo in alto a sinistra, più una `confidence`. Un box risponde sempre, anche se l'oggetto non c'è: si abbina a una noul che chiede se c'è. Un box copre un solo oggetto, quindi va descritto con precisione.
 
-- Prompt vuoto, cos'è e dov'è: 🎬 [`01-intro/08-soggetto.html`](./01-intro/08-soggetto.html)
-- Jev vede anche le immagini: 🎬 [`01-intro/08a-immagini.html`](./01-intro/08a-immagini.html)
-- box, quattro numeri: 🎬 [`01-intro/08b-box.html`](./01-intro/08b-box.html)
-- C'è? Dov'è? (un box arriva sempre): 🎬 [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html)
-- Descrivi quello che cerchi: 🎬 [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html)
-- Quanto ci mette, e cosa sapere: 🎬 [`01-intro/08e-tempi-limiti.html`](./01-intro/08e-tempi-limiti.html)
+- Prompt vuoto, cos'è e dov'è: 🎬 [`01-intro/09-soggetto.html`](./01-intro/09-soggetto.html)
+- Jev vede anche le immagini: 🎬 [`01-intro/09a-immagini.html`](./01-intro/09a-immagini.html)
+- box, quattro numeri: 🎬 [`01-intro/09b-box.html`](./01-intro/09b-box.html)
+- C'è? Dov'è? (un box arriva sempre): 🎬 [`01-intro/09c-sempre-box.html`](./01-intro/09c-sempre-box.html)
+- Descrivi quello che cerchi: 🎬 [`01-intro/09d-descrivi.html`](./01-intro/09d-descrivi.html)
+- Quanto ci mette, e cosa sapere: 🎬 [`01-intro/09e-tempi-limiti.html`](./01-intro/09e-tempi-limiti.html)
 
 ---
 
-## 9. In pratica — 🚧 TODO (placeholder)
+## 10. In pratica — 🚧 TODO (placeholder)
 
 Sezione da scrivere. Le slide segnaposto, nell'ordine:
 
-- Creare account e API key: 🎬 [`01-intro/09a-account.html`](./01-intro/09a-account.html)
-- Esempio di codice: 🎬 [`01-intro/09b-codice.html`](./01-intro/09b-codice.html)
-- Usiamo un gateway come Vercel: 🎬 [`01-intro/09c-gateway.html`](./01-intro/09c-gateway.html)
-- Demo time: 🎬 [`01-intro/09d-demo.html`](./01-intro/09d-demo.html)
+- Creare account e API key: 🎬 [`01-intro/10a-account.html`](./01-intro/10a-account.html)
+- Esempio di codice: 🎬 [`01-intro/10b-codice.html`](./01-intro/10b-codice.html)
+- Usiamo un gateway come Vercel: 🎬 [`01-intro/10c-gateway.html`](./01-intro/10c-gateway.html)
+- Demo time: 🎬 [`01-intro/10d-demo.html`](./01-intro/10d-demo.html)
 
 ---
 
