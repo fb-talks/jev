@@ -29,6 +29,7 @@ const slides = [
   "06a-limiti.html",
   "06b-costi.html",
   "07-chiusura.html",
+  "08-soggetto.html",
   "08a-immagini.html",
   "08b-box.html",
   "08c-sempre-box.html",

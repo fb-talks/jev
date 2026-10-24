@@ -319,9 +319,10 @@ Le immagini sono sperimentali ("Dreamer-ready", non consigliate in produzione): 
 
 La domanda `box` restituisce il rettangolo più piccolo che contiene l'oggetto: quattro bordi (`top`, `bottom`, `left`, `right`) come frazioni da 0 a 1 dell'immagine, dall'angolo in alto a sinistra, più una `confidence`. Un box risponde sempre, anche se l'oggetto non c'è: si abbina a una noul che chiede se c'è. Un box copre un solo oggetto, quindi va descritto con precisione.
 
+- Prompt vuoto, cos'è e dov'è: 🎬 [`01-intro/08-soggetto.html`](./01-intro/08-soggetto.html)
 - Jev vede anche le immagini: 🎬 [`01-intro/08a-immagini.html`](./01-intro/08a-immagini.html)
 - box, quattro numeri: 🎬 [`01-intro/08b-box.html`](./01-intro/08b-box.html)
-- Un box arriva sempre: 🎬 [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html)
+- C'è? Dov'è? (un box arriva sempre): 🎬 [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html)
 - Descrivi quello che cerchi: 🎬 [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html)
 - Quanto ci mette, e cosa sapere: 🎬 [`01-intro/08e-tempi-limiti.html`](./01-intro/08e-tempi-limiti.html)
 

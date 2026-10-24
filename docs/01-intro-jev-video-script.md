@@ -430,6 +430,18 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati a ottobre 2026: ricontrollarli prima di registrare.
 
+### 08 · Prompt vuoto: cos'è, e dov'è?
+
+🎬 **ANIMAZIONE**: [`01-intro/08-soggetto.html`](./01-intro/08-soggetto.html). Il codice della route della demo (tre domande sulla stessa foto: `found`, `where`, `what`) e la risposta di Jev sulla foto del cane: il box sul cane, "dog" con probabilità 1 e tutte le altre etichette a 0. Dura 16 s.
+
+🖥️ **SCHERMO**: `/3-jev-images/demo1`, foto del cane, campo vuoto, **Find it**: compare "dog · 100%" sul box.
+
+🎙️ **VOCE**:
+> Un bonus. Jev non legge solo testo: guarda anche le immagini.
+> In questa demo carico una foto e non scrivo niente. Il codice chiede a Jev tre cose sul "soggetto principale": c'è? Dov'è? E cos'è, scegliendo da una lista: cane, gatto, persona, auto…
+> Risposta: un rettangolo intorno al cane, e "dog", probabilità uno. Tutte le altre etichette a zero.
+> Attenzione: Jev non inventa il nome. Sceglie dalla **vostra** lista, come una choice qualsiasi.
+
 ### 08a · Jev vede anche le immagini
 
 🎬 **ANIMAZIONE**: [`01-intro/08a-immagini.html`](./01-intro/08a-immagini.html). La foto del cane e la chiamata: l'header sperimentale, `state: image(photo)`, poi la domanda nuova `box`; il box si posa sull'occhio. Dura 14 s.
@@ -437,8 +449,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 🖥️ **SCHERMO**: `/3-jev-images/demo1`, clicco la foto del cane, scrivo "eye" e premo **Find it**.
 
 🎙️ **VOCE**:
-> Un bonus. Jev non legge solo testo: guarda anche le immagini.
-> La chiamata è la stessa di sempre. Cambiano due cose: un header, perché le immagini sono ancora sperimentali, e lo state, che adesso è una foto.
+> Vediamo la chiamata. È la stessa di sempre. Cambiano due cose: un header, perché le immagini sono ancora sperimentali, e lo state, che adesso è una foto.
 > E c'è un tipo di domanda nuovo, **box**: dove si trova quello che cerco?
 
 ### 08b · box: quattro numeri
@@ -451,27 +462,32 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 > Nella pagina basta moltiplicarli per cento e usarli come percentuali CSS: il box resta al suo posto a qualsiasi dimensione.
 > E c'è una confidence, quanto Jev è sicuro di quel rettangolo.
 
-### 08c · Un box arriva sempre
+### 08c · C'è? Dov'è?
 
-🎬 **ANIMAZIONE**: [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html). Sulla foto delle auto chiedo "a cat": il box arriva lo stesso; la noul dice 0.02 e il box diventa grigio, "not found". Dura 15 s.
+🎬 **ANIMAZIONE**: [`01-intro/08c-sempre-box.html`](./01-intro/08c-sempre-box.html). Un'immagine con decine di oggetti di casa, scrivo "A clock": il box si posa sull'orologio (confidence 0.93) e il resto si scurisce; la noul dice 0.99; poi l'`if` del codice e il controesempio "a cat" (0.01, not found). Dura 15 s.
 
-🖥️ **SCHERMO**: nella demo, foto delle auto, scrivo "a cat".
+🖥️ **SCHERMO**: nella demo, l'immagine degli oggetti (quarta miniatura), scrivo "A clock". Poi "a cat".
+
+✂️ L'immagine è ingrandita 3× (1260×1050): all'originale 420×350 il box era largo dalla finestra alla TV, confidenza 0.45. Un buon esempio di "immagini piccole, box imprecisi".
 
 🎙️ **VOCE**:
-> Attenzione: un box risponde **sempre**. Chiedete un gatto in una foto senza gatti, e un rettangolo arriva lo stesso, da qualche parte.
-> Per questo nella stessa chiamata aggiungo una noul: l'immagine contiene un gatto? Due per cento.
+> Decine di oggetti, e chiedo: un orologio. Il box lo trova, confidenza novantatré per cento.
+> Nella stessa chiamata c'è anche una noul: l'immagine contiene un orologio? Novantanove per cento.
+> Perché chiederlo, se il box l'ha già trovato? Perché un box risponde **sempre**. Chiedete un gatto in questa immagine, e un rettangolo arriva lo stesso, da qualche parte. La noul invece dice uno per cento.
 > E il codice decide: sotto il cinquanta per cento, "not found".
 
 ### 08d · Descrivi quello che cerchi
 
-🎬 **ANIMAZIONE**: [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html). Tre prompt sulla stessa foto: "the main subject" (box largo, 0.20), "the white car on the left" (0.86), "the brown car on the right" (0.44); poi due consigli dalla documentazione. Dura 16 s.
+🎬 **ANIMAZIONE**: [`01-intro/08d-descrivi.html`](./01-intro/08d-descrivi.html). Tre prompt sulla stessa foto: "the main subject of the image" (box largo, 0.20), "the white car" (0.82), "the brown car" (0.43); poi due consigli dalla documentazione. Dura 16 s.
+
+🖥️ **SCHERMO**: nella demo, foto delle auto: prima campo vuoto (soggetto principale), poi "the white car", poi "the brown car".
 
 🎙️ **VOCE**:
 > Un box copre un solo oggetto. Se ce ne sono due simili, Jev deve indovinare quale volete.
-> "Il soggetto principale": box largo, confidenza venti per cento. "L'auto bianca a sinistra": il box si stringe, ottantasei per cento.
+> "Il soggetto principale": box largo, confidenza venti per cento. "L'auto bianca": il box si stringe, ottantadue per cento.
 > Quindi: una domanda per oggetto, descritto con precisione. E se l'oggetto è piccolo, prima si ritaglia la zona e poi si chiede di nuovo.
 
-✂️ Da evitare "the rusty car on the left": il box è giusto, ma found scende al 23%.
+✂️ Non serve "on the left / on the right": il colore basta. "The main subject" senza "of the image" dà un box già stretto (0.32–0.42), meno efficace. Da evitare "the rusty car": found scende sotto il 50%.
 
 ### 08e · Quanto ci mette, e cosa sapere
 
@@ -521,7 +537,7 @@ Slide segnaposto da completare: per ora solo il titolo di ogni passo.
 
 - [ ] Crediti a pagamento attivi su Vercel AI Gateway (altrimenti le demo rispondono 403)
 - [ ] `npm run dev` avviato, tab aperte su `/1-jev/demo1` e `/1-jev/demo3`
-- [ ] Bonus immagini: tab aperta su `/3-jev-images/demo1`, ricontrollare "eye" sul cane, "a cat" e "the white car on the left" sulle auto
+- [ ] Bonus immagini: tab aperta su `/3-jev-images/demo1`, ricontrollare "eye" sul cane, "A clock" e "a cat" sugli oggetti, "the white car" sulle auto
 - [ ] Ricontrollare in `/1-jev/demo3` "UGLY!!!" (Reject) e "you absolute muppet, great post 😂" (Needs review)
 - [x] Il valore dell'hook è quello reale di `/1-jev/demo1` (0.79–0.81, ottobre 2026): ricontrollarlo prima di registrare
 - [ ] Slide: tabella LLM vs Jev, tre tipi di domanda, pattern a tre fasce, limiti, costi
