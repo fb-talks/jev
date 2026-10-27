@@ -1,8 +1,8 @@
-// Builds the GitHub Pages site in _site/: every deck in docs/ (a folder with _shared/anim.js)
-// is copied as is, plus an index.html that lists its slides in the order set in anim.js.
+// Builds the GitHub Pages site in _site/: every deck in docs/, at any depth (a folder with _shared/anim.js),
+// is copied as is at the same path, plus an index.html that lists its slides in the order set in anim.js.
 //   node .github/pages/build.mjs
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 
 const DOCS = "docs";
 const OUT = "_site";
@@ -12,8 +12,11 @@ const escape = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT);
 
-const decks = readdirSync(DOCS, { withFileTypes: true })
-  .filter((d) => d.isDirectory() && existsSync(join(DOCS, d.name, "_shared/anim.js")))
+// e.g. docs/video-talk/slides/_shared/anim.js → the deck "video-talk/slides"
+const decks = readdirSync(DOCS, { recursive: true })
+  .filter((p) => p.endsWith(join("_shared", "anim.js")) && !p.includes("_export"))
+  .map((p) => ({ name: dirname(dirname(p)) }))
+  .sort((a, b) => a.name.localeCompare(b.name))
   .map((d) => {
     const dir = join(DOCS, d.name);
     // _export/ holds the local video exports (gitignored), not needed online

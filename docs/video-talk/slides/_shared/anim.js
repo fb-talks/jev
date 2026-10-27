@@ -1,4 +1,4 @@
-// Shared runtime for the docs/slides-talk animations.
+// Shared runtime for the docs/video-talk/slides animations.
 //   Plays once, then shows a play button (bottom right) to watch it again
 //   Space = pause / resume (replay once ended) · R = restart · page.html#t=0.3 = freeze at 30%
 //   ← / → (or PageUp / PageDown) = previous / next slide
