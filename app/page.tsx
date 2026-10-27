@@ -13,11 +13,12 @@ const groups = [
   {
     title: "Jev and Gemini",
     demos: [
-      { href: "/2-jev-and-gemini/demo1", title: "Demo 1 · Gemini writes, Jev moderates", text: "Gemini generates a comment, Jev measures category and toxicity." },
-      { href: "/2-jev-and-gemini/demo2", title: "Demo 2 · Gemini rewrites, Jev confirms", text: "A rude comment rewritten politely, with the offensive probability before and after." },
+      { href: "/2-jev-and-gemini/demo1", title: "Demo 1 · Gemini rewrites, Jev confirms", text: "A rude comment rewritten politely, with the offensive probability before and after." },
+      { href: "/2-jev-and-gemini/demo2", title: "Demo 2 · Gemini replies, Jev evaluates", text: "Gemini answers a support request, Jev measures relevance and tone of the reply." },
       { href: "/2-jev-and-gemini/demo3", title: "Demo 3 · Gemini proposes, Jev picks", text: "Three candidate replies, scored by Jev: our code picks the best one." },
-      { href: "/2-jev-and-gemini/demo4", title: "Demo 4 · Jev vs Gemini on 20 websites", text: "Scrape 20 home pages and classify them with both models: time and agreement." },
-      { href: "/2-jev-and-gemini/demo5", title: "Demo 5 · CSV evaluation: Jev vs Gemini", text: "The same CSV of comments, moderated by both models: accuracy and time side by side." },
+      { href: "/2-jev-and-gemini/demo4", title: "Demo 4 · Email to Data", text: "Gemini turns an email into structured data; an email with hidden instructions for the AI is blocked by Jev first, with a guardrail toggle and threshold." },
+      { href: "/2-jev-and-gemini/demo5", title: "Demo 5 · Jev vs Gemini on 20 websites", text: "Scrape 20 home pages and classify them with both models: time and agreement." },
+      { href: "/2-jev-and-gemini/demo6", title: "Demo 6 · CSV evaluation: Jev vs Gemini", text: "The same CSV of comments, moderated by both models: accuracy and time side by side." },
     ],
   },
   {

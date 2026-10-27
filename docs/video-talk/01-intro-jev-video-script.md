@@ -1,5 +1,8 @@
 # 01 · Intro a Jev — script del video
 
+> **Cos'è questo file.** Il **copione** del video e del talk: per ogni sezione cosa si dice (🎙️), cosa si vede (🖥️), quale animazione parte (🎬) e le note di montaggio (✂️), in ordine di slide. In fondo c'è la checklist per la registrazione.
+> Le spiegazioni approfondite, i numeri e le fonti stanno negli appunti: [01-intro-jev.md](./01-intro-jev.md). Le slide sono in [`slides-talk/`](./slides-talk/).
+
 Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **11 minuti**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
 
 Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra).
@@ -15,30 +18,30 @@ Legenda:
 
 ### 01a · Titolo
 
-🎬 **ANIMAZIONE**: [`01-intro/01a-titolo.html`](./01-intro/01a-titolo.html). "Jev" scritto a mano, sotto una barra che si riempie fino a 0.92, intorno arrivano i quattro tipi di domanda (noul, choice, score, box), poi "It doesn't write. It decides." Dura 9 s.
+🎬 **ANIMAZIONE**: [`slides-talk/01a-titolo.html`](./slides-talk/01a-titolo.html). "Jev" scritto a mano, sotto una barra che si riempie fino a 0.92, intorno arrivano i quattro tipi di domanda (noul, choice, score, box), poi "It doesn't write. It decides." Dura 9 s.
 
 🎙️ **VOCE**:
 > _(titolo: nessun parlato, oppure il saluto iniziale)_
 
 ### 01b · Speaker
 
-🎬 **ANIMAZIONE**: [`01-intro/01b-speaker.html`](./01-intro/01b-speaker.html). Le due foto dentro cerchi disegnati a mano (rosa a sinistra, blu a destra), una "&" in mezzo, i nomi con una freccia a mano verso ogni cerchio, poi ruolo e competenze sotto le foto. Dura 12 s.
+🎬 **ANIMAZIONE**: [`slides-talk/01b-speaker.html`](./slides-talk/01b-speaker.html). Le due foto dentro cerchi disegnati a mano (rosa a sinistra, blu a destra), una "&" in mezzo, i nomi con una freccia a mano verso ogni cerchio, poi ruolo e competenze sotto le foto. Dura 12 s.
 
-✂️ 🚧 Segnaposto da completare: nomi, ruoli, competenze, e le foto in `01-intro/_shared/img/speaker-left.jpg` e `speaker-right.jpg` (quadrate, almeno 400×400). Finché mancano, nei cerchi compaiono le iniziali.
+✂️ 🚧 Segnaposto da completare: nomi, ruoli, competenze, e le foto in `slides-talk/_shared/img/speaker-left.jpg` e `speaker-right.jpg` (quadrate, almeno 400×400). Finché mancano, nei cerchi compaiono le iniziali.
 
 🎙️ **VOCE**:
 > _da scrivere: chi siamo, in due frasi_
 
-### 01c · Cos'è Jev, e a cosa serve
+### 01c · LLM vs Jev
 
-🎬 **ANIMAZIONE**: [`01-intro/01c-jev.html`](./01-intro/01c-jev.html). Uno schema disegnato, quasi senza testo. Sopra: dati → LLM → un paragrafo (righe grigie) → va bene per una persona ✓, ma per il codice è un "?". Sotto: dati → Jev → un numero, 0.92 → il codice lo usa ✓ → branch, sort, route. Poi "An LLM writes for people. Jev answers your code." Dura 14 s.
+🎬 **ANIMAZIONE**: [`slides-talk/01c-jev.html`](./slides-talk/01c-jev.html). Uno schema disegnato, quasi senza testo. Sopra: dati → LLM → un paragrafo (righe grigie) → va bene per una persona ✓, ma per il codice è un "?". Sotto: dati → Jev → un numero, 0.92 → il codice lo usa ✓ → branch, sort, route. Poi "An LLM writes for people. Jev answers your code." Dura 14 s.
 
 🎙️ **VOCE**:
-> Gli LLM sono fatti per scrivere testo, testo che legge una persona.
-> Ma quando è il vostro **codice** a dover usare un giudizio, c'è un disallineamento: forzate un generatore di testo a produrre una decisione, e poi dovete fare il parsing della risposta e sperare che sia nel formato giusto.
-> Jev è il primo modello **System One** di TypeSafe: fatto per decisioni veloci e strutturate, che il software usa direttamente.
-> Gli passate uno state, i vostri dati, e delle domande tipizzate. Vi restituisce valori tipizzati e distribuzioni di probabilità. Niente testo da generare, niente parsing.
-> Con quei valori il codice fa branch, ordina, smista. E alcune domande restituiscono anche una **confidence**: quanto è sicuro, per decidere se agire da soli o chiedere a una persona.
+> LLM contro Jev, in uno schema.
+> Sopra, un LLM: gli date i vostri dati e vi risponde con un paragrafo. Perfetto se a leggerlo è una persona.
+> Ma se a usarlo è il vostro **codice**, quel paragrafo è un problema: dovete chiedergli un formato preciso, fare il parsing, e sperare che sia sempre giusto.
+> Sotto, Jev: stessi dati, ma niente testo. Risponde con un numero, zero novantadue, e il codice lo usa subito: per un `if`, per ordinare, per smistare.
+> Un LLM scrive per le persone. **Jev risponde al vostro codice.**
 
 ### 01d · Hook (1:00 – 1:30)
 
@@ -53,13 +56,13 @@ Legenda:
 
 ✂️ Con l'apertura, Jev è già presentato in 01c: "Si chiama Jev" si può accorciare in "Ecco Jev in azione".
 
-🎬 **ANIMAZIONE**: [`01-intro/01d-hook.html`](./01-intro/01d-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
+🎬 **ANIMAZIONE**: [`slides-talk/01d-hook.html`](./slides-talk/01d-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
 
 ---
 
 ## 2. Cos'è Jev (1:30 – 2:45)
 
-🎬 **ANIMAZIONE**: [`01-intro/02-cos-e.html`](./01-intro/02-cos-e.html)
+🎬 **ANIMAZIONE**: [`slides-talk/02-cos-e.html`](./slides-talk/02-cos-e.html)
 
 🎙️ **VOCE** (in camera):
 > Jev è un modello di **TypeSafe AI**, una startup di San Francisco nata nel 2024. È uscito in early access a settembre 2026.
@@ -93,11 +96,11 @@ Legenda:
 > Uno **state**: il testo da valutare. Può essere una stringa, un oggetto JSON o un array.
 > E una o più **domande**. Tutte a scelta multipla.
 
-🎬 **ANIMAZIONE**: [`01-intro/03a-state-domande.html`](./01-intro/03a-state-domande.html). Il ticket di supporto come flusso: state e tre domande entrano in Jev in parallelo, escono tre risposte.
+🎬 **ANIMAZIONE**: [`slides-talk/03a-state-domande.html`](./slides-talk/03a-state-domande.html). Il ticket di supporto come flusso: state e tre domande entrano in Jev in parallelo, escono tre risposte.
 
 ### 03b · I tre tipi di domanda
 
-🎬 **ANIMAZIONE**: [`01-intro/03b-tipi-domanda.html`](./01-intro/03b-tipi-domanda.html). I tre tipi, una card alla volta, ognuna con un mini esempio dal ticket.
+🎬 **ANIMAZIONE**: [`slides-talk/03b-tipi-domanda.html`](./slides-talk/03b-tipi-domanda.html). I tre tipi, una card alla volta, ognuna con un mini esempio dal ticket.
 
 🖥️ **SCHERMO**: tabella dei tre tipi, che appare una riga alla volta.
 
@@ -120,7 +123,7 @@ Legenda:
 
 ### 03c · La chiamata più semplice
 
-🎬 **ANIMAZIONE**: [`01-intro/03c-noul-base.html`](./01-intro/03c-noul-base.html). Il client più semplice possibile: si evidenziano import e client, lo state (il commento della hook), l'unica domanda `noul`, poi `console.log` e a destra la risposta `0.80` con la barra. Finale: "One state, one question, one number." Dura 16 s.
+🎬 **ANIMAZIONE**: [`slides-talk/03c-noul-base.html`](./slides-talk/03c-noul-base.html). Il client più semplice possibile: si evidenziano import e client, lo state (il commento della hook), l'unica domanda `noul`, poi `console.log` e a destra la risposta `0.80` con la barra. Finale: "One state, one question, one number." Dura 16 s.
 
 🖥️ **SCHERMO**: editor con il codice minimo (è la stessa domanda di `/1-jev/demo1`).
 
@@ -151,7 +154,7 @@ console.log(answers.offensive.noul); // 0.80
 
 ### 03d · Il codice del ticket
 
-🎬 **ANIMAZIONE**: [`01-intro/03d-codice.html`](./01-intro/03d-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
+🎬 **ANIMAZIONE**: [`slides-talk/03d-codice.html`](./slides-talk/03d-codice.html). Il codice del ticket: si evidenziano lo state e le tre domande mentre ne parlo, poi i tre risultati (ogni risultato riaccende la sua domanda).
 
 🖥️ **SCHERMO**: editor con l'esempio del ticket di supporto. Evidenzio le parti mentre ne parlo.
 
@@ -193,7 +196,7 @@ answers.urgent.noul;         // 0.92
 
 ### 03e · noul
 
-🎬 **ANIMAZIONE**: [`01-intro/03e-noul.html`](./01-intro/03e-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
+🎬 **ANIMAZIONE**: [`slides-talk/03e-noul.html`](./slides-talk/03e-noul.html). Prima di tre slide, una per tipo (in alto a destra noul · choice · score, quello attivo in rosa). A sinistra la domanda `urgent` e la risposta: un solo campo, `noul: 0.92`. A destra la barra a 0.92, un altro ticket a 0.17, la soglia `if (… > 0.8)`.
 
 🎙️ **VOCE**:
 > Ma cosa c'è esattamente dentro ogni risposta? Dipende dal tipo di domanda. Partiamo dalla più semplice.
@@ -203,7 +206,7 @@ answers.urgent.noul;         // 0.92
 
 ### 03f · choice
 
-🎬 **ANIMAZIONE**: [`01-intro/03f-choice.html`](./01-intro/03f-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
+🎬 **ANIMAZIONE**: [`slides-talk/03f-choice.html`](./slides-talk/03f-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
 
 🎙️ **VOCE**:
 > Una **choice** restituisce tre campi.
@@ -214,7 +217,7 @@ answers.urgent.noul;         // 0.92
 
 ### 03g · score
 
-🎬 **ANIMAZIONE**: [`01-intro/03g-score.html`](./01-intro/03g-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
+🎬 **ANIMAZIONE**: [`slides-talk/03g-score.html`](./slides-talk/03g-score.html). A sinistra la domanda `frustration` e la risposta. A destra una tabella: livello · valore · probabilità, poi valore × probabilità, la somma ≈ 1.04 (lo score), il pallino sulla scala, gli intervalli per 2 / 3 / 5 livelli, infine confidence 0.82.
 
 🎙️ **VOCE**:
 > Una **score** ha le stesse probabilities e la stessa confidence della choice, più il campo **score**.
@@ -235,7 +238,7 @@ answers.urgent.noul;         // 0.92
 
 ## 4. Il pattern a tre fasce (4:30 – 5:45)
 
-🎬 **ANIMAZIONE**: [`01-intro/04-tre-fasce.html`](./01-intro/04-tre-fasce.html)
+🎬 **ANIMAZIONE**: [`slides-talk/04-tre-fasce.html`](./slides-talk/04-tre-fasce.html)
 
 🎙️ **VOCE**:
 > E adesso la parte che secondo me rende Jev interessante per le app vere.
@@ -264,7 +267,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ## 5. Dove usarlo (5:45 – 6:30)
 
-🎬 **ANIMAZIONE**: [`01-intro/05-casi-uso.html`](./01-intro/05-casi-uso.html)
+🎬 **ANIMAZIONE**: [`slides-talk/05-casi-uso.html`](./slides-talk/05-casi-uso.html)
 
 🖥️ **SCHERMO**: due colonne di icone che compaiono una alla volta.
 
@@ -281,7 +284,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ## 6. Come fa a "sapere" le cose? (6:30 – 9:15)
 
-🎬 **ANIMAZIONE**: [`01-intro/06-come-sa.html`](./01-intro/06-come-sa.html). Slide titolo: si disegna un punto interrogativo, poi "How does Jev know things?" e lo spoiler "the knowledge comes from before Jev" (passi 1–4: il modello di base; passo 5: l'addestramento di Jev). Dura 10 s.
+🎬 **ANIMAZIONE**: [`slides-talk/06-come-sa.html`](./slides-talk/06-come-sa.html). Slide titolo: si disegna un punto interrogativo, poi "How does Jev know things?" e lo spoiler "the knowledge comes from before Jev" (passi 1–4: il modello di base; passo 5: l'addestramento di Jev). Dura 10 s.
 
 🎙️ **VOCE** (in camera):
 > La domanda che mi fanno sempre è questa: come fa a sapere che "sei brutto" è offensivo? Nessuno gliel'ha insegnato.
@@ -295,7 +298,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 06a · Passo 1 — Indovinare la parola dopo
 
-🎬 **ANIMAZIONE**: [`01-intro/06a-parola-dopo.html`](./01-intro/06a-parola-dopo.html)
+🎬 **ANIMAZIONE**: [`slides-talk/06a-parola-dopo.html`](./slides-talk/06a-parola-dopo.html)
 
 🖥️ **SCHERMO**: le tre frasi, la parola mancante appare dopo un attimo.
 
@@ -312,7 +315,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 06b · Passo 2 — Le parole diventano coordinate
 
-🎬 **ANIMAZIONE**: [`01-intro/06b-coordinate.html`](./01-intro/06b-coordinate.html)
+🎬 **ANIMAZIONE**: [`slides-talk/06b-coordinate.html`](./slides-talk/06b-coordinate.html)
 
 🖥️ **SCHERMO**: animazione dei punti che si raggruppano in "zona offese" e "zona cortesia".
 
@@ -325,7 +328,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 06c · Passo 3 — Il contesto cambia il significato
 
-🎬 **ANIMAZIONE**: [`01-intro/06c-attention.html`](./01-intro/06c-attention.html). A destra la mappa con tre zone (insults, weather, reviews) e "ugly" da sola al centro, in grigio: ambigua. A sinistra le tre frasi, una alla volta, con l'arco di attention: a ogni frase una copia di "ugly" vola in una zona diversa. Finale: "Same word, three places". Dura 16 s.
+🎬 **ANIMAZIONE**: [`slides-talk/06c-attention.html`](./slides-talk/06c-attention.html). A destra la mappa con tre zone (insults, weather, reviews) e "ugly" da sola al centro, in grigio: ambigua. A sinistra le tre frasi, una alla volta, con l'arco di attention: a ogni frase una copia di "ugly" vola in una zona diversa. Finale: "Same word, three places". Dura 16 s.
 
 🖥️ **SCHERMO**: tre frasi, una freccia da "brutto" alla parola che "guarda", e "brutto" che finisce in tre posti diversi della mappa.
 
@@ -342,7 +345,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 06d · Passo 4 — Anche le opzioni sono testo
 
-🎬 **ANIMAZIONE**: [`01-intro/06d-opzioni.html`](./01-intro/06d-opzioni.html)
+🎬 **ANIMAZIONE**: [`slides-talk/06d-opzioni.html`](./slides-talk/06d-opzioni.html)
 
 🖥️ **SCHERMO**: i quattro livelli di tossicità; una linea collega "SEI BRUTTO" al livello 3.
 
@@ -355,7 +358,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 #### 06e · L'addestramento e le due lezioni
 
-🎬 **ANIMAZIONE**: [`01-intro/06e-scommettere.html`](./01-intro/06e-scommettere.html). Il badge dell'addestramento (dati sintetici + RLCD), poi le due lezioni: rispondere solo scegliendo (la matita scrive, viene cancellata, diventa una casella) e probabilità oneste ("se dice 80%" → 10 prove, 8 giuste).
+🎬 **ANIMAZIONE**: [`slides-talk/06e-scommettere.html`](./slides-talk/06e-scommettere.html). Il badge dell'addestramento (dati sintetici + RLCD), poi le due lezioni: rispondere solo scegliendo (la matita scrive, viene cancellata, diventa una casella) e probabilità oneste ("se dice 80%" → 10 prove, 8 giuste).
 
 🖥️ **SCHERMO**: l'addestramento e le due lezioni.
 
@@ -367,7 +370,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 #### 06f · Un esempio reale: "UGLY!!!"
 
-🎬 **ANIMAZIONE**: [`01-intro/06f-scommessa.html`](./01-intro/06f-scommessa.html). L'esempio reale: le quattro barre di "UGLY!!!" che si riempiono, poi "An honest bet on every option." Dura 8 s.
+🎬 **ANIMAZIONE**: [`slides-talk/06f-scommessa.html`](./slides-talk/06f-scommessa.html). L'esempio reale: le quattro barre di "UGLY!!!" che si riempiono, poi "An honest bet on every option." Dura 8 s.
 
 🖥️ **SCHERMO**: le barre che si riempiono.
 
@@ -384,7 +387,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 06g · E quando sbaglia?
 
-🎬 **ANIMAZIONE**: [`01-intro/06g-quando-sbaglia.html`](./01-intro/06g-quando-sbaglia.html)
+🎬 **ANIMAZIONE**: [`slides-talk/06g-quando-sbaglia.html`](./slides-talk/06g-quando-sbaglia.html)
 
 🖥️ **SCHERMO**: `/1-jev/demo3`. Prima "UGLY!!!": Insults 86%, badge **Reject**. Poi "you absolute muppet, great post 😂": le barre si distribuiscono (6 · 7 · 34 · 53), confidenza 0.32, badge **Needs review**.
 
@@ -403,7 +406,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 07a · Limiti
 
-🎬 **ANIMAZIONE**: [`01-intro/07a-limiti.html`](./01-intro/07a-limiti.html). Le quattro card dei limiti (255 opzioni, 2–10 livelli, 64k token, scatola chiusa), poi il paper indipendente e "It doesn't replace an LLM: it works alongside it". Dura 9 s.
+🎬 **ANIMAZIONE**: [`slides-talk/07a-limiti.html`](./slides-talk/07a-limiti.html). Le quattro card dei limiti (255 opzioni, 2–10 livelli, 64k token, scatola chiusa), poi il paper indipendente e "It doesn't replace an LLM: it works alongside it". Dura 9 s.
 
 🖥️ **SCHERMO**: slide "Limiti", un punto alla volta.
 
@@ -416,7 +419,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 07b · Costi
 
-🎬 **ANIMAZIONE**: [`01-intro/07b-costi.html`](./01-intro/07b-costi.html). Il listino (input $0.042, output $0), il calcolo fino a $1.26, poi lo state pagato una volta per tre domande. Dura 9 s.
+🎬 **ANIMAZIONE**: [`slides-talk/07b-costi.html`](./slides-talk/07b-costi.html). Il listino (input $0.042, output $0), il calcolo fino a $1.26, poi lo state pagato una volta per tre domande. Dura 9 s.
 
 🖥️ **SCHERMO**: slide "Costi": prima il listino `input: $0,042 / milione di token` · `output: $0`, poi il calcolo.
 
@@ -439,7 +442,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ## 8. Chiusura (10:15 – 10:45)
 
-🎬 **ANIMAZIONE**: [`01-intro/08-chiusura.html`](./01-intro/08-chiusura.html)
+🎬 **ANIMAZIONE**: [`slides-talk/08-chiusura.html`](./slides-talk/08-chiusura.html)
 
 🎙️ **VOCE** (in camera):
 > Riassumendo in trenta secondi.
@@ -463,7 +466,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ### 09 · Prompt vuoto: cos'è, e dov'è?
 
-🎬 **ANIMAZIONE**: [`01-intro/09-soggetto.html`](./01-intro/09-soggetto.html). Il codice della route della demo (tre domande sulla stessa foto: `found`, `where`, `what`) e la risposta di Jev sulla foto del cane: il box sul cane, "dog" con probabilità 1 e tutte le altre etichette a 0. Dura 16 s.
+🎬 **ANIMAZIONE**: [`slides-talk/09-soggetto.html`](./slides-talk/09-soggetto.html). Il codice della route della demo (tre domande sulla stessa foto: `found`, `where`, `what`) e la risposta di Jev sulla foto del cane: il box sul cane, "dog" con probabilità 1 e tutte le altre etichette a 0. Dura 16 s.
 
 🖥️ **SCHERMO**: `/3-jev-images/demo1`, foto del cane, campo vuoto, **Find it**: compare "dog · 100%" sul box.
 
@@ -475,7 +478,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ### 09a · Jev vede anche le immagini
 
-🎬 **ANIMAZIONE**: [`01-intro/09a-immagini.html`](./01-intro/09a-immagini.html). La foto del cane e la chiamata: l'header sperimentale, `state: image(photo)`, poi la domanda nuova `box`; il box si posa sull'occhio. Dura 14 s.
+🎬 **ANIMAZIONE**: [`slides-talk/09a-immagini.html`](./slides-talk/09a-immagini.html). La foto del cane e la chiamata: l'header sperimentale, `state: image(photo)`, poi la domanda nuova `box`; il box si posa sull'occhio. Dura 14 s.
 
 🖥️ **SCHERMO**: `/3-jev-images/demo1`, clicco la foto del cane, scrivo "eye" e premo **Find it**.
 
@@ -485,7 +488,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ### 09b · box: quattro numeri
 
-🎬 **ANIMAZIONE**: [`01-intro/09b-box.html`](./01-intro/09b-box.html). I quattro bordi tracciati uno alla volta sulla foto (top 0.37, bottom 0.46, left 0.48, right 0.56), il box che ne nasce, confidence 0.72, poi la conversione in percentuali CSS. Dura 16 s.
+🎬 **ANIMAZIONE**: [`slides-talk/09b-box.html`](./slides-talk/09b-box.html). I quattro bordi tracciati uno alla volta sulla foto (top 0.37, bottom 0.46, left 0.48, right 0.56), il box che ne nasce, confidence 0.72, poi la conversione in percentuali CSS. Dura 16 s.
 
 🎙️ **VOCE**:
 > La risposta di un box sono quattro numeri: i bordi del rettangolo più piccolo che contiene l'oggetto.
@@ -495,7 +498,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ### 09c · C'è? Dov'è?
 
-🎬 **ANIMAZIONE**: [`01-intro/09c-sempre-box.html`](./01-intro/09c-sempre-box.html). Un'immagine con decine di oggetti di casa, scrivo "A clock": il box si posa sull'orologio (confidence 0.93) e il resto si scurisce; la noul dice 0.99; poi l'`if` del codice e il controesempio "a cat" (0.01, not found). Dura 15 s.
+🎬 **ANIMAZIONE**: [`slides-talk/09c-sempre-box.html`](./slides-talk/09c-sempre-box.html). Un'immagine con decine di oggetti di casa, scrivo "A clock": il box si posa sull'orologio (confidence 0.93) e il resto si scurisce; la noul dice 0.99; poi l'`if` del codice e il controesempio "a cat" (0.01, not found). Dura 15 s.
 
 🖥️ **SCHERMO**: nella demo, l'immagine degli oggetti (quarta miniatura), scrivo "A clock". Poi "a cat".
 
@@ -509,7 +512,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ### 09d · Descrivi quello che cerchi
 
-🎬 **ANIMAZIONE**: [`01-intro/09d-descrivi.html`](./01-intro/09d-descrivi.html). Tre prompt sulla stessa foto: "the main subject of the image" (box largo, 0.20), "the white car" (0.82), "the brown car" (0.43); poi due consigli dalla documentazione. Dura 16 s.
+🎬 **ANIMAZIONE**: [`slides-talk/09d-descrivi.html`](./slides-talk/09d-descrivi.html). Tre prompt sulla stessa foto: "the main subject of the image" (box largo, 0.20), "the white car" (0.82), "the brown car" (0.43); poi due consigli dalla documentazione. Dura 16 s.
 
 🖥️ **SCHERMO**: nella demo, foto delle auto: prima campo vuoto (soggetto principale), poi "the white car", poi "the brown car".
 
@@ -522,7 +525,7 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ### 09e · Quanto ci mette, e cosa sapere
 
-🎬 **ANIMAZIONE**: [`01-intro/09e-tempi-limiti.html`](./01-intro/09e-tempi-limiti.html). I tempi misurati (446–844 ms, una volta 2380 ms) e quattro cose da sapere: sperimentale, PNG o JPEG, 280–1568 px per lato, pagato come input. Dura 14 s.
+🎬 **ANIMAZIONE**: [`slides-talk/09e-tempi-limiti.html`](./slides-talk/09e-tempi-limiti.html). I tempi misurati (446–844 ms, una volta 2380 ms) e quattro cose da sapere: sperimentale, PNG o JPEG, 280–1568 px per lato, pagato come input. Dura 14 s.
 
 🎙️ **VOCE**:
 > Una foto, tre domande, una chiamata: di solito tra mezzo secondo e ottocento millisecondi. Abbastanza per un'interfaccia.
@@ -536,28 +539,28 @@ Slide segnaposto da completare: per ora solo il titolo di ogni passo.
 
 ### 10a · 🚧 TODO — Creare account e API key
 
-🎬 **ANIMAZIONE**: [`01-intro/10a-account.html`](./01-intro/10a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides-talk/10a-account.html`](./slides-talk/10a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
 ### 10b · 🚧 TODO — Esempio di codice
 
-🎬 **ANIMAZIONE**: [`01-intro/10b-codice.html`](./01-intro/10b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides-talk/10b-codice.html`](./slides-talk/10b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
 ### 10c · 🚧 TODO — Usiamo un gateway come Vercel
 
-🎬 **ANIMAZIONE**: [`01-intro/10c-gateway.html`](./01-intro/10c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides-talk/10c-gateway.html`](./slides-talk/10c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_
 
 ### 10d · 🚧 TODO — Demo time
 
-🎬 **ANIMAZIONE**: [`01-intro/10d-demo.html`](./01-intro/10d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides-talk/10d-demo.html`](./slides-talk/10d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_

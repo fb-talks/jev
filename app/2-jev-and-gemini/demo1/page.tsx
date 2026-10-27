@@ -3,82 +3,117 @@
 import { useState } from "react";
 
 export default function Demo1() {
-  const [topic, setTopic] = useState("an angry reader who thinks the post is useless");
-  const [comment, setComment] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Answers | null>(null);
-  const [questions, setQuestions] = useState<Record<keyof Answers, Question> | null>(null);
+  const [text, setText] = useState("Who taught you to code? Useless post.");
+  const [before, setBefore] = useState<BeforeStep | null>(null);
+  const [gemini, setGemini] = useState<GeminiStep | null>(null);
+  const [after, setAfter] = useState<AfterStep | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  // which step we are waiting for, to show where the request is
+  const waitingFor = !loading ? null : !before ? "Jev is measuring the comment…" : !gemini ? "Gemini is rewriting…" : "Jev is measuring the rewrite…";
 
-  async function generate() {
+  async function rewrite() {
     setLoading(true);
+    setBefore(null);
+    setGemini(null);
+    setAfter(null);
+    setError(null);
     const res = await fetch("/2-jev-and-gemini/demo1/api", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ topic }),
+      body: JSON.stringify({ text }),
     });
-    const data = await res.json();
+
+    if (!res.ok || !res.body) {
+      const data = await res.json();
+      setError(data.error ?? "Request failed");
+      setLoading(false);
+      return;
+    }
+
+    // one JSON line per step: Jev, then Gemini, then Jev again
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += value;
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+      for (const line of lines.filter(Boolean)) {
+        const event: Step = JSON.parse(line);
+        if (event.step === "before") setBefore(event);
+        if (event.step === "gemini") setGemini(event);
+        if (event.step === "after") setAfter(event);
+        if (event.step === "error") setError(event.error);
+      }
+    }
     setLoading(false);
-    setError(data.error ?? null);
-    setComment(data.comment ?? null);
-    setAnswers(data.answers ?? null);
-    setQuestions(data.questions ?? null);
   }
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 py-10">
-      <h1 className="text-2xl font-semibold">Demo 1 · Gemini writes, Jev moderates</h1>
+      <h1 className="text-2xl font-semibold">Demo 1 · Gemini rewrites, Jev confirms</h1>
+      <p className="-mt-2 text-zinc-600 dark:text-zinc-400">A rude comment goes in. Jev measures how offensive it is, Gemini rewrites it politely, and Jev measures it again: the drop in probability proves the rewrite worked.</p>
 
-      <input
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={3}
         className="rounded-xl border border-zinc-300 bg-transparent p-3 dark:border-zinc-700"
       />
 
-      <button onClick={generate} disabled={loading} className="self-start rounded-full bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">
-        {loading ? "Generating…" : "Generate comment"}
+      <button onClick={rewrite} disabled={loading} className="self-start rounded-full bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">
+        {loading ? "Rewriting…" : "Rewrite politely"}
       </button>
 
-      {error && <p className="text-rose-600">{error}</p>}
-      {comment && <blockquote className="border-l-4 border-indigo-500 pl-3 italic">{comment}</blockquote>}
-      {answers && questions && (
-        <>
-          <Card title="Category" subtitle={`choice: ${answers.category.choice}`} question={questions.category.instructions}>
-            {Object.entries(answers.category.probabilities).map(([k, v]) => (
-              <Bar
-                key={k}
-                label={k}
-                value={v}
-                highlight={k === answers.category.choice}
-                hint={(questions.category.criteria as Record<string, string>)[k]}
-              />
-            ))}
-          </Card>
-          <Card title="Toxicity" subtitle={`score: ${answers.toxicity.score.toFixed(2)} / 3`} question={questions.toxicity.instructions}>
-            {Object.entries(answers.toxicity.probabilities).map(([k, v]) => (
-              <Bar key={k} label={answers.toxicity.legend[k] ?? k} value={v} />
-            ))}
-          </Card>
-        </>
+      {before && (
+        <Card title="1 · Jev measures the original" subtitle={`${before.ms} ms`} question={before.question}>
+          <p>{text}</p>
+          <Bar label="Offensive" value={before.offensive} />
+        </Card>
       )}
+      {gemini && (
+        <Card title="2 · Gemini rewrites it" subtitle={`${gemini.ms} ms`}>
+          <blockquote className="border-l-4 border-indigo-500 pl-3 italic">{gemini.rewritten}</blockquote>
+        </Card>
+      )}
+      {after && before && (
+        <Card title="3 · Jev measures the rewrite" subtitle={`${after.ms} ms`} question={before.question}>
+          <Bar label="Offensive" value={after.offensive} highlight />
+        </Card>
+      )}
+      {waitingFor && <p className="animate-pulse text-sm text-zinc-500">{waitingFor}</p>}
+      {before && gemini && after && (
+        <p className="text-sm text-zinc-500">
+          Jev, twice: {before.ms + after.ms} ms · Gemini: {gemini.ms} ms
+        </p>
+      )}
+      {error && <p className="text-rose-600">{error}</p>}
     </main>
   );
 }
 
 // ---------- Types ----------
 
-// The questions as the SDK builds them: the text we wrote, and the options or levels.
-interface Question {
-  type: "noul" | "choice" | "score";
-  instructions: string;
-  criteria?: Record<string, string> | string[];
+// The steps streamed by the API route, one JSON line each.
+interface BeforeStep {
+  step: "before";
+  ms: number;
+  question: string;
+  offensive: number;
 }
-
-// The shape of the answers returned by the API route.
-interface Answers {
-  category: { choice: string; confidence: number; probabilities: Record<string, number> };
-  toxicity: { score: number; confidence: number; probabilities: Record<string, number>; legend: Record<string, string> };
+interface GeminiStep {
+  step: "gemini";
+  ms: number;
+  rewritten: string;
 }
+interface AfterStep {
+  step: "after";
+  ms: number;
+  offensive: number;
+}
+type Step = BeforeStep | GeminiStep | AfterStep | { step: "error"; error: string };
 
 // ---------- UI ----------
 

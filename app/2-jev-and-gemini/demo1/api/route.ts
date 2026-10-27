@@ -1,55 +1,60 @@
-import { choice, score, TypeSafeClient } from "@typesafe-ai/sdk";
+import { noul, TypeSafeClient } from "@typesafe-ai/sdk";
 import { generateText } from "ai";
 
-// The descriptions are our "prompt": the clearer they are, the better the probabilities.
-const questions = {
-  category: choice("What kind of comment is this, relative to a post on a tech blog?", {
-    relevant: "Comment, opinion or question about the post's content",
-    spam: "Advertising, promotional links or unsolicited messages",
-    off_topic: "Has nothing to do with the post",
-  }),
-  toxicity: score("How offensive is the tone of the comment?", [
-    "Polite or neutral",
-    "Critical but respectful",
-    "Combative or sarcastic toward people",
-    "Insults, hate or personal attacks",
-  ]),
-};
+const questions = { offensive: noul("The comment is offensive or insulting") };
 
-// Demo 1: Gemini writes a comment, Jev moderates it.
+// Demo 1: Jev measures, Gemini rewrites, Jev measures again.
+// The response is a stream of JSON lines, one per step, so the page shows each step (and its speed) as it ends.
 export async function POST(request: Request) {
-  const { topic } = await request.json();
+  const { text } = await request.json();
 
-  if (typeof topic !== "string" || !topic.trim()) {
-    return Response.json({ error: "Describe the comment to write." }, { status: 400 });
+  if (typeof text !== "string" || !text.trim()) {
+    return Response.json({ error: "Write a comment to rewrite." }, { status: 400 });
   }
 
-  try {
-    // Gemini goes through the same Vercel AI Gateway: with a "provider/model" string
-    // the AI SDK uses the Gateway on its own and reads the same credential.
-    const { text } = await generateText({
-      model: "google/gemini-3.8-flash",
-      instructions: "You are a reader of a tech blog. Write a single comment of 1-2 sentences. Only the comment, no quotes.",
-      prompt: `Write a comment with this intent: ${topic}`,
-    });
-    const comment = text.trim();
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (event: object) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
 
-    // Jev through Vercel AI Gateway, with TypeSafe's official SDK. The key stays on the server:
-    // AI_GATEWAY_API_KEY locally, the OIDC token on Vercel. Created here because the
-    // constructor throws when the key is missing.
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-    });
+      try {
+        // Jev through Vercel AI Gateway, with TypeSafe's official SDK. The key stays on the server:
+        // AI_GATEWAY_API_KEY locally, the OIDC token on Vercel. Created here because the
+        // constructor throws when the key is missing.
+        const jev = new TypeSafeClient({
+          apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
+          baseURL: "https://ai-gateway.vercel.sh/typesafe",
+          defaultModel: "typesafe-ai/jev",
+        });
 
-    const { answers } = await jev.systemOne({ state: comment, questions });
+        let start = performance.now();
+        const before = await jev.systemOne({ state: text, questions });
+        // the question goes back too, so the page shows the exact text Jev received
+        send({ step: "before", ms: Math.round(performance.now() - start), question: questions.offensive.instructions, offensive: before.answers.offensive.noul });
 
-    // the questions go back too, so the page shows the exact text Jev received
-    return Response.json({ comment, questions, answers });
-  } catch (err) {
-    console.error(err);
-    const message = err instanceof Error ? err.message : "Unknown error";
-    return Response.json({ error: `AI call failed: ${message}` }, { status: 502 });
-  }
+        // Gemini goes through the same Vercel AI Gateway: with a "provider/model" string
+        // the AI SDK uses the Gateway on its own and reads the same credential.
+        start = performance.now();
+        const gemini = await generateText({
+          model: "google/gemini-3.8-flash",
+          instructions: "Rewrite the comment in a polite, respectful tone, keeping its meaning and criticism. Only the rewritten comment, no quotes.",
+          prompt: text,
+        });
+        const rewritten = gemini.text.trim();
+        send({ step: "gemini", ms: Math.round(performance.now() - start), rewritten });
+
+        start = performance.now();
+        const after = await jev.systemOne({ state: rewritten, questions });
+        send({ step: "after", ms: Math.round(performance.now() - start), offensive: after.answers.offensive.noul });
+      } catch (err) {
+        console.error(err);
+        const message = err instanceof Error ? err.message : "Unknown error";
+        send({ step: "error", error: `AI call failed: ${message}` });
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, { headers: { "Content-Type": "application/x-ndjson" } });
 }

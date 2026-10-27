@@ -1,5 +1,5 @@
 /*
-  Shared base for the docs/01-intro animations.
+  Shared base for the docs/slides-talk animations.
   Style inspired by the mokup.dev mini-animations: CSS only, infinite loop.
   Each page sets --loop and its own @keyframes; keyframe percentages
   are relative to the loop.
