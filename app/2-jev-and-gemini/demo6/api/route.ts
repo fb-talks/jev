@@ -1,5 +1,6 @@
-import { choice, noul, score, TypeSafeClient } from "@typesafe-ai/sdk";
+import { choice, noul, score } from "@typesafe-ai/sdk";
 import { generateText, jsonSchema, Output } from "ai";
+import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
 
 // The criteria, written once and shared by both models, so the comparison is fair.
 const categories = {
@@ -47,6 +48,7 @@ personal_data, true if: ${personalData}`;
 // Demo 6: one CSV row per call, classified by the chosen models (Jev, Gemini or both) at the same time.
 export async function POST(request: Request) {
   const { text, models = ["jev", "gemini"] } = await request.json();
+  const keys = await apiKeys();
   const runJev = models.includes("jev");
   const runGemini = models.includes("gemini");
 
@@ -55,12 +57,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Jev through Vercel AI Gateway: AI_GATEWAY_API_KEY locally, the OIDC token on Vercel.
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-    });
+    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+    const jev = jevClient(keys);
 
     // the chosen models at the same time, each with its own stopwatch
     const [jevResult, geminiResult] = await Promise.all([
@@ -68,7 +66,7 @@ export async function POST(request: Request) {
       runGemini
         ? timed(() =>
             generateText({
-              model: "google/gemini-3.8-flash",
+              model: geminiModel(keys),
               instructions: geminiInstructions,
               prompt: text,
               output: Output.object({ schema: geminiSchema }),

@@ -1,4 +1,5 @@
-import { box, choice, image, noul, TypeSafeClient } from "@typesafe-ai/sdk";
+import { box, choice, image, noul } from "@typesafe-ai/sdk";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 const labels = {
   dog: null,
@@ -14,6 +15,7 @@ const labels = {
 // Demo 1: one photo and a prompt. Is it there, where is it, and what is it?
 export async function POST(request: Request) {
   const form = await request.formData();
+  const keys = await apiKeys();
   const photo = form.get("photo");
   const prompt = String(form.get("prompt") ?? "").trim();
   const target = prompt || "The main subject of the image";
@@ -33,13 +35,9 @@ export async function POST(request: Request) {
   };
 
   try {
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-      // images are still experimental: opt in with this header
-      defaultHeaders: { "TypeSafe-Danger-Zone-Images": "true" },
-    });
+    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts);
+    // images are still experimental: opt in with this header
+    const jev = jevClient(keys, { "TypeSafe-Danger-Zone-Images": "true" });
 
     // the photo is the state: every question looks at it
     // the stopwatch covers only Jev's call, not the upload from the browser

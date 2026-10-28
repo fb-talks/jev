@@ -1,5 +1,6 @@
-import { score, TypeSafeClient } from "@typesafe-ai/sdk";
+import { score } from "@typesafe-ai/sdk";
 import { generateText, jsonSchema, Output } from "ai";
+import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
 
 const questions = {
   quality: score("How helpful and polite is this reply from the post's author?", [
@@ -23,6 +24,7 @@ const repliesSchema = jsonSchema<Record<(typeof styles)[number], string>>({
 // The response is a stream of JSON lines, one per step, so the page shows each step (and its speed) as it ends.
 export async function POST(request: Request) {
   const { text } = await request.json();
+  const keys = await apiKeys();
 
   if (typeof text !== "string" || !text.trim()) {
     return Response.json({ error: "Write a comment to reply to." }, { status: 400 });
@@ -34,11 +36,10 @@ export async function POST(request: Request) {
       const send = (event: object) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
 
       try {
-        // Gemini goes through the same Vercel AI Gateway: with a "provider/model" string
-        // the AI SDK uses the Gateway on its own and reads the same credential.
+        // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
         let start = performance.now();
         const { output } = await generateText({
-          model: "google/gemini-3.8-flash",
+          model: geminiModel(keys),
           instructions: "You are the author of a tech blog post. Write 3 very different replies to the reader's comment: one curt, one friendly, one detailed.",
           prompt: text,
           output: Output.object({ schema: repliesSchema }),
@@ -46,14 +47,8 @@ export async function POST(request: Request) {
         const replies = styles.map((style) => ({ style, text: output[style].trim() }));
         send({ step: "gemini", ms: Math.round(performance.now() - start), replies });
 
-        // Jev through Vercel AI Gateway, with TypeSafe's official SDK. The key stays on the server:
-        // AI_GATEWAY_API_KEY locally, the OIDC token on Vercel. Created here because the
-        // constructor throws when the key is missing.
-        const jev = new TypeSafeClient({
-          apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-          baseURL: "https://ai-gateway.vercel.sh/typesafe",
-          defaultModel: "typesafe-ai/jev",
-        });
+        // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+        const jev = jevClient(keys);
 
         // the 3 Jev calls run in parallel: the time is the slowest of the three, not the sum
         start = performance.now();

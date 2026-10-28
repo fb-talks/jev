@@ -1,4 +1,5 @@
-import { choice, noul, score, TypeSafeClient } from "@typesafe-ai/sdk";
+import { choice, noul, score } from "@typesafe-ai/sdk";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // The descriptions are our "prompt": the clearer they are, the better the probabilities.
 const questions = {
@@ -20,20 +21,15 @@ const questions = {
 // Demo 2: one question of each type (choice, score, noul), with all their probabilities.
 export async function POST(request: Request) {
   const { text } = await request.json();
+  const keys = await apiKeys();
 
   if (typeof text !== "string" || !text.trim()) {
     return Response.json({ error: "Write a comment to analyze." }, { status: 400 });
   }
 
   try {
-    // Jev through Vercel AI Gateway, with TypeSafe's official SDK. The key stays on the server:
-    // AI_GATEWAY_API_KEY locally, the OIDC token on Vercel. Created here because the
-    // constructor throws when the key is missing.
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-    });
+    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+    const jev = jevClient(keys);
 
     const { answers } = await jev.systemOne({ state: text, questions });
     // the questions go back too, so the page shows the exact text Jev received

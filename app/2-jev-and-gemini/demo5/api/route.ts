@@ -1,7 +1,8 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
-import { choice, score, TypeSafeClient } from "@typesafe-ai/sdk";
+import { choice, score } from "@typesafe-ai/sdk";
 import { generateText, jsonSchema, Output } from "ai";
+import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
 
 // Scraping, Jev and Gemini in one request: Gemini alone can take 20+ seconds.
 export const maxDuration = 60;
@@ -72,6 +73,7 @@ const MAX_CHARS = 4000;
 // Demo 5: one URL per call. We scrape it once, then the chosen models classify the same text.
 export async function POST(request: Request) {
   const { url, models = ["jev", "gemini"] } = await request.json();
+  const keys = await apiKeys();
   const runJev = models.includes("jev");
   const runGemini = models.includes("gemini");
 
@@ -97,12 +99,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Jev through Vercel AI Gateway: AI_GATEWAY_API_KEY locally, the OIDC token on Vercel.
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-    });
+    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+    const jev = jevClient(keys);
 
     // the chosen models at the same time, each with its own stopwatch
     const [jevResult, geminiResult] = await Promise.all([
@@ -110,7 +108,7 @@ export async function POST(request: Request) {
       runGemini
         ? timed(() =>
             generateText({
-              model: "google/gemini-3.8-flash",
+              model: geminiModel(keys),
               instructions: geminiInstructions,
               prompt: page.text,
               output: Output.object({ schema: geminiSchema }),

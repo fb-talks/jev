@@ -1,4 +1,5 @@
-import { choice, noul, score, TypeSafeClient } from "@typesafe-ai/sdk";
+import { choice, noul, score } from "@typesafe-ai/sdk";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // The same questions as Demo 3: the evaluation measures this exact moderation setup.
 const questions = {
@@ -22,18 +23,15 @@ const questions = {
 // and compares Jev's decision with the expected one.
 export async function POST(request: Request) {
   const { text } = await request.json();
+  const keys = await apiKeys();
 
   if (typeof text !== "string" || !text.trim()) {
     return Response.json({ error: "Empty comment." }, { status: 400 });
   }
 
   try {
-    // Jev through Vercel AI Gateway: AI_GATEWAY_API_KEY locally, the OIDC token on Vercel.
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-    });
+    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+    const jev = jevClient(keys);
 
     const start = performance.now();
     const result = await jev.systemOne({ state: text, questions });

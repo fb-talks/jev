@@ -1,4 +1,5 @@
-import { noul, TypeSafeClient } from "@typesafe-ai/sdk";
+import { noul } from "@typesafe-ai/sdk";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 const questions = {
   offensive: noul("The comment is offensive or insulting"),
@@ -7,20 +8,15 @@ const questions = {
 // Demo 1: one comment, one yes/no question.
 export async function POST(request: Request) {
   const { text } = await request.json();
+  const keys = await apiKeys();
 
   if (typeof text !== "string" || !text.trim()) {
     return Response.json({ error: "Write a comment to analyze." }, { status: 400 });
   }
 
   try {
-    // Jev through Vercel AI Gateway, with TypeSafe's official SDK. The key stays on the server:
-    // AI_GATEWAY_API_KEY locally, the OIDC token on Vercel. Created here because the
-    // constructor throws when the key is missing.
-    const jev = new TypeSafeClient({
-      apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-      baseURL: "https://ai-gateway.vercel.sh/typesafe",
-      defaultModel: "typesafe-ai/jev",
-    });
+    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+    const jev = jevClient(keys);
 
     const { answers } = await jev.systemOne({ state: text, questions });
 

@@ -1,5 +1,6 @@
-import { choice, TypeSafeClient } from "@typesafe-ai/sdk";
+import { choice } from "@typesafe-ai/sdk";
 import { generateText, jsonSchema, Output } from "ai";
+import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
 
 // The descriptions are our "prompt": the clearer they are, the better the probabilities.
 const questions = {
@@ -53,6 +54,7 @@ const dataSchema = jsonSchema<{
 // The response is a stream of JSON lines, one per step, so the page shows Jev's verdict before Gemini starts.
 export async function POST(request: Request) {
   const { email, guardrail, threshold } = await request.json();
+  const keys = await apiKeys();
 
   if (typeof email !== "string" || !email.trim() || typeof guardrail !== "boolean" || typeof threshold !== "number") {
     return Response.json({ error: "Paste an email, choose the guardrail and the threshold." }, { status: 400 });
@@ -65,14 +67,8 @@ export async function POST(request: Request) {
 
       try {
         if (guardrail) {
-          // Jev through Vercel AI Gateway, with TypeSafe's official SDK. The key stays on the server:
-          // AI_GATEWAY_API_KEY locally, the OIDC token on Vercel. Created here because the
-          // constructor throws when the key is missing.
-          const jev = new TypeSafeClient({
-            apiKey: process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_OIDC_TOKEN,
-            baseURL: "https://ai-gateway.vercel.sh/typesafe",
-            defaultModel: "typesafe-ai/jev",
-          });
+          // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
+          const jev = jevClient(keys);
           const start = performance.now();
           const { answers } = await jev.systemOne({ state: email, questions });
           const ms = Math.round(performance.now() - start);
@@ -84,13 +80,12 @@ export async function POST(request: Request) {
           if (blocked) return;
         }
 
-        // Gemini goes through the same Vercel AI Gateway: with a "provider/model" string
-        // the AI SDK uses the Gateway on its own and reads the same credential.
+        // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
         // The email goes straight into the prompt, as many real assistants do: without the guardrail,
         // only Gemini's own resistance stands between the hidden instructions and the user.
         const start = performance.now();
         const { output, usage } = await generateText({
-          model: "google/gemini-3.8-flash",
+          model: geminiModel(keys),
           // today's date, so dates without a year land in the right one
           instructions: `You are the email assistant of the user. Extract the key data of the email below. Be terse. Today is ${new Date().toISOString().slice(0, 10)}.`,
           prompt: email,
