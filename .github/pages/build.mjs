@@ -1,5 +1,6 @@
 // Builds the GitHub Pages site in _site/: every deck in docs/, at any depth (a folder with _shared/anim.js),
 // is copied as is at the same path, plus an index.html that lists its slides in the order set in anim.js.
+// The video script named by `const SCRIPT` in anim.js (speaker notes) is copied too, at the same relative path.
 //   node .github/pages/build.mjs
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -23,6 +24,8 @@ const decks = readdirSync(DOCS, { recursive: true })
     cpSync(dir, join(OUT, d.name), { recursive: true, filter: (src) => !src.includes("/_export") });
     // Slide order comes from the `slides` array in anim.js
     const js = readFileSync(join(dir, "_shared/anim.js"), "utf8");
+    const script = js.match(/const SCRIPT = "([^"]+)"/)?.[1];
+    if (script) cpSync(join(dir, script), join(OUT, d.name, script));
     const files = [...js.match(/const slides = \[([\s\S]*?)\]/)[1].matchAll(/"([^"]+\.html)"/g)].map((m) => m[1]);
     const slides = files.map((file) => {
       const html = readFileSync(join(dir, file), "utf8");
@@ -69,7 +72,7 @@ writeFileSync(
 <body>
 <main>
   <h1><span>Jev</span> slides</h1>
-  <p>← / → to move between slides · Space to pause · R to restart · H to hide the controls</p>
+  <p>← / → to move between slides · Space to pause · R to restart · N for the speaker notes · H to hide the controls</p>
 ${list}
 </main>
 </body>

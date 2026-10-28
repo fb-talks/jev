@@ -5,7 +5,7 @@
 
 Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **12 minuti e mezzo**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
 
-Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra).
+Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra). Questo file è anche la fonte delle **note dello speaker**: ogni slide (tasto N o bottone "Notes") mostra la sezione che contiene il suo link 🎬, quindi le note si modificano solo qui.
 
 Legenda:
 - 🎙️ **VOCE**: il parlato (in camera o fuori campo)

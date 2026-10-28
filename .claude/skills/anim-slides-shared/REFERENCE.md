@@ -35,7 +35,12 @@ When changing the runtime in a deck, ask whether the starter in `assets/` should
 - The animation **plays once** and stops at **94% of `--loop`**, then a play button appears bottom-right.
 - Keys: `←`/`→` (or PageUp/PageDown) previous/next slide · Space pause/resume (replay when ended) · R restart ·
   H hide/show the on-screen controls (remembered across slides, for recording).
-- Bottom-left badge: file prefix + position in `slides` (e.g. `05e · 12 / 15`). Keep that corner free too.
+- Bottom-left badge: file prefix + position in `slides` (e.g. `05e · 12 / 15`); clicking it opens a full-height
+  slide list (titles from the video script headings). Next to it a **Notes** button (or `N`) opens the speaker
+  notes panel at the bottom. Keep that corner free too.
+- Speaker notes are not stored in the slides: `const SCRIPT` in `anim.js` points to the video script, and each
+  slide shows the script section that holds its 🎬 link (fetched at runtime, so over http, not `file://`).
+  To change the notes, edit the script. `.github/pages/build.mjs` publishes the script next to the deck.
 - `page.html#t=0.5` freezes the slide at 50% of its timeline (used by `snap.mjs`).
 - Navigation follows the `slides` array in `anim.js`, not the file system: **every slide must be listed there**.
 
