@@ -26,13 +26,28 @@ Dalla [introduzione di TypeSafe](https://docs.typesafe.ai/introduction): Jev è 
 
 Jev è un modello di TypeSafe AI, startup di San Francisco fondata nel 2024 e uscita in early access il 15 settembre 2026. Il nome viene dall'economista William Stanley Jevons e dal suo "paradosso": se una risorsa diventa più efficiente, se ne usa di più. L'idea è che un'intelligenza artificiale molto più economica verrà usata ovunque.
 
+### Prima: modelli che scrivono e modelli che scelgono
+
+🎬 [`slides/01e-classificatori.html`](./slides/01e-classificatori.html)
+
+I modelli di machine learning si dividono, a grandi linee, in due famiglie:
+
+- **generativi**: producono contenuto nuovo. Un LLM scrive testo libero un token alla volta, scegliendo ogni volta la parola successiva;
+- **discriminativi**, cioè i **classificatori**: ricevono un input e dicono a quale opzione di un insieme fisso appartiene, con una probabilità per ogni opzione. Non scrivono nulla.
+
+I classificatori sono in giro da decenni: il filtro antispam (spam / non spam), il sentiment di una recensione (positiva / neutra / negativa), le schede di Gmail (Principale / Promozioni / Social). Ognuno è addestrato su un dataset etichettato per **un solo compito**, con opzioni fissate una volta per tutte.
+
+Jev appartiene alla seconda famiglia, ma le opzioni gliele passi tu a ogni richiesta (vedi sotto e [Jev e i classificatori](#jev-e-i-classificatori)).
+
+### Jev è un modello discriminativo
+
 Tecnicamente è un **modello discriminativo**: serve a classificare o a stimare valori, non a generare testo. Per ogni domanda restituisce una **distribuzione di probabilità** sulle opzioni che gli passi tu, e basta. I campi `choice`, `score` e `confidence` della risposta derivano da quelle probabilità: per esempio lo `score` è la media dei livelli pesata con le loro probabilità. Arrivano già calcolati dall'API.
 
 TypeSafe lo chiama un modello **"System One"**, richiamando il "Sistema 1" di Kahneman: il pensiero veloce e intuitivo.
 
 ### Jev e i classificatori
 
-🎬 [`slides/02a-classificatori.html`](./slides/02a-classificatori.html)
+🎬 [`slides/02a-tre-modi.html`](./slides/02a-tre-modi.html)
 
 Jev fa lo stesso lavoro di un classificatore, ma si usa come un LLM:
 
@@ -375,14 +390,18 @@ La domanda `box` restituisce il rettangolo più piccolo che contiene l'oggetto: 
 
 ---
 
-## 10. In pratica — 🚧 TODO (placeholder)
+## 10. In pratica: Jev + Gemini
 
-Sezione da scrivere. Le slide segnaposto, nell'ordine:
+Le sette demo del gruppo `/2-jev-and-gemini`, con il flusso e il codice affiancati (versione per il talk del codice in `page.tsx` di ogni demo):
 
-- Creare account e API key: 🎬 [`slides/10a-account.html`](./slides/10a-account.html)
-- Esempio di codice: 🎬 [`slides/10b-codice.html`](./slides/10b-codice.html)
-- Usiamo un gateway come Vercel: 🎬 [`slides/10c-gateway.html`](./slides/10c-gateway.html)
-- Demo time: 🎬 [`slides/10d-demo.html`](./slides/10d-demo.html)
+- **Gemini riscrive, Jev conferma** (`demo1`): Jev misura `noul("offensive")` sul commento (0.78), Gemini lo riscrive in tono educato, Jev rifà la stessa domanda sulla riscrittura (0.11). Il calo di probabilità è la prova che la riscrittura ha funzionato. 🎬 [`slides/10a-riscrive.html`](./slides/10a-riscrive.html)
+- **Gemini risponde, Jev valuta** (`demo2`): Gemini scrive una risposta di supporto, Jev la valuta con una `choice` (pertinenza) e uno `score` (tono). Lo state contiene sia il messaggio del cliente sia la risposta, perché la pertinenza ha senso solo rispetto alla richiesta. 🎬 [`slides/10b-risponde.html`](./slides/10b-risponde.html)
+- **Gemini propone, Jev sceglie** (`demo3`): Gemini scrive tre risposte come dati strutturati, Jev le valuta in parallelo con uno `score`, il codice tiene la migliore. 🎬 [`slides/10c-propone.html`](./slides/10c-propone.html)
+- **Email to Data** (`demo4`): Jev cerca istruzioni nascoste per l'AI (prompt injection) con una `choice`. Sopra la soglia l'email è bloccata e Gemini non viene chiamato (0 token), altrimenti Gemini estrae i dati. 🎬 [`slides/10d-email.html`](./slides/10d-email.html)
+- **Jev contro Gemini su 20 siti** (`demo5`): lo stesso testo e gli stessi criteri ai due modelli, in parallelo, per confrontare tempi e accordo. 🎬 [`slides/10e-siti.html`](./slides/10e-siti.html)
+- **Valutazione di un CSV** (`demo6`): tre domande (una per tipo) e una policy nel codice che trasforma le risposte in pubblica / rivedi / rifiuta, confrontata con la decisione umana. 🎬 [`slides/10f-csv.html`](./slides/10f-csv.html)
+- **Smart router** (`demo7`): Jev classifica l'intento; se è semplice e la probabilità supera la soglia, risponde un template (0 token), altrimenti Gemini. 🎬 [`slides/10g-router.html`](./slides/10g-router.html)
+- Demo time (🚧 segnaposto): 🎬 [`slides/10h-demo.html`](./slides/10h-demo.html)
 
 ---
 

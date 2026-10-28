@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10a · Gemini rewrites, Jev confirms</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), first example:
+  /2-jev-and-gemini/demo1. Horizontal layout: the flow on the left, top to bottom; the code on the right.
+  Each step of the flow lights up the code that does it. The code is the talk version in app/2-jev-and-gemini/demo1/page.tsx;
+  0.78 and 0.11 are the values in its comments.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 18s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Flow, left, top to bottom ---------- */
+  .flow { position: absolute; left: 135px; top: 215px; width: 560px; }
+  .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; height: 92px; padding: 0 26px; border-radius: 16px; border: 2.5px solid #c5cddc; background: #fff; opacity: 0; }
+  .node b { display: block; font-size: 28px; }
+  .node span { font-size: 20px; opacity: .55; }
+  .node.jev { border-color: var(--pink); background: var(--pink-bg); }
+  .node.gem { border-color: var(--blue); background: var(--blue-bg); }
+  .node.ok { border-color: var(--green); background: var(--green-bg); }
+  .node .val { font-family: var(--sans); font-weight: 700; font-size: 44px; line-height: 1; color: var(--pink); opacity: 0; }
+  .link { width: 4px; height: 36px; margin-left: 60px; border-radius: 2px; background: var(--ink); transform-origin: top; transform: scaleY(0); }
+  .n1 { animation-name: n1; } .n2 { animation-name: n2; } .n3 { animation-name: n3; } .n4 { animation-name: n4; } .n5 { animation-name: n5; }
+  .l1 { animation-name: l1; } .l2 { animation-name: l2; } .l3 { animation-name: l3; } .l4 { animation-name: l4; }
+  .n2 .val { animation-name: v1; } .n4 .val { animation-name: v2; }
+
+  /* ---------- Code, right ---------- */
+  .code-card { position: absolute; left: 760px; top: 215px; width: 1025px; height: 620px; padding: 22px 30px; border-radius: 22px; background: #1f2230; color: #e8ebf4; opacity: 0; animation-name: codein; }
+  .blk { margin: 0 0 8px; padding: 8px 18px 8px 20px; border-left: 5px solid transparent; border-radius: 8px; opacity: .3; }
+  .blk h5 { margin: 0 0 6px; font-family: var(--sans); font-size: 19px; font-weight: 600; letter-spacing: .3px; color: #9aa3b8; }
+  .blk pre { margin: 0; font-family: var(--mono); font-size: 20px; line-height: 1.4; white-space: pre; }
+  .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
+  .b0 { animation-name: b0; } .b1 { animation-name: b1; } .b2 { animation-name: b2; } .b3 { animation-name: b3; }
+
+  .caption .num { font-family: var(--sans); font-weight: 700; font-size: 46px; }
+  .caption { position: absolute; left: 0; right: 0; top: 880px; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Timeline (18s loop) ----------
+     0–4%    scene in · 4–8% code card, the question for Jev lights up (b0)
+     8–12%   node "Comment"
+     14–18%  node "Jev measures" + code block 1 · 20–23% 0.78
+     26–30%  node "Gemini rewrites" + code block 2 (blue)
+     38–42%  node "Jev measures again" + code block 3 · 44–47% 0.11
+     52–56%  node "Before vs after"
+     each block stays lit, the one in focus has a coloured border until the next step
+     72–78%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codein { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes l1 { 0%, 12% { transform: scaleY(0) } 14%, 100% { transform: scaleY(1) } }
+  @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes v1 { 0%, 20% { opacity: 0; transform: scale(.6) } 23%, 100% { opacity: 1; transform: none } }
+  @keyframes l2 { 0%, 24% { transform: scaleY(0) } 26%, 100% { transform: scaleY(1) } }
+  @keyframes n3 { 0%, 26% { opacity: 0; transform: translateY(14px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes l3 { 0%, 36% { transform: scaleY(0) } 38%, 100% { transform: scaleY(1) } }
+  @keyframes n4 { 0%, 38% { opacity: 0; transform: translateY(14px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes v2 { 0%, 44% { opacity: 0; transform: scale(.6) } 47%, 100% { opacity: 1; transform: none } }
+  @keyframes l4 { 0%, 50% { transform: scaleY(0) } 52%, 100% { transform: scaleY(1) } }
+  @keyframes n5 { 0%, 52% { opacity: 0; transform: translateY(14px) } 56%, 100% { opacity: 1; transform: none } }
+
+  @keyframes b0 { 0%, 4% { opacity: .3 } 8%, 100% { opacity: 1 } }
+  @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 24% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 28%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b2 { 0%, 26% { opacity: .3; border-color: transparent; background: none } 30%, 36% { opacity: 1; border-color: var(--blue); background: rgba(13,153,255,.1) } 40%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b3 { 0%, 38% { opacity: .3; border-color: transparent; background: none } 42%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>10 · Jev + Gemini · demo 1</small>Gemini rewrites, Jev confirms</div>
+
+    <div class="flow">
+      <div class="node n1"><div><b>Comment</b><span>"Who taught you to code? Useless post."</span></div></div>
+      <div class="link l1"></div>
+      <div class="node jev n2"><div><b>Jev measures</b><span>P(offensive) before</span></div><span class="val">0.78</span></div>
+      <div class="link l2"></div>
+      <div class="node gem n3"><div><b>🤖 Gemini rewrites</b><span>polite, same meaning</span></div></div>
+      <div class="link l3"></div>
+      <div class="node jev n4"><div><b>Jev measures again</b><span>P(offensive) after</span></div><span class="val">0.11</span></div>
+      <div class="link l4"></div>
+      <div class="node ok n5"><div><b>Before vs after</b><span>did the rewrite work?</span></div></div>
+    </div>
+
+    <div class="code-card">
+      <div class="blk b0">
+        <h5>THE QUESTION FOR JEV</h5>
+<pre><span class="k">const</span> questions = {
+  offensive: noul(<span class="s">"The comment is offensive or insulting"</span>),
+};</pre>
+      </div>
+      <div class="blk b1">
+        <h5>1 · JEV MEASURES THE ORIGINAL</h5>
+<pre><span class="k">const</span> before = <span class="k">await</span> jev.systemOne({ state: text, questions });
+before.answers.offensive.noul; <span class="c">// </span><span class="n">0.78</span></pre>
+      </div>
+      <div class="blk b2">
+        <h5>2 · GEMINI REWRITES IT</h5>
+<pre><span class="k">const</span> { text: rewritten } = <span class="k">await</span> generateText({
+  model: <span class="s">"google/gemini-3.8-flash"</span>, <span class="c">// same AI Gateway</span>
+  instructions: <span class="s">"Rewrite the comment in a polite tone…"</span>,
+  prompt: text,
+});</pre>
+      </div>
+      <div class="blk b3">
+        <h5>3 · JEV MEASURES THE REWRITE</h5>
+<pre><span class="k">const</span> after = <span class="k">await</span> jev.systemOne({ state: rewritten, questions });
+after.answers.offensive.noul; <span class="c">// </span><span class="n">0.11</span></pre>
+      </div>
+    </div>
+
+    <div class="caption">Gemini writes, <span class="underline-pink">Jev proves it worked</span>: <span class="num">0.78 → 0.11</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

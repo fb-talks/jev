@@ -3,7 +3,7 @@
 > **Cos'è questo file.** Il **copione** del video e del talk: per ogni sezione cosa si dice (🎙️), cosa si vede (🖥️), quale animazione parte (🎬) e le note di montaggio (✂️), in ordine di slide. In fondo c'è la checklist per la registrazione.
 > Le spiegazioni approfondite, i numeri e le fonti stanno negli appunti: [01-intro-jev.md](./01-intro-jev.md). Le slide sono in [`slides/`](./slides/).
 
-Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **12 minuti**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
+Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **12 minuti e mezzo**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
 
 Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra).
 
@@ -62,6 +62,19 @@ Legenda:
 
 ## 2. Cos'è Jev (1:30 – 2:45)
 
+### 01e · Scrivere o scegliere
+
+🎬 **ANIMAZIONE**: [`slides/01e-classificatori.html`](./slides/01e-classificatori.html). A sinistra un modello generativo che scrive righe di testo, a destra un classificatore (in rosa) che sceglie "spam" al 97%; sotto, tre classificatori di tutti i giorni; chiude "Jev is a classifier, but you give it the options on every request". Dura 14 s.
+
+🎙️ **VOCE**:
+> Prima di dirvi cos'è Jev, un passo indietro. I modelli di AI fanno, a grandi linee, due mestieri.
+> Ci sono i modelli **generativi**, come gli LLM: **scrivono**. Producono testo libero, una parola alla volta.
+> E ci sono i modelli **discriminativi**, i **classificatori**: **scelgono**. Gli date un testo, e vi dicono a quale opzione appartiene, con una probabilità. Questa mail è spam al 97%.
+> Li usate da anni senza saperlo: il filtro antispam, il sentiment delle recensioni, le schede di Gmail. Ognuno addestrato per un solo compito.
+> Jev è un classificatore. Ma con una differenza: **le opzioni gliele date voi**, a ogni richiesta.
+
+### 02 · Cos'è Jev
+
 🎬 **ANIMAZIONE**: [`slides/02-cos-e.html`](./slides/02-cos-e.html)
 
 🎙️ **VOCE** (in camera):
@@ -85,7 +98,7 @@ Legenda:
 
 ### 02a · Tre modi di classificare
 
-🎬 **ANIMAZIONE**: [`slides/02a-classificatori.html`](./slides/02a-classificatori.html). Tre colonne: classificatore classico, LLM con un prompt, Jev (in rosa); le prime due si attenuano, chiude "A decision model: a classifier you don't train". Dura 16 s.
+🎬 **ANIMAZIONE**: [`slides/02a-tre-modi.html`](./slides/02a-tre-modi.html). Tre colonne: classificatore classico, LLM con un prompt, Jev (in rosa); le prime due si attenuano, chiude "A decision model: a classifier you don't train". Dura 16 s.
 
 🎙️ **VOCE**:
 > Se avete già classificato del testo, l'avete fatto in due modi.
@@ -553,34 +566,77 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 ---
 
-## 10. In pratica — 🚧 TODO (placeholder)
+## 10. In pratica: Jev + Gemini
 
-Slide segnaposto da completare: per ora solo il titolo di ogni passo.
+Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice che lo realizza. Ogni passo del diagramma illumina il blocco di codice corrispondente. Due impaginazioni alternate: orizzontale (diagramma a sinistra, codice a destra: 10a, 10d, 10f) e verticale (diagramma sopra, codice sotto: 10b, 10c, 10e, 10g).
 
-### 10a · 🚧 TODO — Creare account e API key
+### 10a · Gemini riscrive, Jev conferma
 
-🎬 **ANIMAZIONE**: [`slides/10a-account.html`](./slides/10a-account.html). Placeholder: icona, titolo e i quattro pallini del passo (1 di 4). Dura 6 s.
-
-🎙️ **VOCE**:
-> _da scrivere_
-
-### 10b · 🚧 TODO — Esempio di codice
-
-🎬 **ANIMAZIONE**: [`slides/10b-codice.html`](./slides/10b-codice.html). Placeholder: icona, titolo e i quattro pallini del passo (2 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides/10a-riscrive.html`](./slides/10a-riscrive.html). A sinistra il flusso dall'alto in basso: commento → Jev misura (0.78) → Gemini riscrive → Jev misura di nuovo (0.11) → prima e dopo. A destra il codice di `/2-jev-and-gemini/demo1`, un blocco per passo. Dura 18 s.
 
 🎙️ **VOCE**:
-> _da scrivere_
+> Primo esempio: un commento maleducato. Jev misura quanto è offensivo: settantotto per cento.
+> Gemini lo riscrive in tono educato, mantenendo il senso della critica.
+> E Jev rifà **la stessa domanda** sul testo nuovo: undici per cento.
+> Gemini scrive, Jev dimostra con un numero che la riscrittura ha funzionato. E il codice è tutto qui: una domanda, due chiamate a Jev e una a Gemini, con la stessa chiave del gateway.
 
-### 10c · 🚧 TODO — Usiamo un gateway come Vercel
+### 10b · Gemini risponde, Jev valuta
 
-🎬 **ANIMAZIONE**: [`slides/10c-gateway.html`](./slides/10c-gateway.html). Placeholder: icona, titolo e i quattro pallini del passo (3 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides/10b-risponde.html`](./slides/10b-risponde.html). In alto il flusso da sinistra a destra: messaggio del cliente → Gemini scrive → Jev valuta → verdetto "hold it". Sotto, a sinistra le domande per Jev (una choice e uno score), a destra le due chiamate di `/2-jev-and-gemini/demo2`. Dura 18 s.
 
 🎙️ **VOCE**:
-> _da scrivere_
+> Secondo esempio: un cliente scrive al supporto, e Gemini prepara la risposta.
+> Prima che parta, Jev la controlla con due domande: la risposta affronta davvero il problema? Una **choice**. E come tratta il cliente? Uno **score** su quattro livelli.
+> Jev vede tutti e due i testi, il messaggio e la risposta: la pertinenza ha senso solo rispetto alla richiesta.
+> Qui la risposta è generica e scortese: "generic", tono 2.74 su 3. Non si manda.
 
-### 10d · 🚧 TODO — Demo time
+### 10c · Gemini propone, Jev sceglie
 
-🎬 **ANIMAZIONE**: [`slides/10d-demo.html`](./slides/10d-demo.html). Placeholder: icona, titolo e i quattro pallini del passo (4 di 4). Dura 6 s.
+🎬 **ANIMAZIONE**: [`slides/10c-propone.html`](./slides/10c-propone.html). Verticale. Commento → Gemini propone 3 risposte come dati → tre "Jev scores" in parallelo (0.50, 0.74, 1.00) → "highest score?" → la risposta migliore, "detailed". Sotto, la chiamata a Gemini con structured output e le tre chiamate a Jev con `Promise.all`. Dura 18 s.
+
+🎙️ **VOCE**:
+> Invece di correggere una bozza, ne faccio scrivere tre a Gemini: una secca, una cordiale, una dettagliata. Come dati strutturati, niente testo da interpretare.
+> Jev le valuta tutte e tre **in parallelo**: il tempo è quello della più lenta, non la somma.
+> E il nostro codice tiene quella con il punteggio più alto.
+
+### 10d · Email to Data: Jev fa da guardia, Gemini estrae
+
+🎬 **ANIMAZIONE**: [`slides/10d-email.html`](./slides/10d-email.html). Orizzontale. Email → Jev controlla (1.00) → "P > 0.50?" → sì: bloccata. Il ramo "no" (Gemini estrae → JSON) resta attenuato, come il blocco di codice di Gemini: è la strada non presa. Dura 18 s.
+
+🎙️ **VOCE**:
+> Gemini trasforma un'email in dati: date, importi, azioni. Ma un'email può contenere testo nascosto che dà ordini all'AI.
+> Allora prima la legge Jev, con una domanda: ci sono istruzioni per un assistente AI? Qui: cento per cento.
+> La decisione è nel nostro codice, una soglia leggibile. Sopra la soglia, l'email **non arriva mai a Gemini**: zero token.
+
+### 10e · Jev contro Gemini su 20 siti
+
+🎬 **ANIMAZIONE**: [`slides/10e-siti.html`](./slides/10e-siti.html). Verticale. URL → scraping una volta → Jev e Gemini classificano lo stesso testo in parallelo → confronto di tempi e accordo. Sotto, gli stessi criteri per i due modelli e le due chiamate in `Promise.all`. Dura 18 s.
+
+🎙️ **VOCE**:
+> Un confronto onesto: venti home page, lette una volta sola. Jev e Gemini ricevono lo stesso testo e le stesse tre domande: tipo di sito, settore, quanto è commerciale.
+> Partono insieme, ognuno con il suo cronometro. L'unica differenza è il modello: chi è più veloce, e quanto sono d'accordo?
+
+### 10f · Valutazione di un CSV: Jev contro Gemini
+
+🎬 **ANIMAZIONE**: [`slides/10f-csv.html`](./slides/10f-csv.html). Orizzontale. Riga del CSV → Jev e Gemini rispondono → la stessa policy trasforma le risposte in una decisione → confronto con la decisione attesa. A destra le tre domande (una per tipo), le chiamate in parallelo e la policy. Dura 18 s.
+
+🎙️ **VOCE**:
+> Un CSV di commenti, ognuno con la decisione che avrebbe preso un moderatore umano.
+> Tre domande, una per tipo: una choice per lo spam, uno score per la tossicità, una noul per i dati personali.
+> E la **policy sta nel nostro codice**, non nel modello: ogni risposta diventa un rischio da zero a uno, e le soglie decidono pubblica, rivedi o rifiuta. La stessa policy per tutti e due i modelli: chi è d'accordo più spesso con l'umano?
+
+### 10g · Smart router: Jev smista, Gemini solo quando serve
+
+🎬 **ANIMAZIONE**: [`slides/10g-router.html`](./slides/10g-router.html). Verticale. "Where is my order?" → Jev classifica (0.99, ~0.3 s) → "simple and P ≥ 0.50?" → sì: template, 0 token. Il ramo Gemini resta attenuato. Sotto, la choice sull'intento e il routing nel codice. Dura 18 s.
+
+🎙️ **VOCE**:
+> Ultimo esempio: una casella di supporto. Molti messaggi sono semplici: dov'è il mio ordine, come cambio la password.
+> Jev classifica ogni messaggio in circa tre decimi di secondo. Se l'intento è semplice e Jev è abbastanza sicuro, risponde un template: zero token.
+> Tutto il resto, o quando Jev non è sicuro, va a Gemini. Gemini solo quando serve.
+
+### 10h · 🚧 TODO — Demo time
+
+🎬 **ANIMAZIONE**: [`slides/10h-demo.html`](./slides/10h-demo.html). Placeholder: icona e titolo. Dura 6 s.
 
 🎙️ **VOCE**:
 > _da scrivere_

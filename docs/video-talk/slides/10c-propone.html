@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10c · Gemini proposes, Jev picks</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 3:
+  /2-jev-and-gemini/demo3; the code is the talk version in app/2-jev-and-gemini/demo3/page.tsx, shortened to fit.
+  Vertical layout: the flow on top, the code below. 0.50 · 0.74 · 1.00 are the normalized scores in its comments.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 18s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Flow nodes ---------- */
+  .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px; border-radius: 16px; border: 2.5px solid #c5cddc; background: #fff; opacity: 0; }
+  .node b { display: block; font-size: 25px; line-height: 1.2; }
+  .node small { display: block; font-size: 18px; opacity: .55; }
+  .node.jev { border-color: var(--pink); background: var(--pink-bg); }
+  .node.gem { border-color: var(--blue); background: var(--blue-bg); }
+  .node.ok { border-color: var(--green); background: var(--green-bg); }
+  .node.stop { border-color: var(--red); background: var(--red-bg); }
+  .node.step { background: #f1f3f8; }
+  .node.if { border-style: dashed; border-color: var(--ink); justify-content: center; text-align: center; }
+  .node.if b { font-family: var(--mono); font-size: 21px; font-weight: 500; }
+  .node .val { flex: none; font-family: var(--sans); font-weight: 700; font-size: 30px; color: var(--pink); opacity: 0; }
+  .via { position: absolute; font-family: var(--mono); font-size: 18px; font-weight: 600; opacity: .6; }
+
+  /* ---------- Code ---------- */
+  .code { position: absolute; padding: 20px 24px; border-radius: 22px; background: #1f2230; color: #e8ebf4; opacity: 0; animation-name: codein; }
+  .blk { margin: 0 0 8px; padding: 8px 16px 8px 18px; border-left: 5px solid transparent; border-radius: 8px; opacity: .3; }
+  .blk h5 { margin: 0 0 5px; font-family: var(--sans); font-size: 18px; font-weight: 600; letter-spacing: .3px; color: #9aa3b8; }
+  .blk pre { margin: 0; font-family: var(--mono); font-size: var(--fs, 19px); line-height: 1.38; white-space: pre; }
+  .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
+
+  .caption { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Flow, top, left to right ---------- */
+  .flow { position: absolute; left: 135px; top: 195px; width: 1650px; height: 210px; display: flex; align-items: center; }
+  .col { flex: none; display: flex; flex-direction: column; gap: 12px; }
+  .col .node { width: var(--w); min-height: 92px; }
+  .col.many .node { min-height: 62px; }
+  .hl { flex: 1; position: relative; height: 4px; margin: 0 12px; border-radius: 2px; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+  .hl::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
+  .code { top: 440px; height: 330px; }
+  .caption { top: 820px; }
+
+  .flow { --w: 240px; }
+  .n2 { width: 290px !important; } .n4 { width: 180px !important; }
+  .col.many .node { width: 290px; }
+  .code.l { left: 135px; width: 760px; } .code.r { left: 925px; width: 860px; }
+  .blk pre { --fs: 18px; }
+
+  /* ---------- Animations ---------- */
+  .n1 { animation-name: n1; }
+  .h1 { animation-name: h1; }
+  .n2 { animation-name: n2; }
+  .b1 { animation-name: b1; }
+  .h2 { animation-name: h2; }
+  .n3 { animation-name: n3; }
+  .b2 { animation-name: b2; }
+  .v1 { animation-name: v1; }
+  .v2 { animation-name: v2; }
+  .v3 { animation-name: v3; }
+  .h3 { animation-name: h3; }
+  .n4 { animation-name: n4; }
+  .b3 { animation-name: b3; }
+  .h4 { animation-name: h4; }
+  .n5 { animation-name: n5; }
+
+  /* ---------- Timeline (18s loop) ----------
+     0–4%    scene in · 4–8% code panels (dimmed)
+     8–12%   node "Blog comment"
+     14–18%  "Gemini proposes" + code block 1 (blue) until 26%
+     28–32%  three "Jev scores" + code block 2 (pink) until 42% · 33–40% 0.50, 0.74, 1.00
+     44–48%  "highest score?" + code block 3
+     52–56%  "Best reply"
+     72–78%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codein { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes h1 { 0%, 12% { transform: scaleX(0) } 14%, 100% { transform: scaleX(1) } }
+  @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--blue); background: rgba(13,153,255,.1) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes h2 { 0%, 26% { transform: scaleX(0) } 28%, 100% { transform: scaleX(1) } }
+  @keyframes n3 { 0%, 28% { opacity: 0; transform: translateY(14px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes b2 { 0%, 28% { opacity: .3; border-color: transparent; background: none } 32%, 42% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 46%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes v1 { 0%, 33% { opacity: 0; transform: scale(.6) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes v2 { 0%, 35% { opacity: 0; transform: scale(.6) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes v3 { 0%, 37% { opacity: 0; transform: scale(.6) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes h3 { 0%, 42% { transform: scaleX(0) } 44%, 100% { transform: scaleX(1) } }
+  @keyframes n4 { 0%, 44% { opacity: 0; transform: translateY(14px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes b3 { 0%, 44% { opacity: .3; border-color: transparent; background: none } 48%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes h4 { 0%, 50% { transform: scaleX(0) } 52%, 100% { transform: scaleX(1) } }
+  @keyframes n5 { 0%, 52% { opacity: 0; transform: translateY(14px) } 56%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>10 · Jev + Gemini · demo 3</small>Gemini proposes, Jev picks</div>
+
+    <div class="flow">
+      <div class="col"><div class="node n1"><div><b>Blog comment</b><small>a reader's question</small></div></div></div>
+      <div class="hl h1"></div>
+      <div class="col"><div class="node gem n2"><div><b>🤖 Gemini proposes</b><small>3 replies, as data</small></div></div></div>
+      <div class="hl h2"></div>
+      <div class="col many">
+        <div class="node jev n3"><div><b>Jev scores</b><small>curt</small></div><span class="val v1">0.50</span></div>
+        <div class="node jev n3"><div><b>Jev scores</b><small>friendly</small></div><span class="val v2">0.74</span></div>
+        <div class="node jev n3"><div><b>Jev scores</b><small>detailed</small></div><span class="val v3">1.00</span></div>
+      </div>
+      <div class="hl h3"></div>
+      <div class="col"><div class="node if n4"><b>highest<br>score?</b></div></div>
+      <div class="hl h4"></div>
+      <div class="col"><div class="node ok n5"><div><b>Best reply</b><small>"detailed", picked by our code</small></div></div></div>
+    </div>
+
+    <div class="code l">
+      <div class="blk b1">
+        <h5>1 · GEMINI PROPOSES 3 REPLIES, AS DATA</h5>
+<pre><span class="k">const</span> { output } = <span class="k">await</span> generateText({
+  model: <span class="s">"google/gemini-3.8-flash"</span>,
+  instructions: <span class="s">"Write 3 replies: curt, friendly, detailed"</span>,
+  prompt: comment,
+  output: Output.object({ schema: repliesSchema }),
+});
+<span class="c">// always three replies as data: no text to parse</span></pre>
+      </div>
+    </div>
+
+    <div class="code r">
+      <div class="blk b2">
+        <h5>2 · JEV SCORES THEM, IN PARALLEL</h5>
+<pre><span class="k">const</span> questions = {
+  quality: score(<span class="s">"How helpful and polite is this reply?"</span>, levels),
+};
+<span class="c">// 3 calls at once: the time is the slowest one, not the sum</span>
+<span class="k">const</span> results = <span class="k">await</span> Promise.all(replies.map((reply) =>
+  jev.systemOne({ state: <span class="s">`${comment}\n${reply}`</span>, questions })));</pre>
+      </div>
+      <div class="blk b3">
+        <h5>3 · OUR CODE PICKS THE BEST</h5>
+<pre><span class="k">const</span> scores = results.map((r) => r.answers.quality.score / <span class="n">3</span>);
+<span class="c">// </span><span class="n">[0.50, 0.74, 1.00]</span><span class="c"> → best: "detailed"</span></pre>
+      </div>
+    </div>
+
+    <div class="caption">Instead of fixing one draft, <span class="underline-pink">Jev picks the best</span> of three.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

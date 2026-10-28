@@ -1,3 +1,12 @@
+# Jev demos
+
+Demos and talk material about Jev, TypeSafe AI's decision model, alone and together with Gemini.
+
+- **Slides:** https://fb-talks.github.io/jev/
+- **Demos:** https://jev-eight-mu.vercel.app/
+
+---
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

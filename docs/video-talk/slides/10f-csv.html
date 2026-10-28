@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10f · CSV evaluation: Jev vs Gemini</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 6:
+  /2-jev-and-gemini/demo6; the code is the talk version in app/2-jev-and-gemini/demo6/page.tsx, shortened to fit.
+  Horizontal layout: the flow on the left, the code on the right.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 18s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Flow nodes ---------- */
+  .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px; border-radius: 16px; border: 2.5px solid #c5cddc; background: #fff; opacity: 0; }
+  .node b { display: block; font-size: 25px; line-height: 1.2; }
+  .node small { display: block; font-size: 18px; opacity: .55; }
+  .node.jev { border-color: var(--pink); background: var(--pink-bg); }
+  .node.gem { border-color: var(--blue); background: var(--blue-bg); }
+  .node.ok { border-color: var(--green); background: var(--green-bg); }
+  .node.stop { border-color: var(--red); background: var(--red-bg); }
+  .node.step { background: #f1f3f8; }
+  .node.if { border-style: dashed; border-color: var(--ink); justify-content: center; text-align: center; }
+  .node.if b { font-family: var(--mono); font-size: 21px; font-weight: 500; }
+  .node .val { flex: none; font-family: var(--sans); font-weight: 700; font-size: 30px; color: var(--pink); opacity: 0; }
+  .via { position: absolute; font-family: var(--mono); font-size: 18px; font-weight: 600; opacity: .6; }
+
+  /* ---------- Code ---------- */
+  .code { position: absolute; padding: 20px 24px; border-radius: 22px; background: #1f2230; color: #e8ebf4; opacity: 0; animation-name: codein; }
+  .blk { margin: 0 0 8px; padding: 8px 16px 8px 18px; border-left: 5px solid transparent; border-radius: 8px; opacity: .3; }
+  .blk h5 { margin: 0 0 5px; font-family: var(--sans); font-size: 18px; font-weight: 600; letter-spacing: .3px; color: #9aa3b8; }
+  .blk pre { margin: 0; font-family: var(--mono); font-size: var(--fs, 19px); line-height: 1.38; white-space: pre; }
+  .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
+
+  .caption { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Flow, left, top to bottom ---------- */
+  .flow { position: absolute; left: 135px; top: 205px; width: 570px; }
+  .row { display: grid; grid-template-columns: 1fr; }
+  .row.pair { grid-template-columns: 1fr 1fr; gap: 18px; }
+  .row .node { min-height: 82px; }
+  .vl { position: relative; height: 34px; }
+  .vl i { position: absolute; top: 0; width: 4px; height: 100%; margin-left: -2px; border-radius: 2px; background: var(--ink); transform-origin: top; transform: scaleY(0); }
+  .vl .via { top: 4px; }
+  .code { left: 760px; top: 205px; width: 1025px; height: 640px; }
+  .caption { top: 880px; }
+
+  .blk pre { --fs: 19px; }
+
+  /* ---------- Animations ---------- */
+  .n1 { animation-name: n1; }
+  .l1 { animation-name: l1; }
+  .n2 { animation-name: n2; }
+  .b1 { animation-name: b1; }
+  .b2 { animation-name: b2; }
+  .l2 { animation-name: l2; }
+  .n3 { animation-name: n3; }
+  .b3 { animation-name: b3; }
+  .l3 { animation-name: l3; }
+  .n4 { animation-name: n4; }
+
+  /* ---------- Timeline (18s loop) ----------
+     0–4%    scene in · 4–8% code card (dimmed)
+     8–12%   node "CSV row"
+     14–18%  Jev and Gemini answer + the questions (block 1) until 26% · 18–22% the parallel calls (block 2) until 30%
+     34–38%  two "policy → decision" + block 3 (pink)
+     48–52%  "vs expected"
+     72–78%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codein { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes l1 { 0%, 12% { transform: scaleY(0) } 14%, 100% { transform: scaleY(1) } }
+  @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b2 { 0%, 18% { opacity: .3; border-color: transparent; background: none } 22%, 30% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 34%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes l2 { 0%, 32% { transform: scaleY(0) } 34%, 100% { transform: scaleY(1) } }
+  @keyframes n3 { 0%, 34% { opacity: 0; transform: translateY(14px) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes b3 { 0%, 34% { opacity: .3; border-color: transparent; background: none } 38%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes l3 { 0%, 46% { transform: scaleY(0) } 48%, 100% { transform: scaleY(1) } }
+  @keyframes n4 { 0%, 48% { opacity: 0; transform: translateY(14px) } 52%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>10 · Jev + Gemini · demo 6</small>CSV evaluation: Jev vs Gemini</div>
+
+    <div class="flow">
+      <div class="row"><div class="node n1"><div><b>CSV row</b><small>comment + expected decision</small></div></div></div>
+      <div class="vl"><i class="l1" style="left: 25%"></i><i class="l1" style="left: 75%"></i></div>
+      <div class="row pair">
+        <div class="node jev n2"><div><b>Jev answers</b><small>3 questions · probabilities</small></div></div>
+        <div class="node gem n2"><div><b>🤖 Gemini answers</b><small>3 questions · labels</small></div></div>
+      </div>
+      <div class="vl"><i class="l2" style="left: 25%"></i><i class="l2" style="left: 75%"></i></div>
+      <div class="row pair">
+        <div class="node if n3"><b>policy<br>→ decision</b></div>
+        <div class="node if n3"><b>policy<br>→ decision</b></div>
+      </div>
+      <div class="vl"><i class="l3" style="left: 25%"></i><i class="l3" style="left: 75%"></i></div>
+      <div class="row"><div class="node ok n4"><div><b>vs expected</b><small>who agrees more with the human · how fast</small></div></div></div>
+    </div>
+
+    <div class="code">
+      <div class="blk b1">
+        <h5>THREE QUESTIONS, ONE OF EACH TYPE</h5>
+<pre><span class="k">const</span> jevQuestions = {
+  category: choice(<span class="s">"What kind of comment is this?"</span>, categories),
+  toxicity: score(<span class="s">"How offensive is the tone?"</span>, toxicityLevels),
+  personal_data: noul(<span class="s">"Contains an email, phone number or address"</span>),
+};</pre>
+      </div>
+      <div class="blk b2">
+        <h5>BOTH MODELS ON EVERY CSV ROW</h5>
+<pre><span class="k">const</span> [jevResult, geminiResult] = <span class="k">await</span> Promise.all([
+  timed(() => jev.systemOne({ state: comment, questions: jevQuestions })),
+  timed(() => generateText({ model, prompt: comment, output })),
+]);</pre>
+      </div>
+      <div class="blk b3">
+        <h5>THE POLICY LIVES IN OUR CODE, NOT IN THE MODEL</h5>
+<pre><span class="k">const</span> signals = [
+  { name: <span class="s">"Spam"</span>, risk: a.category.probabilities.spam },
+  { name: <span class="s">"Toxicity"</span>, risk: a.toxicity.score / <span class="n">3</span> },
+  { name: <span class="s">"Personal data"</span>, risk: a.personal_data.noul },
+];
+<span class="k">const</span> verdict = (risk) =>
+  risk >= reject ? <span class="s">"reject"</span> : risk >= review ? <span class="s">"review"</span> : <span class="s">"publish"</span>;</pre>
+      </div>
+    </div>
+
+    <div class="caption">Same policy for both: <span class="underline-pink">who agrees with the human?</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

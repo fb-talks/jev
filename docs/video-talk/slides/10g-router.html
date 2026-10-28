@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10g · Smart router: Jev triages, Gemini only when needed</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 7:
+  /2-jev-and-gemini/demo7; the code is the talk version in app/2-jev-and-gemini/demo7/page.tsx, shortened to fit.
+  Vertical layout: the flow on top, the code below. "order_status", 0.99 and ~0.3 s are the values in its comments;
+  the message goes to the template, so the Gemini branch stays dimmed.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 18s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Flow nodes ---------- */
+  .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px; border-radius: 16px; border: 2.5px solid #c5cddc; background: #fff; opacity: 0; }
+  .node b { display: block; font-size: 25px; line-height: 1.2; }
+  .node small { display: block; font-size: 18px; opacity: .55; }
+  .node.jev { border-color: var(--pink); background: var(--pink-bg); }
+  .node.gem { border-color: var(--blue); background: var(--blue-bg); }
+  .node.ok { border-color: var(--green); background: var(--green-bg); }
+  .node.stop { border-color: var(--red); background: var(--red-bg); }
+  .node.step { background: #f1f3f8; }
+  .node.if { border-style: dashed; border-color: var(--ink); justify-content: center; text-align: center; }
+  .node.if b { font-family: var(--mono); font-size: 21px; font-weight: 500; }
+  .node .val { flex: none; font-family: var(--sans); font-weight: 700; font-size: 30px; color: var(--pink); opacity: 0; }
+  .via { position: absolute; font-family: var(--mono); font-size: 18px; font-weight: 600; opacity: .6; }
+
+  /* ---------- Code ---------- */
+  .code { position: absolute; padding: 20px 24px; border-radius: 22px; background: #1f2230; color: #e8ebf4; opacity: 0; animation-name: codein; }
+  .blk { margin: 0 0 8px; padding: 8px 16px 8px 18px; border-left: 5px solid transparent; border-radius: 8px; opacity: .3; }
+  .blk h5 { margin: 0 0 5px; font-family: var(--sans); font-size: 18px; font-weight: 600; letter-spacing: .3px; color: #9aa3b8; }
+  .blk pre { margin: 0; font-family: var(--mono); font-size: var(--fs, 19px); line-height: 1.38; white-space: pre; }
+  .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
+
+  .caption { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Flow, top, left to right ---------- */
+  .flow { position: absolute; left: 135px; top: 195px; width: 1650px; height: 210px; display: flex; align-items: center; }
+  .col { flex: none; display: flex; flex-direction: column; gap: 12px; }
+  .col .node { width: var(--w); min-height: 92px; }
+  .col.many .node { min-height: 62px; }
+  .hl { flex: 1; position: relative; height: 4px; margin: 0 12px; border-radius: 2px; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+  .hl::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
+  .code { top: 440px; height: 330px; }
+  .caption { top: 820px; }
+
+  .flow { --w: 240px; }
+  .n2 { width: 320px !important; } .n3 { width: 220px !important; }
+  .col.many .node { width: 290px; min-height: 92px; }
+  .code.l { left: 135px; width: 760px; } .code.r { left: 925px; width: 860px; }
+  .blk pre { --fs: 18px; }
+  .via.y { left: -52px; top: 40px; } .via.n { left: -44px; top: 136px; }
+
+  /* ---------- Animations ---------- */
+  .n1 { animation-name: n1; }
+  .h1 { animation-name: h1; }
+  .n2 { animation-name: n2; }
+  .b0 { animation-name: b0; }
+  .b1 { animation-name: b1; }
+  .v1 { animation-name: v1; }
+  .h2 { animation-name: h2; }
+  .n3 { animation-name: n3; }
+  .b2 { animation-name: b2; }
+  .h3 { animation-name: h3; }
+  .t1 { animation-name: t1; }
+  .n4 { animation-name: n4; }
+  .t2 { animation-name: t2; }
+  .n5 { animation-name: n5; }
+  .h4 { animation-name: h4; }
+  .n6 { animation-name: n6; }
+
+  /* ---------- Timeline (18s loop) ----------
+     0–4%    scene in · 4–8% code panels (dimmed)
+     8–12%   node "Message"
+     14–18%  "Jev classifies" + the question and block 1 (pink) until 26% · 20–23% 0.99
+     28–32%  "simple and P ≥ 0.50?" + block 2 (pink)
+     38–42%  "yes" → "Template" · 44–48% "no" → Gemini, dimmed: the path not taken
+     52–56%  "Reply"
+     72–78%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codein { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes h1 { 0%, 12% { transform: scaleX(0) } 14%, 100% { transform: scaleX(1) } }
+  @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes b0 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes v1 { 0%, 20% { opacity: 0; transform: scale(.6) } 23%, 100% { opacity: 1; transform: none } }
+  @keyframes h2 { 0%, 26% { transform: scaleX(0) } 28%, 100% { transform: scaleX(1) } }
+  @keyframes n3 { 0%, 28% { opacity: 0; transform: translateY(14px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes b2 { 0%, 28% { opacity: .3; border-color: transparent; background: none } 32%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes h3 { 0%, 36% { transform: scaleX(0) } 38%, 100% { transform: scaleX(1) } }
+  @keyframes t1 { 0%, 38% { opacity: 0; transform: translateY(14px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes n4 { 0%, 38% { opacity: 0; transform: translateY(14px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes t2 { 0%, 44% { opacity: 0; transform: translateY(14px) } 48%, 100% { opacity: .35; transform: none } }
+  @keyframes n5 { 0%, 44% { opacity: 0; transform: translateY(14px) } 48%, 100% { opacity: .35; transform: none } }
+  @keyframes h4 { 0%, 50% { transform: scaleX(0) } 52%, 100% { transform: scaleX(1) } }
+  @keyframes n6 { 0%, 52% { opacity: 0; transform: translateY(14px) } 56%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>10 · Jev + Gemini · demo 7</small>Smart router: Jev triages, Gemini only when needed</div>
+
+    <div class="flow">
+      <div class="col"><div class="node n1"><div><b>Message</b><small>"Where is my order?"</small></div></div></div>
+      <div class="hl h1"></div>
+      <div class="col"><div class="node jev n2"><div><b>Jev classifies</b><small>~0.3 s · intent + P</small></div><span class="val v1">0.99</span></div></div>
+      <div class="hl h2"></div>
+      <div class="col"><div class="node if n3"><b>simple and<br>P ≥ 0.50?</b></div></div>
+      <div class="hl h3"></div>
+      <div class="col many" style="position: relative">
+        <span class="via y t1">yes</span>
+        <div class="node ok n4"><div><b>⚡ Template</b><small>simple intents · 0 tokens</small></div></div>
+        <div class="node gem n5"><div><b>🤖 Gemini</b><small>complex or uncertain</small></div></div>
+        <span class="via n t2">no</span>
+      </div>
+      <div class="hl h4"></div>
+      <div class="col"><div class="node n6" style="width: 180px"><div><b>Reply</b><small>in ~0.3 s</small></div></div></div>
+    </div>
+
+    <div class="code l">
+      <div class="blk b0">
+        <h5>THE QUESTION FOR JEV: WHAT DOES THE CUSTOMER NEED?</h5>
+<pre><span class="k">const</span> questions = {
+  intent: choice(<span class="s">"What does the customer need?"</span>, {
+    greeting: <span class="s">"Only a greeting or thanks"</span>,
+    order_status: <span class="s">"Only asks where an order is"</span>,
+    password_reset: <span class="s">"Only asks how to reset the password"</span>,
+    complex: <span class="s">"Anything else: a problem, a complaint…"</span>,
+  }),
+};</pre>
+      </div>
+    </div>
+
+    <div class="code r">
+      <div class="blk b1">
+        <h5>1 · JEV CLASSIFIES EVERY MESSAGE</h5>
+<pre><span class="k">const</span> { answers } = <span class="k">await</span> jev.systemOne({ state: message, questions });
+<span class="k">const</span> { choice: intent, probabilities } = answers.intent;
+<span class="k">const</span> p = probabilities[intent]; <span class="c">// </span><span class="n">"order_status", 0.99</span></pre>
+      </div>
+      <div class="blk b2">
+        <h5>2 · OUR CODE ROUTES IT</h5>
+<pre><span class="k">if</span> (intent <span class="k">in</span> templates &amp;&amp; p >= threshold)
+  <span class="k">return</span> { route: <span class="s">"template"</span>, reply: templates[intent](message) };
+<span class="c">// everything else, or when Jev isn't sure: Gemini</span>
+<span class="k">const</span> { text } = <span class="k">await</span> generateText({ model, prompt: message });</pre>
+      </div>
+    </div>
+
+    <div class="caption">Simple requests get a template: <span class="underline-pink">Gemini only when needed</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

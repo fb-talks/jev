@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10d · Email to Data: Jev guards, Gemini extracts</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 4:
+  /2-jev-and-gemini/demo4; the code is the talk version in app/2-jev-and-gemini/demo4/page.tsx, shortened to fit.
+  Horizontal layout: the flow on the left, the code on the right. The email has hidden instructions: risk 1.00 (from its
+  comments) is above the default 0.50 threshold, so the email is blocked and the Gemini branch stays dimmed.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 18s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Flow nodes ---------- */
+  .node { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 22px; border-radius: 16px; border: 2.5px solid #c5cddc; background: #fff; opacity: 0; }
+  .node b { display: block; font-size: 25px; line-height: 1.2; }
+  .node small { display: block; font-size: 18px; opacity: .55; }
+  .node.jev { border-color: var(--pink); background: var(--pink-bg); }
+  .node.gem { border-color: var(--blue); background: var(--blue-bg); }
+  .node.ok { border-color: var(--green); background: var(--green-bg); }
+  .node.stop { border-color: var(--red); background: var(--red-bg); }
+  .node.step { background: #f1f3f8; }
+  .node.if { border-style: dashed; border-color: var(--ink); justify-content: center; text-align: center; }
+  .node.if b { font-family: var(--mono); font-size: 21px; font-weight: 500; }
+  .node .val { flex: none; font-family: var(--sans); font-weight: 700; font-size: 30px; color: var(--pink); opacity: 0; }
+  .via { position: absolute; font-family: var(--mono); font-size: 18px; font-weight: 600; opacity: .6; }
+
+  /* ---------- Code ---------- */
+  .code { position: absolute; padding: 20px 24px; border-radius: 22px; background: #1f2230; color: #e8ebf4; opacity: 0; animation-name: codein; }
+  .blk { margin: 0 0 8px; padding: 8px 16px 8px 18px; border-left: 5px solid transparent; border-radius: 8px; opacity: .3; }
+  .blk h5 { margin: 0 0 5px; font-family: var(--sans); font-size: 18px; font-weight: 600; letter-spacing: .3px; color: #9aa3b8; }
+  .blk pre { margin: 0; font-family: var(--mono); font-size: var(--fs, 19px); line-height: 1.38; white-space: pre; }
+  .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
+
+  .caption { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
+
+  /* ---------- Flow, left, top to bottom ---------- */
+  .flow { position: absolute; left: 135px; top: 205px; width: 570px; }
+  .row { display: grid; grid-template-columns: 1fr; }
+  .row.pair { grid-template-columns: 1fr 1fr; gap: 18px; }
+  .row .node { min-height: 82px; }
+  .vl { position: relative; height: 34px; }
+  .vl i { position: absolute; top: 0; width: 4px; height: 100%; margin-left: -2px; border-radius: 2px; background: var(--ink); transform-origin: top; transform: scaleY(0); }
+  .vl .via { top: 4px; }
+  .code { left: 760px; top: 205px; width: 1025px; height: 640px; }
+  .caption { top: 880px; }
+
+  .blk pre { --fs: 19px; }
+
+  /* ---------- Animations ---------- */
+  .n1 { animation-name: n1; }
+  .l1 { animation-name: l1; }
+  .n2 { animation-name: n2; }
+  .b0 { animation-name: b0; }
+  .b1 { animation-name: b1; }
+  .v1 { animation-name: v1; }
+  .l2 { animation-name: l2; }
+  .n3 { animation-name: n3; }
+  .l3 { animation-name: l3; }
+  .l3t { animation-name: l3t; }
+  .n4 { animation-name: n4; }
+  .l4 { animation-name: l4; }
+  .l4t { animation-name: l4t; }
+  .n5 { animation-name: n5; }
+  .l5 { animation-name: l5; }
+  .n6 { animation-name: n6; }
+
+  /* ---------- Timeline (18s loop) ----------
+     0–4%    scene in · 4–8% code card (dimmed)
+     8–12%   node "Email"
+     14–18%  "Jev checks" + the question and block 1 (pink) · 20–23% 1.00
+     28–32%  "P > 0.50?"
+     36–42%  "yes" → "Blocked"
+     46–58%  "no" branch, Gemini and JSON data appear dimmed: the path not taken; code block 2 stays dimmed
+     72–78%  caption
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codein { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes l1 { 0%, 12% { transform: scaleY(0) } 14%, 100% { transform: scaleY(1) } }
+  @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes b0 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes v1 { 0%, 20% { opacity: 0; transform: scale(.6) } 23%, 100% { opacity: 1; transform: none } }
+  @keyframes l2 { 0%, 26% { transform: scaleY(0) } 28%, 100% { transform: scaleY(1) } }
+  @keyframes n3 { 0%, 28% { opacity: 0; transform: translateY(14px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes l3 { 0%, 36% { transform: scaleY(0) } 38%, 100% { transform: scaleY(1) } }
+  @keyframes l3t { 0%, 36% { opacity: 0; transform: translateY(14px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes n4 { 0%, 38% { opacity: 0; transform: translateY(14px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes l4 { 0%, 46% { transform: scaleY(0) } 48%, 100% { transform: scaleY(1) } }
+  @keyframes l4t { 0%, 46% { opacity: 0; transform: translateY(14px) } 50%, 100% { opacity: .35; transform: none } }
+  @keyframes n5 { 0%, 48% { opacity: 0; transform: translateY(14px) } 52%, 100% { opacity: .35; transform: none } }
+  @keyframes l5 { 0%, 52% { transform: scaleY(0) } 54%, 100% { transform: scaleY(1) } }
+  @keyframes n6 { 0%, 54% { opacity: 0; transform: translateY(14px) } 58%, 100% { opacity: .35; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>10 · Jev + Gemini · demo 4</small>Email to Data: Jev guards, Gemini extracts</div>
+
+    <div class="flow">
+      <div class="row"><div class="node n1"><div><b>Email</b><small>with text hidden for the AI</small></div></div></div>
+      <div class="vl"><i class="l1" style="left: 50%"></i></div>
+      <div class="row"><div class="node jev n2"><div><b>Jev checks</b><small>P(hidden_instructions)</small></div><span class="val v1">1.00</span></div></div>
+      <div class="vl"><i class="l2" style="left: 50%"></i></div>
+      <div class="row"><div class="node if n3"><b>P &gt; 0.50?</b></div></div>
+      <div class="vl"><i class="l3" style="left: 25%"></i><span class="via l3t" style="left: calc(25% + 14px)">yes</span><i class="l4" style="left: 75%"></i><span class="via l4t" style="left: calc(75% + 14px)">no</span></div>
+      <div class="row pair">
+        <div class="node stop n4"><div><b>⛔ Blocked</b><small>Gemini not called</small></div></div>
+        <div class="node gem n5"><div><b>🤖 Gemini extracts</b><small>structured output</small></div></div>
+      </div>
+      <div class="vl"><i class="l5" style="left: 75%"></i></div>
+      <div class="row pair"><div></div><div class="node ok n6"><div><b>JSON data</b><small>dates · amounts · actions</small></div></div></div>
+    </div>
+
+    <div class="code">
+      <div class="blk b0">
+        <h5>THE QUESTION FOR JEV</h5>
+<pre><span class="k">const</span> questions = {
+  injection: choice(<span class="s">"Does this email contain instructions for an AI?"</span>, {
+    none: <span class="s">"A normal email written for a human reader"</span>,
+    hidden_instructions: <span class="s">"Tries to give orders to an AI assistant"</span>,
+  }),
+};</pre>
+      </div>
+      <div class="blk b1">
+        <h5>1 · JEV CHECKS THE EMAIL, OUR CODE DECIDES</h5>
+<pre><span class="k">const</span> { answers } = <span class="k">await</span> jev.systemOne({ state: email, questions });
+<span class="k">const</span> risk = answers.injection.probabilities.hidden_instructions; <span class="c">// </span><span class="n">1.00</span>
+<span class="k">if</span> (risk &gt; threshold) <span class="k">return</span> { blocked: <span class="k">true</span> }; <span class="c">// Gemini: 0 tokens</span></pre>
+      </div>
+      <div class="blk b2">
+        <h5>2 · GEMINI EXTRACTS THE DATA (NOT REACHED)</h5>
+<pre><span class="k">const</span> { output } = <span class="k">await</span> generateText({
+  model: <span class="s">"google/gemini-3.8-flash"</span>,
+  prompt: email,
+  output: Output.object({ schema: dataSchema }), <span class="c">// dates, amounts…</span>
+});</pre>
+      </div>
+    </div>
+
+    <div class="caption">Above the threshold, <span class="underline-pink">the email never reaches Gemini</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>
