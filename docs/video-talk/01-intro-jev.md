@@ -28,9 +28,24 @@ Jev è un modello di TypeSafe AI, startup di San Francisco fondata nel 2024 e us
 
 Tecnicamente è un **modello discriminativo**: serve a classificare o a stimare valori, non a generare testo. Per ogni domanda restituisce una **distribuzione di probabilità** sulle opzioni che gli passi tu, e basta. I campi `choice`, `score` e `confidence` della risposta derivano da quelle probabilità: per esempio lo `score` è la media dei livelli pesata con le loro probabilità. Arrivano già calcolati dall'API.
 
-A differenza dei classificatori classici **non va addestrato sui tuoi dati**: lavora zero-shot sulle categorie che gli dai al momento della richiesta, proprio come un LLM.
-
 TypeSafe lo chiama un modello **"System One"**, richiamando il "Sistema 1" di Kahneman: il pensiero veloce e intuitivo.
+
+### Jev e i classificatori
+
+🎬 [`slides/02a-classificatori.html`](./slides/02a-classificatori.html)
+
+Jev fa lo stesso lavoro di un classificatore, ma si usa come un LLM:
+
+| | Classificatore classico | LLM + prompt | Jev |
+|---|---|---|---|
+| Preparazione | dataset etichettato + addestramento | un prompt | nessun addestramento |
+| Etichette | fisse, decise in addestramento | scritte nel prompt | passate a ogni richiesta |
+| Risposta | etichetta + probabilità | testo da interpretare e validare | valore tipizzato + probabilità |
+| Pro / contro | veloce ed economico, ma rigido | flessibile, ma lento e costoso | zero-shot, veloce ed economico |
+
+In breve: **non va addestrato sui tuoi dati**. Lavora zero-shot sulle categorie che gli dai al momento della richiesta, proprio come un LLM, ma risponde come un classificatore.
+
+Il nome generico di questa categoria è **decision model**: lo usano TypeSafe stessa, la stampa, Artificial Analysis (che li confronta nel "Decision Index") e Liquid AI per i suoi modelli d1 (vedi [Non solo Jev](#non-solo-jev)). "System One" è il nome commerciale di TypeSafe. Riassumendo: *decision model* è la categoria, *discriminativo* è il tipo tecnico di modello, *System One* è il marchio.
 
 ---
 
@@ -308,6 +323,26 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 - **nessun piano gratuito**: su **Vercel AI Gateway** la tariffa è la stessa, ma con il solo credito gratuito mensile Jev risponde `403 Free tier users do not have access to this model`. Servono crediti a pagamento (ne basta pochissimo);
 - disponibile anche su Cloudflare Workers AI e OpenRouter.
 
+### Non solo Jev
+
+🎬 [`slides/07c-non-solo-jev.html`](./slides/07c-non-solo-jev.html)
+
+Jev non è più l'unico decision model. **Liquid AI** ha pubblicato due modelli dello stesso tipo:
+
+- **d1** (annunciato il 29 settembre 2026): non genera testo e restituisce probabilità sulle opzioni date (`output_tokens` sempre 0). Al lancio era solo via API, con un livello gratuito (`d1:free`) e senza un listino pubblicato;
+- **d1-ultra** (15 ottobre 2026, disponibile lo stesso giorno su Vercel AI Gateway come `liquid/d1-ultra`): il modello più grande, legge testo e immagini. Costa **0,042 $ per milione di token in input** (come Jev) e l'output è gratis.
+
+**La stessa API di Jev.** Gli stessi tre tipi (`noul`, `choice`, `score`) e un endpoint chiamato `/decisions/v1/systemone`. Si usa l'SDK di TypeSafe cambiando chiave, `baseURL` (`https://api.liquid.ai`) e nome del modello.
+
+**Differenze e cautele:**
+
+- d1-ultra fa pagare **ogni immagine per ogni domanda**, mentre Jev fa pagare lo state una volta per richiesta: con tante domande sulla stessa foto costa molto di più;
+- il "d1 batte Jev" viene dai test di Liquid: sul Decision Index 0.2.1, rifatto da loro, d1 prende 58,9 contro 57,9 di Jev 1.13. In un benchmark di terzi (typed-decisions, dati sintetici) i due sono vicini: accuratezza 0,742 contro 0,727, e Jev ha un Brier score leggermente migliore;
+- d1-ultra è primo nell'Artificial Analysis Decision Index v1.0 (13 ottobre 2026), ma il vantaggio viene soprattutto dal fatto che si astiene più spesso, non da più risposte giuste. Secondo Artificial Analysis tutti i decision model testati sono troppo sicuri di sé;
+- le fonti non sono d'accordo su alcuni dettagli (finestra di contesto, date esatte, pesi aperti di varianti più piccole): prima di citarli, ricontrollare la documentazione di Liquid.
+
+**Perché parlarne:** sta nascendo una categoria e l'API di Jev è diventata quasi uno standard. Scrivere il codice con l'SDK di TypeSafe non vincola a un solo fornitore.
+
 #### Perché Vercel AI Gateway (scelta di questa demo)
 
 - un solo conto e una sola dashboard per tutti i modelli (Jev per decidere, un LLM per scrivere);
@@ -363,3 +398,8 @@ Sezione da scrivere. Le slide segnaposto, nell'ordine:
 - [How much does Jev cost? – Flavio Copes](https://flaviocopes.com/jev-pricing/)
 - [What Is Jev? – OpenRouter](https://openrouter.ai/blog/insights/what-is-jev/)
 - [JEV versus LLMs (paper) – arXiv](https://arxiv.org/pdf/2610.06625)
+- [Liquid AI d1, decision model compatibile con l'API di Jev – PyTorch KR](https://discuss.pytorch.kr/t/liquid-ai-jev-api-d1/12063)
+- [Liquid's d1-ultra prices like Jev but rebills images per question – beri.net](https://www.beri.net/article/liquid-ai-d1-ultra-decision-model-pricing-artificial-analysis-decision-index-vs-jev-decision-1-image-billing-per-question)
+- [Liquid AI's d1-ultra tops Artificial Analysis Decision Index v1.0 – Digg](https://digg.com/ai/lextqjva)
+- [Vercel changelog (d1-ultra su AI Gateway, 15 ottobre 2026)](https://vercel.com/changelog.md)
+- [TypeSafe AI launches Jev decision model – Let's Data Science](https://letsdatascience.com/news/typesafe-ai-launches-jev-decision-model-889a38c0)

@@ -3,7 +3,7 @@
 > **Cos'è questo file.** Il **copione** del video e del talk: per ogni sezione cosa si dice (🎙️), cosa si vede (🖥️), quale animazione parte (🎬) e le note di montaggio (✂️), in ordine di slide. In fondo c'è la checklist per la registrazione.
 > Le spiegazioni approfondite, i numeri e le fonti stanno negli appunti: [01-intro-jev.md](./01-intro-jev.md). Le slide sono in [`slides/`](./slides/).
 
-Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **11 minuti**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
+Basato su [01-intro-jev.md](./01-intro-jev.md). Durata stimata: **12 minuti**, più circa 2 minuti e mezzo per il bonus sulle immagini (sezione 9).
 
 Le animazioni sono online su [fb-talks.github.io/jev](https://fb-talks.github.io/jev/) (← / → per passare da una slide all'altra).
 
@@ -81,9 +81,18 @@ Legenda:
 > Tecnicamente Jev è un **modello discriminativo**. Non genera testo: classifica, o stima un valore.
 > Per ogni domanda vi restituisce una **distribuzione di probabilità** sulle opzioni che gli passate voi. E basta.
 >
-> E a differenza dei classificatori classici, **non dovete addestrarlo sui vostri dati**. Gli date le categorie al momento della richiesta, proprio come fareste con un prompt.
->
 > TypeSafe lo chiama un modello **"System One"**, come il Sistema 1 di Kahneman: il pensiero veloce, intuitivo. Quello che usate quando riconoscete una faccia, non quando fate una moltiplicazione.
+
+### 02a · Tre modi di classificare
+
+🎬 **ANIMAZIONE**: [`slides/02a-classificatori.html`](./slides/02a-classificatori.html). Tre colonne: classificatore classico, LLM con un prompt, Jev (in rosa); le prime due si attenuano, chiude "A decision model: a classifier you don't train". Dura 16 s.
+
+🎙️ **VOCE**:
+> Se avete già classificato del testo, l'avete fatto in due modi.
+> Con un **classificatore classico**: raccogliete un dataset etichettato, lo addestrate, ed è veloce ed economico. Ma le etichette sono fisse: se aggiungete una categoria, si riaddestra.
+> Oppure con un **LLM e un prompt**: flessibile, ma vi risponde con del testo da interpretare e validare, ed è lento e caro.
+> Jev sta in mezzo: **non dovete addestrarlo**. Gli date le categorie a ogni richiesta, come in un prompt, e vi risponde con un valore tipizzato e le probabilità, come un classificatore.
+> Questa categoria di modelli si chiama **decision model**. "System One" è il nome che gli dà TypeSafe.
 
 ---
 
@@ -428,6 +437,17 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Per confronto, un LLM costa da 20 centesimi a 10 dollari per milione di token in input, e l'output costa circa 5 volte di più.
 > E lo state si paga una volta per richiesta, non per domanda: conviene mettere più domande nella stessa chiamata.
 > Una chiamata piccola sono circa 300 token. Centomila commenti moderati sono trenta milioni di token: circa un dollaro e venticinque.
+
+### 07c · Non solo Jev
+
+🎬 **ANIMAZIONE**: [`slides/07c-non-solo-jev.html`](./slides/07c-non-solo-jev.html). Jev e Liquid AI d1 / d1-ultra ai lati, al centro "Same API" (noul, choice, score e l'SDK di TypeSafe con il `baseURL` di Liquid), poi due avvertenze: immagini pagate per domanda e benchmark dei produttori. Chiude "A new category: decision models". Dura 14 s.
+
+🎙️ **VOCE**:
+> Jev non è più l'unico. A fine settembre **Liquid AI** ha pubblicato **d1**, e a metà ottobre **d1-ultra**, che legge anche le immagini.
+> Sono decision model come Jev, e usano **la stessa API**: stessi tre tipi di domanda, e funziona perfino l'SDK di TypeSafe, cambiando il `baseURL`.
+> d1-ultra costa come Jev: 4 centesimi per milione di token in input, output gratis. Con una differenza: le immagini si pagano **per ogni domanda**, non una volta per richiesta.
+> E i benchmark in cui "d1 batte Jev" li ha fatti Liquid. Nei test indipendenti sono vicini, e tutti un po' troppo sicuri di sé.
+> Il punto è un altro: sta nascendo una **categoria**, e l'API di Jev sta diventando uno standard.
 
 ### Vercel AI Gateway (nessuna slide)
 
