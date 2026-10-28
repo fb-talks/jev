@@ -11,6 +11,7 @@ Le sezioni seguono l'ordine delle slide in [`slides/`](./slides/) e del [copione
 
 Dalla [introduzione di TypeSafe](https://docs.typesafe.ai/introduction): Jev è il primo modello "System One", fatto per decisioni veloci e strutturate che il software usa direttamente. Gli LLM producono testo per persone: usarli per decisioni che il codice consuma vuol dire forzarli a scrivere una risposta strutturata e poi fare il parsing. Si manda invece uno state (i dati) e una o più domande tipizzate; tornano valori tipizzati con le probabilità. Le domande sono valutate in parallelo e in isolamento, quindi aggiungerne non rallenta e non peggiora le altre. "No text generation, no parsing."
 
+- Copertina: 🎬 [`slides/00-copertina.html`](./slides/00-copertina.html)
 - Titolo: 🎬 [`slides/01a-titolo.html`](./slides/01a-titolo.html)
 - Speaker: 🎬 [`slides/01b-speaker.html`](./slides/01b-speaker.html)
 - LLM vs Jev: 🎬 [`slides/01c-jev.html`](./slides/01c-jev.html)

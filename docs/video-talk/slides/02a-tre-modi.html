@@ -43,6 +43,7 @@
 
   /* ---------- Caption ---------- */
   .caption { position: absolute; left: 0; right: 0; top: 870px; text-align: center; font-family: var(--hand); font-size: 58px; opacity: 0; animation-name: caption; }
+  .caption-sub { position: absolute; left: 0; right: 0; top: 960px; text-align: center; font-family: var(--sans); font-size: 30px; color: var(--muted); opacity: 0; animation-name: caption-sub; }
 
   /* ---------- Timeline (16s loop) ----------
      0–4%    scene in
@@ -51,6 +52,7 @@
      46–50%  columns 1 and 2 dim
      48–52%  column 3 "Jev" (pink) · 52–64% rows · 64–68% verdict
      78–84%  caption "Jev is a decision model: a classifier you don't train"
+     84–88%  sub-caption: already trained on language, not on your data
      94%     final frame (playback stops here)        96–100% fade out */
   @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
   @keyframes c1 { 0%, 5% { opacity: 0; transform: translateY(20px) } 8%, 46% { opacity: 1; transform: none } 50%, 100% { opacity: .5; transform: none } }
@@ -70,6 +72,7 @@
   @keyframes c3i3 { 0%, 58% { opacity: 0 } 61%, 100% { opacity: 1 } }
   @keyframes c3v  { 0%, 63% { opacity: 0; transform: scale(.9) } 67%, 100% { opacity: 1; transform: none } }
   @keyframes caption { 0%, 78% { opacity: 0; transform: translateY(12px) } 84%, 100% { opacity: 1; transform: none } }
+  @keyframes caption-sub { 0%, 84% { opacity: 0 } 88%, 100% { opacity: 1 } }
 </style>
 </head>
 <body>
@@ -104,6 +107,7 @@
     </div>
 
     <div class="caption">A <span class="underline-pink">decision model</span>: a classifier you don't train.</div>
+    <div class="caption-sub">It already knows language: you just don't train it on <b>your</b> data.</div>
   </div>
 </div>
 <script src="_shared/anim.js"></script>

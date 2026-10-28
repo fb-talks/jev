@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>00 · From paragraphs to decisions</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Cover of the talk, before the title slide (docs/video-talk/01-intro-jev-video-script.md, "00 · Copertina").
+  Left: the talk title on two lines, the authors and a Start button that opens the next slide in the deck (data-next, set by anim.js).
+  Right: the essence of the talk, top to bottom: a paragraph written for people goes into Jev
+  and comes out as one decision for the code, a probability per option.
+  The probabilities are illustrative, not measured.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  @property --n { syntax: "<integer>"; inherits: false; initial-value: 0; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Left: title, authors, Start ---------- */
+  .eyebrow { position: absolute; left: 135px; top: 250px; font-size: 22px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #8a93a6; opacity: 0; animation-name: eyebrow; }
+  .title { position: absolute; left: 135px; top: 300px; margin: 0; font-family: var(--hand); font-size: 100px; font-weight: 400; line-height: 1.12; }
+  .title span { display: block; opacity: 0; }
+  .title .l1 { animation-name: line1; }
+  .title .l2 { animation-name: line2; }
+  .title .l2 em { font-style: normal; color: var(--pink); }
+  .authors { position: absolute; left: 135px; top: 615px; display: flex; align-items: center; gap: 18px; font-size: 30px; font-weight: 600; opacity: 0; animation-name: authors; }
+  .authors i { font-style: normal; color: var(--muted); font-family: var(--hand); font-size: 36px; }
+  .start {
+    position: absolute; left: 135px; top: 730px; display: inline-flex; align-items: center; gap: 16px; padding: 22px 44px;
+    border-radius: 999px; background: var(--pink); color: #fff; text-decoration: none; font-size: 32px; font-weight: 700;
+    box-shadow: 0 18px 36px -18px rgba(255,0,191,.7); opacity: 0; animation-name: start; transition: filter .2s;
+  }
+  .start:hover { filter: brightness(1.08); }
+  .start svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Right: paragraph → Jev → decision ---------- */
+  .label { position: absolute; font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+
+  .para { position: absolute; left: 1080px; top: 150px; width: 700px; height: 230px; padding: 66px 40px 0; opacity: 0; animation-name: para; }
+  .para .label { left: 40px; top: 18px; }
+  .para i { display: block; height: 16px; margin-bottom: 18px; border-radius: 8px; background: #dde4f0; transform-origin: left; transform: scaleX(0); }
+  .para i:nth-of-type(1) { width: 96%; animation-name: w1; }
+  .para i:nth-of-type(2) { width: 88%; animation-name: w2; }
+  .para i:nth-of-type(3) { width: 93%; animation-name: w3; }
+  .para i:nth-of-type(4) { width: 61%; animation-name: w4; }
+
+  .wire { position: absolute; left: 1430px; width: 0; border-left: 3px dashed #cfd6e3; opacity: 0; }
+  .wire--in { top: 380px; height: 70px; animation-name: wire-in; }
+  .wire--out { top: 590px; height: 70px; animation-name: wire-out; }
+  .dot { position: absolute; left: 1420px; width: 23px; height: 23px; border-radius: 50%; background: var(--pink); opacity: 0; }
+  .dot--in { top: 370px; animation-name: dot-in; }
+  .dot--out { top: 580px; animation-name: dot-out; }
+
+  .jev { position: absolute; left: 1330px; top: 450px; width: 200px; height: 140px; display: grid; place-items: center;
+    border: 3px solid var(--ink); border-radius: 26px; background: #fff; font-family: var(--hand); font-size: 76px; opacity: 0; animation-name: jev; }
+
+  .decision { position: absolute; left: 1080px; top: 660px; width: 700px; height: 270px; padding: 54px 40px 0; opacity: 0; animation-name: decision; }
+  .decision .label { left: 40px; top: 20px; }
+  .row { display: grid; grid-template-columns: 170px 1fr 110px; align-items: center; gap: 22px; height: 64px; font-size: 26px; font-weight: 600; color: #8a93a6; }
+  .row .bar { height: 24px; }
+  .row .bar > i { width: 0; background: var(--muted); }
+  .row b { text-align: right; font-family: var(--mono); font-size: 30px; font-weight: 500; --n: 0; counter-reset: n var(--n); }
+  .row b::before { content: "0." counter(n, decimal-leading-zero); }
+  .row--win { color: var(--ink); }
+  .row--win .bar > i { background: var(--pink); animation-name: b1; }
+  .row--win b { color: var(--pink); animation-name: n1; }
+  .row:nth-child(3) .bar > i { animation-name: b2; }
+  .row:nth-child(3) b { animation-name: n2; }
+  .row:nth-child(4) .bar > i { animation-name: b3; }
+  .row:nth-child(4) b { animation-name: n3; }
+  .row .bar > i, .row b { animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in             4–8%   eyebrow
+     6–12%   title, first line    12–18% second line
+     20–26%  authors              26–32% Start button
+     8–12%   paragraph card       12–30% its four lines are written, one every 4%
+     30–34%  wire into Jev        32–42% the dot travels into Jev   40–46% Jev appears, then pulses
+     46–50%  wire out             48–56% the dot travels to the decision card
+     54–58%  decision card        58–76% the bars fill, the numbers count up (0.92 / 0.06 / 0.02)
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes eyebrow { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes line1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes line2 { 0%, 12% { opacity: 0; transform: translateY(24px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes authors { 0%, 20% { opacity: 0; transform: translateY(14px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes start { 0%, 26% { opacity: 0; transform: scale(.9) } 30% { opacity: 1; transform: scale(1.04) } 32%, 100% { opacity: 1; transform: none } }
+
+  @keyframes para { 0%, 8% { opacity: 0; transform: translateY(20px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes w1 { 0%, 12% { transform: scaleX(0) } 16%, 100% { transform: scaleX(1) } }
+  @keyframes w2 { 0%, 16% { transform: scaleX(0) } 20%, 100% { transform: scaleX(1) } }
+  @keyframes w3 { 0%, 20% { transform: scaleX(0) } 24%, 100% { transform: scaleX(1) } }
+  @keyframes w4 { 0%, 24% { transform: scaleX(0) } 28%, 100% { transform: scaleX(1) } }
+  @keyframes wire-in { 0%, 30% { opacity: 0 } 34%, 100% { opacity: 1 } }
+  @keyframes dot-in { 0%, 32% { opacity: 0; transform: none } 34% { opacity: 1; transform: none } 42% { opacity: 1; transform: translateY(80px) } 43%, 100% { opacity: 0; transform: translateY(80px) } }
+  @keyframes jev { 0%, 38% { opacity: 0; transform: scale(.85) } 42% { opacity: 1; transform: none } 44% { transform: scale(1.06); border-color: var(--pink) } 46%, 100% { opacity: 1; transform: none; border-color: var(--ink) } }
+  @keyframes wire-out { 0%, 46% { opacity: 0 } 50%, 100% { opacity: 1 } }
+  @keyframes dot-out { 0%, 48% { opacity: 0; transform: none } 49% { opacity: 1; transform: none } 56% { opacity: 1; transform: translateY(80px) } 57%, 100% { opacity: 0; transform: translateY(80px) } }
+  @keyframes decision { 0%, 54% { opacity: 0; transform: translateY(20px) } 58%, 100% { opacity: 1; transform: none } }
+  @keyframes b1 { 0%, 58% { width: 0 } 76%, 100% { width: 92% } }
+  @keyframes n1 { 0%, 58% { --n: 0 } 76%, 100% { --n: 92 } }
+  @keyframes b2 { 0%, 58% { width: 0 } 76%, 100% { width: 6% } }
+  @keyframes n2 { 0%, 58% { --n: 0 } 76%, 100% { --n: 6 } }
+  @keyframes b3 { 0%, 58% { width: 0 } 76%, 100% { width: 2% } }
+  @keyframes n3 { 0%, 58% { --n: 0 } 76%, 100% { --n: 2 } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">A talk about Jev · TypeSafe AI</div>
+    <h1 class="title"><span class="l1">From paragraphs</span><span class="l2">to <em class="underline-pink">decisions</em></span></h1>
+    <div class="authors">Mario Rossi <i>&amp;</i> Maria Verde</div>
+    <a class="start" href="01d-hook.html" data-next>Start <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+    <div class="card para"><span class="label">Text, for people</span><i></i><i></i><i></i><i></i></div>
+    <div class="wire wire--in"></div>
+    <div class="dot dot--in"></div>
+    <div class="jev">Jev</div>
+    <div class="wire wire--out"></div>
+    <div class="dot dot--out"></div>
+    <div class="card decision">
+      <span class="label">A decision, for your code</span>
+      <div class="row row--win"><span>offensive</span><div class="bar"><i></i></div><b></b></div>
+      <div class="row"><span>neutral</span><div class="bar"><i></i></div><b></b></div>
+      <div class="row"><span>praise</span><div class="bar"><i></i></div><b></b></div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

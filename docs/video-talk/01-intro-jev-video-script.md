@@ -14,7 +14,31 @@ Legenda:
 
 ---
 
-## 1. Apertura (0:00 – 1:30)
+## 1. Apertura (0:00 – 1:00)
+
+### 00 · Copertina
+
+🎬 **ANIMAZIONE**: [`slides/00-copertina.html`](./slides/00-copertina.html). A sinistra il titolo su due righe, "From paragraphs / to decisions", gli autori (Mario Rossi & Maria Verde) e il pulsante **Start**, che passa alla slide successiva. A destra l'essenza del talk: un paragrafo "per le persone" entra in Jev ed esce come una decisione "per il codice", una probabilità per opzione (offensive 0.92). Dura 10 s. Le probabilità sono illustrative.
+
+🎙️ **VOCE**:
+> _(copertina: resta a schermo mentre il pubblico si siede; nessun parlato)_
+
+### 01d · Hook (0:00 – 0:30)
+
+🖥️ **SCHERMO**: `/1-jev/demo1`. Scrivo "Who taught you to code? Useless post." e clicco **Analyze**. Compare "Offensive: 80%" circa (valore reale: 79–81%).
+
+🎙️ **VOCE**:
+> Questo non è un LLM per darvi una risposta testuale o che vi scrive un paragrafo per dirvi che il commento è offensivo.
+> È un modello che vi risponde con un numero: offensivo, all'ottanta per cento. In pochi millisecondi anziché secondi o minuti.
+> Si chiama **Jev**, e oggi vediamo cos'è, come si usa e, soprattutto, come fa a "sapere" che una frase è un insulto.
+
+✂️ Titolo a schermo: **"Un LLM scrive. Jev sceglie."**
+
+🗑️ **TO DELETE** — con l'hook spostato in apertura, prima di 01c, questa nota non è più vera.
+
+✂️ Con l'apertura, Jev è già presentato in 01c: "Si chiama Jev" si può accorciare in "Ecco Jev in azione".
+
+🎬 **ANIMAZIONE**: [`slides/01d-hook.html`](./slides/01d-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
 
 ### 01a · Titolo
 
@@ -32,7 +56,13 @@ Legenda:
 🎙️ **VOCE**:
 > _da scrivere: chi siamo, in due frasi_
 
+---
+
+## 2. Cos'è Jev (1:00 – 2:45)
+
 ### 01c · LLM vs Jev
+
+🗑️ **TO DELETE** — stesso messaggio dell'animazione di 01d (LLM scrive un paragrafo, Jev risponde con un numero) e di 01e (scrivere o scegliere): è il terzo confronto LLM vs Jev in un minuto.
 
 🎬 **ANIMAZIONE**: [`slides/01c-jev.html`](./slides/01c-jev.html). Uno schema disegnato, quasi senza testo. Sopra: dati → LLM → un paragrafo (righe grigie) → va bene per una persona ✓, ma per il codice è un "?". Sotto: dati → Jev → un numero, 0.92 → il codice lo usa ✓ → branch, sort, route. Poi "An LLM writes for people. Jev answers your code." Dura 14 s.
 
@@ -42,25 +72,6 @@ Legenda:
 > Ma se a usarlo è il vostro **codice**, quel paragrafo è un problema: dovete chiedergli un formato preciso, fare il parsing, e sperare che sia sempre giusto.
 > Sotto, Jev: stessi dati, ma niente testo. Risponde con un numero, zero novantadue, e il codice lo usa subito: per un `if`, per ordinare, per smistare.
 > Un LLM scrive per le persone. **Jev risponde al vostro codice.**
-
-### 01d · Hook (1:00 – 1:30)
-
-🖥️ **SCHERMO**: `/1-jev/demo1`. Scrivo "Who taught you to code? Useless post." e clicco **Analyze**. Compare "Offensive: 80%" circa (valore reale: 79–81%).
-
-🎙️ **VOCE**:
-> Questo non è un LLM per darvi una risposta testuale o che vi scrive un paragrafo per dirvi che il commento è offensivo.
-> È un modello che vi risponde con un numero: offensivo, all'ottanta per cento. In pochi millisecondi anziché secondi o minuti.
-> Si chiama **Jev**, e oggi vediamo cos'è, come si usa e, soprattutto, come fa a "sapere" che una frase è un insulto.
-
-✂️ Titolo a schermo: **"Un LLM scrive. Jev sceglie."**
-
-✂️ Con l'apertura, Jev è già presentato in 01c: "Si chiama Jev" si può accorciare in "Ecco Jev in azione".
-
-🎬 **ANIMAZIONE**: [`slides/01d-hook.html`](./slides/01d-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
-
----
-
-## 2. Cos'è Jev (1:30 – 2:45)
 
 ### 01e · Scrivere o scegliere
 
@@ -82,6 +93,8 @@ Legenda:
 >
 >Il nome Jev non è un acronimo, ma deriva dall'economista e logico ottocentesco William Stanley Jevons. 
 > La startup TypeSafe AI ha scelto questo nome per via del celebre Paradosso di Jevons. In economia, questo principio dimostra che quando il progresso tecnologico rende l'uso di una risorsa più efficiente (riducendone i costi), il consumo totale di quella risorsa tende ad aumentare anziché diminuire, poiché si aprono infinite nuove possibilità di utilizzo
+
+🗑️ **TO DELETE** — la tabella LLM/Jev ripete 01c e 01e: è il quarto confronto LLM vs Jev in due minuti, e la slide 02 non la mostra.
 
 🖥️ **SCHERMO**: slide con due colonne.
 
@@ -106,15 +119,33 @@ Legenda:
 > Oppure con un **LLM e un prompt**: flessibile, ma vi risponde con del testo da interpretare e validare, ed è lento e caro.
 > Jev sta in mezzo: **non dovete addestrarlo**. Gli date le categorie a ogni richiesta, come in un prompt, e vi risponde con un valore tipizzato e le probabilità, come un classificatore.
 > Questa categoria di modelli si chiama **decision model**. "System One" è il nome che gli dà TypeSafe.
+> Attenzione: "non dovete addestrarlo" non vuol dire che non sia addestrato. Il linguaggio lo conosce già, e come fa lo vediamo più avanti. Quello che non serve è addestrarlo sui **vostri** dati.
 
 ---
 
-## 3. Come si usa: state + domande (2:45 – 4:30)
+## 3. Dove usarlo (2:45 – 3:30)
+
+🎬 **ANIMAZIONE**: [`slides/05-casi-uso.html`](./slides/05-casi-uso.html)
+
+🖥️ **SCHERMO**: due colonne di icone che compaiono una alla volta.
+
+🎙️ **VOCE**:
+> Dove lo usereste? Pensate a tutte le micro-decisioni ad alto volume.
+>
+> In un **CMS**: moderazione dei commenti, classificazione degli articoli per sezione o livello del lettore, una checklist pre-pubblicazione con tante domande sì/no in parallelo, una per ogni regola editoriale.
+>
+> In un **CRM**: smistamento di ticket ed email, lead scoring dal form contatti, deduplicazione dei contatti, rischio di abbandono in un batch notturno, oppure la "next best action" scelta da un insieme chiuso di azioni.
+>
+> In tutti questi casi non vi serve una frase. Vi serve **un tipo e una confidenza**.
+
+---
+
+## 4. Come si usa: state + domande (3:30 – 5:15)
 
 ### 03a · State + domande
 
 🎙️ **VOCE**:
-> Usarlo è semplice. Gli mandate due cose.
+> Prendiamo uno di questi casi: lo smistamento dei ticket di supporto. Usarlo è semplice. Gli mandate due cose.
 > Uno **state**: il testo da valutare. Può essere una stringa, un oggetto JSON o un array.
 > E una o più **domande**. Tutte a scelta multipla.
 
@@ -258,7 +289,7 @@ answers.urgent.noul;         // 0.92
 
 ---
 
-## 4. Il pattern a tre fasce (4:30 – 5:45)
+## 5. Il pattern a tre fasce (5:15 – 6:30)
 
 🎬 **ANIMAZIONE**: [`slides/04-tre-fasce.html`](./slides/04-tre-fasce.html)
 
@@ -284,23 +315,6 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Questa è la demo di moderazione commenti che trovate nel repository. Guardate: muovo la soglia e la decisione cambia. **Senza richiamare Jev.** Le probabilità ce le abbiamo già; la policy è codice nostro.
 
 ✂️ Zoom sul badge mentre cambia.
-
----
-
-## 5. Dove usarlo (5:45 – 6:30)
-
-🎬 **ANIMAZIONE**: [`slides/05-casi-uso.html`](./slides/05-casi-uso.html)
-
-🖥️ **SCHERMO**: due colonne di icone che compaiono una alla volta.
-
-🎙️ **VOCE**:
-> Dove lo usereste? Pensate a tutte le micro-decisioni ad alto volume.
->
-> In un **CMS**: moderazione dei commenti, classificazione degli articoli per sezione o livello del lettore, una checklist pre-pubblicazione con tante domande sì/no in parallelo, una per ogni regola editoriale.
->
-> In un **CRM**: smistamento di ticket ed email, lead scoring dal form contatti, deduplicazione dei contatti, rischio di abbandono in un batch notturno, oppure la "next best action" scelta da un insieme chiuso di azioni.
->
-> In tutti questi casi non vi serve una frase. Vi serve **un tipo e una confidenza**.
 
 ---
 

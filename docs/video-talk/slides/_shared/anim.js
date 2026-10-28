@@ -8,13 +8,15 @@ const frame = document.querySelector(".frame");
 
 // Slide order: add new pages here
 const slides = [
+  "00-copertina.html",
+  "01d-hook.html",
   "01a-titolo.html",
   "01b-speaker.html",
   "01c-jev.html",
-  "01d-hook.html",
   "01e-classificatori.html",
   "02-cos-e.html",
   "02a-tre-modi.html",
+  "05-casi-uso.html",
   "03a-state-domande.html",
   "03b-tipi-domanda.html",
   "03c-noul-base.html",
@@ -23,7 +25,6 @@ const slides = [
   "03f-choice.html",
   "03g-score.html",
   "04-tre-fasce.html",
-  "05-casi-uso.html",
   "06-come-sa.html",
   "06a-parola-dopo.html",
   "06b-coordinate.html",
@@ -100,6 +101,10 @@ const restart = () => {
   animations().forEach((a) => { a.currentTime = 0; a.play(); });
 };
 replay.addEventListener("click", restart);
+
+// Links marked data-next (e.g. the cover's Start button) open the next slide in the deck
+const nextSlide = slides[slides.indexOf(file) + 1];
+if (nextSlide) document.querySelectorAll("[data-next]").forEach((a) => (a.href = nextSlide));
 
 // Slide number, bottom left: "05e · 12 / 15" (the file prefix, then the position in the deck).
 // Clicking it opens the slide list, as tall as the window.
