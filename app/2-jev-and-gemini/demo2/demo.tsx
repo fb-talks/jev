@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FlowDiagram } from "../_components/flow";
+import { FlowDiagram } from "../../_components/flow";
 
 // A few ready-made styles, so the demo can show every outcome with one click.
 const styles = [

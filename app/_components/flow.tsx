@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 // A small flow diagram, described as data: lanes of columns, each column with one or more nodes.
-// Shared by the Jev + Gemini demos, so every page explains its process the same way.
+// Shared by the demos, so every page explains its process the same way.
 
 export type Kind = "io" | "step" | "jev" | "gemini" | "code" | "ok" | "stop";
 

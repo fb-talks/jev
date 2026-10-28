@@ -1,4 +1,4 @@
-import { CodePanel, type Snippet } from "../_components/code";
+import { CodePanel, type Snippet } from "../../_components/code";
 import Demo5 from "./demo";
 
 // A server component: it highlights the key code with Shiki, the interactive demo is in demo.tsx.

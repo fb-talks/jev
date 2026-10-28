@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FlowDiagram } from "../_components/flow";
+import { FlowDiagram } from "../../_components/flow";
 
 // A realistic support inbox: half simple requests, half real problems, and a couple of tricky ones.
 const sample = `Hi there!

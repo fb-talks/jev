@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { FlowDiagram } from "../_components/flow";
+import { FlowDiagram } from "../../_components/flow";
 
 // The interactive part of the demo; the code panel comes from the server, already highlighted.
 export default function Demo5({ code }: { code: React.ReactNode }) {

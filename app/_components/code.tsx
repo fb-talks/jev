@@ -6,10 +6,12 @@ import { codeToHtml } from "shiki";
 export interface Snippet {
   title: string;
   code: string;
+  // "tsx" for snippets with JSX
+  lang?: "ts" | "tsx";
 }
 
 export async function CodePanel({ snippets }: { snippets: Snippet[] }) {
-  const html = await Promise.all(snippets.map((s) => highlight(s.code)));
+  const html = await Promise.all(snippets.map((s) => highlight(s.code, s.lang)));
 
   return (
     // closed by default; click the title to open it
@@ -35,7 +37,7 @@ export async function CodePanel({ snippets }: { snippets: Snippet[] }) {
 
 // Cached: the snippets never change, and Shiki reads the current time inside, which Cache Components
 // doesn't allow while prerendering. Two themes in the same HTML, as CSS variables: the classes above pick one.
-async function highlight(code: string) {
+async function highlight(code: string, lang: "ts" | "tsx" = "ts") {
   "use cache";
-  return codeToHtml(code, { lang: "ts", themes: { light: "github-light", dark: "github-dark" }, defaultColor: false });
+  return codeToHtml(code, { lang, themes: { light: "github-light", dark: "github-dark" }, defaultColor: false });
 }

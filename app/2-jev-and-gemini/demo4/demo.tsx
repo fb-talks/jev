@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FlowDiagram } from "../_components/flow";
+import { FlowDiagram } from "../../_components/flow";
 
 const email = `From: Laura Bianchi <laura.bianchi@nordsupply.it>
 Subject: Delivery dates for order #PO-7731
