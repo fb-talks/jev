@@ -32,10 +32,11 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 
-/* 1920×1080 frame, centered in the window and scaled by anim.js.
-   Absolute + translate(-50%, -50%) keeps it centered even when the window is narrower than 1920px. */
+/* 1920×1080 frame, centered in the window and scaled by anim.js. Fixed, not absolute: on phones an absolute
+   1920px box widens the page before it is scaled, and the slide then comes out cropped.
+   left/top 50% + translate(-50%, -50%) keeps it centered even when the window is narrower than 1920px. */
 .frame {
-  position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px;
+  position: fixed; left: 50%; top: 50%; width: 1920px; height: 1080px;
   transform: translate(-50%, -50%); transform-origin: center; color: var(--ink); font-family: var(--sans);
   background-color: #fafbff;
   background-image: radial-gradient(circle, rgba(0,0,0,0.07) 1.5px, transparent 1.8px);
@@ -105,6 +106,14 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
   font: 500 14px/1 var(--mono); letter-spacing: .3px;
 }
 .dock button:hover, .notes-open .notes-toggle { color: var(--pink); border-color: var(--pink); }
+
+/* Phones: smaller controls, closer to the corners, so they cover less of the scaled-down slide */
+@media (max-width: 900px), (max-height: 500px) {
+  .replay { right: 10px; bottom: calc(10px + var(--notes-h, 0px)); width: 40px; height: 40px; border-width: 2px; }
+  .replay svg { width: 18px; height: 18px; margin-left: 2px; }
+  .dock { left: 8px; bottom: calc(8px + var(--notes-h, 0px)); gap: 4px; }
+  .dock button { padding: 4px 8px; font-size: 11px; background: rgba(255,255,255,.7); }
+}
 
 /* Slide menu: as tall as the window, scrolls on its own */
 .slide-menu {
