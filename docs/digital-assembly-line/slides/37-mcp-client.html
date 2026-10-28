@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>37 · MCP, client side</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 37 of the original deck (docs/digital-assembly-line/speaker-notes.md, "37 · Concept 6: MCP, client side").
+  Left: the five client steps (sse_client, ClientSession, initialize, call_tool, return). Right: the real
+  subagents/soste_search_agent.py of branch 05d; the line of each step lights up pink while the step appears.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 29px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .tag { position: absolute; right: 80px; top: 74px; padding: 14px 28px; border-radius: 999px; background: #1d1f27; color: #f5c542; font-family: var(--mono); font-size: 22px; }
+
+  /* ---------- Left: the five steps ---------- */
+  .txt { position: absolute; left: 80px; top: 200px; width: 730px; padding: 34px 38px; font-size: 24px; line-height: 1.4; }
+  .pt { position: relative; margin: 0 0 20px; padding-left: 50px; opacity: 0; }
+  .pt:last-child { margin-bottom: 0; }
+  .pt::before { position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--pink-bg); color: var(--pink); font-weight: 700; font-size: 20px; line-height: 34px; text-align: center; }
+  .p1::before { content: "1"; } .p2::before { content: "2"; } .p3::before { content: "3"; } .p4::before { content: "4"; } .p5::before { content: "5"; }
+  .pt code { font-family: var(--mono); font-size: 21px; font-weight: 700; }
+  .p1 { animation-name: p1; } .p2 { animation-name: p2; } .p3 { animation-name: p3; } .p4 { animation-name: p4; } .p5 { animation-name: p5; }
+
+  /* ---------- Right: code ---------- */
+  .codecard { position: absolute; left: 850px; top: 160px; width: 930px; padding: 22px 28px 24px; border-radius: 24px; background: #1d1f27; border: 3px solid var(--pink); box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: codecard; }
+  .tabbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-family: var(--mono); font-size: 20px; color: #f5c542; }
+  .tabbar i { width: 11px; height: 11px; border-radius: 50%; background: #f5c542; }
+  .tabbar span { margin-left: 14px; }
+  .src { font-variant-ligatures: none; font-family: var(--mono); font-size: 20px; line-height: var(--lh); color: #e7e9ee; }
+  .l { white-space: pre; min-height: var(--lh); }
+  .c { color: #8d96a8; } .p { color: #ff5cd6; } .s { color: #9fe0b0; }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; } .g4 { animation-name: g4; } .g5 { animation-name: g5; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in              4–10%  code card
+     10–14%  step 1 sse_client     → line lit 10–26%
+     26–30%  step 2 ClientSession  → line lit 26–42%
+     42–46%  step 3 initialize     → line lit 42–58%
+     58–62%  step 4 call_tool      → call lit 58–74%
+     74–78%  step 5 return         → line lit 74–94%
+     94%     final frame           96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codecard { 0%, 4% { opacity: 0; transform: translateX(30px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes p1 { 0%, 10% { opacity: 0; transform: translateX(-16px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 26% { opacity: 0; transform: translateX(-16px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes p3 { 0%, 42% { opacity: 0; transform: translateX(-16px) } 46%, 100% { opacity: 1; transform: none } }
+  @keyframes p4 { 0%, 58% { opacity: 0; transform: translateX(-16px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes p5 { 0%, 74% { opacity: 0; transform: translateX(-16px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 10% { background: transparent; box-shadow: inset 4px 0 0 transparent } 12%, 24% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 26%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 26% { background: transparent; box-shadow: inset 4px 0 0 transparent } 28%, 40% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 42%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g3 { 0%, 42% { background: transparent; box-shadow: inset 4px 0 0 transparent } 44%, 56% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 58%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g4 { 0%, 58% { background: transparent; box-shadow: inset 4px 0 0 transparent } 60%, 72% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 74%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g5 { 0%, 74% { background: transparent; box-shadow: inset 4px 0 0 transparent } 76%, 100% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 6 · Google · AI Community 2026</small>What is <em>MCP</em> (Client Side)?</div>
+    <div class="tag">05b and 05d · Art #5b and #5d</div>
+
+    <div class="card txt">
+      <p class="pt p1"><code>sse_client(MCP_SSE_URL)</code>: connects to the local MCP server via HTTP/SSE streams (<b>read</b> for incoming events, <b>write</b> for outgoing requests).</p>
+      <p class="pt p2"><code>ClientSession(read, write)</code>: creates an active MCP client session over those streams.</p>
+      <p class="pt p3"><code>await session.initialize()</code>: performs the initial MCP protocol <b>handshake</b> to negotiate capabilities.</p>
+      <p class="pt p4"><code>session.call_tool(...)</code>: dispatches a remote procedure call (<b>RPC</b>) to execute the tool named "find_soste_by_fuel_and_location" on the target MCP server.</p>
+      <p class="pt p5"><code>return str(result.content)</code>: formats the tool output into a text string so the LLM agent can parse it and formulate its final answer to the user.</p>
+    </div>
+
+    <div class="codecard">
+      <div class="tabbar"><i></i><i></i><i></i><span>subagents/soste_search_agent.py (Branch 05d)</span></div>
+      <div class="src">
+        <div class="l">MCP_PORT = os.getenv(<span class="s">"MCP_PORT"</span>, <span class="s">"8002"</span>)</div>
+        <div class="l">MCP_SSE_URL = <span class="s">f"http://127.0.0.1:{MCP_PORT}/sse"</span></div>
+        <div class="l"> </div>
+        <div class="l"><span class="c"># Define the async tool function that ADK executes</span></div>
+        <div class="l"><span class="c"># when SosteSearchAgent invokes it</span></div>
+        <div class="l">async def get_mcp_soste_session(</div>
+        <div class="l">    latitude: float,</div>
+        <div class="l">    longitude: float,</div>
+        <div class="l">    fuel_type: Optional[str] = None,</div>
+        <div class="l">) -&gt; str:</div>
+        <div class="l">    <span class="s">""".....  """</span></div>
+        <div class="grp g1"><div class="l">    async with <span class="p">sse_client</span>(MCP_SSE_URL) as (read, write):</div></div>
+        <div class="grp g2"><div class="l">        async with <span class="p">ClientSession</span>(read, write) as session:</div></div>
+        <div class="grp g3"><div class="l">            await <span class="p">session.initialize</span>()</div></div>
+        <div class="l">            <span class="c"># Arguments forwarded to the MCP tool</span></div>
+        <div class="l">            <span class="c"># 'find_soste_by_fuel_and_location'</span></div>
+        <div class="l">            args = {</div>
+        <div class="l">                <span class="s">"latitude"</span>: latitude,</div>
+        <div class="l">                <span class="s">"longitude"</span>: longitude,</div>
+        <div class="l">            }</div>
+        <div class="l">            if fuel_type:</div>
+        <div class="l">                args[<span class="s">"fuel_type"</span>] = fuel_type</div>
+        <div class="grp g4">
+          <div class="l">            result = <span class="p">await session.call_tool(</span></div>
+          <div class="l">                <span class="p">"find_soste_by_fuel_and_location"</span>, arguments=args</div>
+          <div class="l">            <span class="p">)</span></div>
+        </div>
+        <div class="grp g5"><div class="l">            return str(result.content)</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

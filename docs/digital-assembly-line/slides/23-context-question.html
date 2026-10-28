@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>23 · Stuff everything into the context?</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 23 of the original deck (docs/digital-assembly-line/speaker-notes.md, "23 · Stuff everything into the context?").
+  Statement slide: the question, then a context window that fills up block after block (history, facts,
+  prior outputs…) until the last block no longer fits; "What is the problem?" underlined pink.
+  The blocks are illustrative, not measured.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 80px; top: 60px; font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+
+  .q { position: absolute; left: 120px; right: 120px; top: 190px; margin: 0; text-align: center; font-family: var(--hand); font-size: 92px; font-weight: 400; line-height: 1.3; }
+  .q span { display: block; opacity: 0; }
+  .q .l1 { animation-name: l1; }
+  .q .l2 { animation-name: l2; }
+  .q em { font-style: normal; position: relative; color: var(--pink); }
+  .q em::after { content: ""; position: absolute; left: 0; right: 0; bottom: -4px; height: 9px; border-radius: 5px; background: var(--pink); transform: scaleX(0); transform-origin: left; animation-name: under; }
+
+  /* ---------- The context window ---------- */
+  .lbl { position: absolute; left: 360px; top: 600px; font-family: var(--mono); font-size: 22px; color: #8a93a6; opacity: 0; animation-name: win; }
+  .win { position: absolute; left: 360px; top: 640px; width: 1200px; height: 130px; padding: 18px; display: flex; gap: 12px; border: 4px solid var(--ink); border-radius: 20px; background: #fff; opacity: 0; animation-name: win, full; }
+  .b { flex: none; display: grid; place-items: center; height: 86px; border-radius: 12px; font-size: 22px; font-weight: 600; background: var(--stage); border: 2px solid #d5dbe6; opacity: 0; }
+  .b1 { width: 300px; animation-name: b1; } .b2 { width: 220px; animation-name: b2; } .b3 { width: 260px; animation-name: b3; } .b4 { width: 300px; animation-name: b4; }
+  .b5 { position: absolute; left: 1520px; top: 660px; width: 240px; border-color: var(--red); background: var(--red-bg); color: var(--red); animation-name: b5; }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in
+     6–16%   "Stuff everything into the LLM's context window."
+     18–24%  the context window          26–32% history   34–40% facts   42–48% prior outputs   50–56% more history
+     60–68%  one more block does not fit: it bumps against the edge, the window turns red
+     70–78%  "What is the problem?"     78–88% underlined pink
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes l1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes l2 { 0%, 70% { opacity: 0; transform: translateY(24px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes under { 0%, 78% { transform: scaleX(0) } 88%, 100% { transform: scaleX(1) } }
+  @keyframes win { 0%, 18% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes full { 0%, 62% { border-color: var(--ink) } 66%, 100% { border-color: var(--red) } }
+  @keyframes b1 { 0%, 26% { opacity: 0; transform: translateY(-30px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes b2 { 0%, 34% { opacity: 0; transform: translateY(-30px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes b3 { 0%, 42% { opacity: 0; transform: translateY(-30px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes b4 { 0%, 50% { opacity: 0; transform: translateY(-30px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes b5 {
+    0%, 58% { opacity: 0; transform: translateY(-40px) }
+    62% { opacity: 1; transform: translateX(-30px) }
+    64% { opacity: 1; transform: translateX(8px) rotate(4deg) }
+    68%, 100% { opacity: 1; transform: translate(20px, 70px) rotate(10deg) }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <h1 class="q">
+      <span class="l1">Stuff everything into the LLM's context window.</span>
+      <span class="l2"><em>What is the problem?</em></span>
+    </h1>
+
+    <div class="lbl">context window</div>
+    <div class="win">
+      <div class="b b1">full conversation history</div>
+      <div class="b b2">all relevant facts</div>
+      <div class="b b3">all prior outputs</div>
+      <div class="b b4">…and more history</div>
+    </div>
+    <div class="b b5">one more turn</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

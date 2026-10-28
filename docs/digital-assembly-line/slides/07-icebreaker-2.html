@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>07 · Icebreaker #2</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 07 of the original deck (docs/digital-assembly-line/speaker-notes.md, "07 · Icebreaker #2: have you ever…").
+  Seven "Have you ever…" questions, from a local agent up to evaluations, one row at a time;
+  each row gets a raised hand when it is asked. The last one (adk eval) is pink, as in the original.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .q { position: absolute; left: 135px; width: 1520px; height: 92px; display: flex; align-items: center; gap: 24px; padding: 0 30px; font-size: 30px; font-weight: 600; opacity: 0; }
+  .q .n { flex: none; width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-size: 24px; font-weight: 700; }
+  .q .hand { margin-left: auto; font-size: 40px; opacity: 0; }
+  .q code { font-family: var(--mono); font-size: 27px; }
+  .q7 { background: var(--pink-bg); border: 2.5px solid var(--pink); color: var(--pink); }
+  .q7 .n { background: var(--pink); }
+
+  .q1 { top: 205px; animation-name: q1; } .q1 .hand { animation-name: h1; }
+  .q2 { top: 311px; animation-name: q2; } .q2 .hand { animation-name: h2; }
+  .q3 { top: 417px; animation-name: q3; } .q3 .hand { animation-name: h3; }
+  .q4 { top: 523px; animation-name: q4; } .q4 .hand { animation-name: h4; }
+  .q5 { top: 629px; animation-name: q5; } .q5 .hand { animation-name: h5; }
+  .q6 { top: 735px; animation-name: q6; } .q6 .hand { animation-name: h6; }
+  .q7 { top: 851px; animation-name: q7; } .q7 .hand { animation-name: h7; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in + kicker
+     6–10%   [1] AI agent locally            ✋ 10–13%
+     16–20%  [2] … with Tools                ✋ 20–23%
+     26–30%  [3] Multi-Agent System          ✋ 30–33%
+     36–40%  [4] 4 State Layers              ✋ 40–43%
+     46–50%  [5] MCP                         ✋ 50–53%
+     56–60%  [6] A2A Protocol                ✋ 60–63%
+     68–74%  [7] LAST QUESTION: adk eval (pink)  ✋ 74–78%
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes q1 { 0%, 6% { opacity: 0; transform: translateX(-30px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes q2 { 0%, 16% { opacity: 0; transform: translateX(-30px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes q3 { 0%, 26% { opacity: 0; transform: translateX(-30px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes q4 { 0%, 36% { opacity: 0; transform: translateX(-30px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes q5 { 0%, 46% { opacity: 0; transform: translateX(-30px) } 50%, 100% { opacity: 1; transform: none } }
+  @keyframes q6 { 0%, 56% { opacity: 0; transform: translateX(-30px) } 60%, 100% { opacity: 1; transform: none } }
+  @keyframes q7 { 0%, 68% { opacity: 0; transform: scale(.96) } 72% { opacity: 1; transform: scale(1.02) } 74%, 100% { opacity: 1; transform: none } }
+  @keyframes h1 { 0%, 10% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 13%, 100% { opacity: 1; transform: none } }
+  @keyframes h2 { 0%, 20% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 23%, 100% { opacity: 1; transform: none } }
+  @keyframes h3 { 0%, 30% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 33%, 100% { opacity: 1; transform: none } }
+  @keyframes h4 { 0%, 40% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 43%, 100% { opacity: 1; transform: none } }
+  @keyframes h5 { 0%, 50% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 53%, 100% { opacity: 1; transform: none } }
+  @keyframes h6 { 0%, 60% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 63%, 100% { opacity: 1; transform: none } }
+  @keyframes h7 { 0%, 74% { opacity: 0; transform: translateY(14px) rotate(-20deg) } 78%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Icebreaker #2 · Raise Your Hand! ✋</small>"Have You Ever..." (Questions 1–7)</div>
+
+    <div class="card q q1"><span class="n">1</span><span class="t">Have you ever built an AI agent locally?</span><span class="hand">✋</span></div>
+    <div class="card q q2"><span class="n">2</span><span class="t">Have you ever built an agent locally with Tools?</span><span class="hand">✋</span></div>
+    <div class="card q q3"><span class="n">3</span><span class="t">Have you ever built a Multi-Agent System (MAS) locally (adding subagents)?</span><span class="hand">✋</span></div>
+    <div class="card q q4"><span class="n">4</span><span class="t">Have you ever built a MAS with 4 State Layers (<code>session</code>, <code>user:</code>, <code>app:</code>, <code>temp:</code>)?</span><span class="hand">✋</span></div>
+    <div class="card q q5"><span class="n">5</span><span class="t">Have you ever built a MAS with MCP (Model Context Protocol)?</span><span class="hand">✋</span></div>
+    <div class="card q q6"><span class="n">6</span><span class="t">Have you ever connected a MAS to another agent using the A2A Protocol?</span><span class="hand">✋</span></div>
+    <div class="card q q7"><span class="n">7</span><span class="t">LAST QUESTION: Have you ever run Evaluations (<code>adk eval</code>) on your agents?</span><span class="hand">✋</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

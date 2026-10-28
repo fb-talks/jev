@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>26 · Session and State</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 26 of the original deck (docs/digital-assembly-line/speaker-notes.md, "26 · Session and State").
+  What a session is made of: identification (id, appName, userId), activity tracking (lastUpdateTime),
+  history (events) and the session state (state, "a scratchpad for the agent"). Each part appears on the left
+  while the same block is framed on the real session JSON (screenshot) on the right; the state stays pink.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 15s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Left: definition + four parts ---------- */
+  .intro { position: absolute; left: 80px; top: 215px; width: 960px; margin: 0; font-size: 28px; line-height: 1.4; opacity: 0; animation-name: intro; }
+  .parts { position: absolute; left: 80px; top: 345px; width: 960px; display: flex; flex-direction: column; gap: 16px; }
+  .part { display: flex; gap: 20px; align-items: flex-start; padding: 18px 24px; opacity: 0; }
+  .part .n { flex: none; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--stage); font-weight: 700; font-size: 22px; }
+  .part p { margin: 0; font-size: 23px; line-height: 1.38; }
+  .part b { display: block; font-size: 25px; margin-bottom: 2px; }
+  .part code { font-family: var(--mono); font-size: 22px; }
+  .p1 { animation-name: p1; } .p2 { animation-name: p2; } .p3 { animation-name: p3; } .p4 { animation-name: p4; }
+  .p4 { border: 2.5px solid var(--pink); }
+  .p4 .n { background: var(--pink); color: #fff; }
+  .p4 .hl { color: var(--pink); font-weight: 700; }
+
+  /* ---------- Right: session JSON screenshot (798×858 shown at 707×760) ---------- */
+  .shot { position: absolute; left: 1120px; top: 190px; width: 707px; height: 760px; border-radius: 18px; overflow: hidden; background: #1f1f1f; box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: shot; }
+  .shot img { display: block; width: 707px; height: 760px; }
+  .box { position: absolute; left: 8px; border: 3px solid var(--pink); border-radius: 10px; background: rgba(255,0,191,.12); opacity: 0; }
+  .b1 { top: 29px; width: 470px; height: 82px; animation-name: b1; }
+  .b2 { top: 110px; width: 420px; height: 28px; animation-name: b2; }
+  .b3 { top: 452px; right: 8px; height: 304px; animation-name: b3; }
+  .b4 { top: 160px; right: 8px; height: 268px; animation-name: b4; }
+  .tag { position: absolute; right: 18px; padding: 6px 14px; border-radius: 8px; background: var(--pink); color: #fff; font-size: 20px; font-weight: 700; opacity: 0; }
+  .t4 { top: 170px; animation-name: b4; }
+
+  /* ---------- Timeline (15s loop) ----------
+     0–4%    scene in              4–10%  definition          6–12%  JSON screenshot
+     14–18%  part 1 · box on id/appName/userId (16–30%)
+     30–34%  part 2 · box on lastUpdateTime (32–44%)
+     44–48%  part 3 · box on events (46–58%)
+     58–62%  part 4 (pink) · box + "scratchpad" tag on state (60%→ stays)
+     94%     final frame            96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes intro { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes shot { 0%, 6% { opacity: 0; transform: translateX(30px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes p1 { 0%, 14% { opacity: 0; transform: translateY(16px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 30% { opacity: 0; transform: translateY(16px) } 34%, 100% { opacity: 1; transform: none } }
+  @keyframes p3 { 0%, 44% { opacity: 0; transform: translateY(16px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes p4 { 0%, 58% { opacity: 0; transform: translateY(16px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes b1 { 0%, 16% { opacity: 0 } 19%, 28% { opacity: 1 } 31%, 100% { opacity: 0 } }
+  @keyframes b2 { 0%, 32% { opacity: 0 } 35%, 42% { opacity: 1 } 45%, 100% { opacity: 0 } }
+  @keyframes b3 { 0%, 46% { opacity: 0 } 49%, 56% { opacity: 1 } 59%, 100% { opacity: 0 } }
+  @keyframes b4 { 0%, 60% { opacity: 0 } 64%, 100% { opacity: 1 } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Second assembly line point · Structured handoffs</small>Session and State</div>
+
+    <p class="intro"><b>Each session</b> is a single, continuous conversational lifecycle and execution boundary between a user and your agent. It is composed of:</p>
+    <div class="parts">
+      <div class="card part p1"><span class="n">1</span><p><b>Identification <code>(id, appName, userId)</code></b>a unique identifier for this specific conversation thread, agent application and a particular user.</p></div>
+      <div class="card part p2"><span class="n">2</span><p><b>Activity tracking <code>(lastUpdateTime)</code></b>a timestamp of the last time an event occurred in this conversation thread.</p></div>
+      <div class="card part p3"><span class="n">3</span><p><b>History <code>(events)</code></b>a chronological sequence of all interactions (Event objects: user messages, agent responses, tool actions) in this thread. All interactions in the web UI are here.</p></div>
+      <div class="card part p4"><span class="n">4</span><p><b>Session State <code>(state)</code></b>a place to store temporary data relevant only to this ongoing conversation, acting as a <span class="hl">scratchpad for the agent</span> during the interaction.</p></div>
+    </div>
+
+    <div class="shot">
+      <img src="_shared/img/session-json.png" alt="Session JSON: id, appName, userId, lastUpdateTime, state, events">
+      <div class="box b1"></div>
+      <div class="box b2"></div>
+      <div class="box b3"></div>
+      <div class="box b4"></div>
+      <div class="tag t4">scratchpad</div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>27 · Session state &amp; the 4 state layers</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 27 of the original deck (docs/digital-assembly-line/speaker-notes.md, "27 · Session state & the 4 state layers").
+  (The original labels it "Concept 5", like slide 28; here it is Concept 4.)
+  Left: instead of playing "telephone" through chat history, agents read and write session.state with
+  4 prefix scopes (unprefixed, user:, app:, temp:), one row at a time, plus the footnote on external storage.
+  Right: the code. A user: key is set when the session is created, then injected into the agent's
+  instruction with {user:...}: both spots light up pink and an arrow joins them.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .ref { position: absolute; right: 80px; top: 92px; padding: 12px 22px; border-radius: 12px; background: #1f1f1f; color: #ffd166; font-family: var(--mono); font-size: 22px; opacity: 0; animation-name: intro; }
+
+  /* ---------- Left: the four scopes ---------- */
+  .scopes { position: absolute; left: 80px; top: 215px; width: 880px; padding: 30px 34px; opacity: 0; animation-name: intro; }
+  .scopes > p { margin: 0 0 18px; font-size: 25px; line-height: 1.4; }
+  .scopes code, .note code { font-family: var(--mono); font-size: 22px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .row { display: flex; gap: 18px; align-items: flex-start; padding: 14px 0; border-top: 1px solid var(--line); opacity: 0; }
+  .row .n { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--stage); font-weight: 700; font-size: 21px; }
+  .row p { margin: 0; font-size: 23px; line-height: 1.38; }
+  .row b { font-family: var(--mono); font-size: 23px; color: var(--pink); }
+  .r1 { animation-name: r1; } .r2 { animation-name: r2; } .r3 { animation-name: r3; } .r4 { animation-name: r4; }
+  .r2 .n { animation-name: n2; }
+  .note { position: absolute; left: 80px; top: 905px; width: 880px; margin: 0; font-size: 22px; line-height: 1.4; color: #5b6475; opacity: 0; animation-name: note; }
+
+  /* ---------- Right: code ---------- */
+  .ed { position: absolute; left: 1010px; top: 200px; width: 830px; padding: 26px 34px 30px; border-radius: 24px; background: #1f1f1f; color: #e8e8ee; box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: ed; }
+  .ed-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-family: var(--mono); font-size: 20px; color: #ffd166; }
+  .ed-head i { width: 12px; height: 12px; border-radius: 50%; background: #ffd166; }
+  .ed-head span { margin-left: 10px; }
+  .code { font-family: var(--mono); font-size: 21px; line-height: 32px; }
+  .l { white-space: pre; height: 32px; opacity: 0; }
+  .a { animation-name: la; } .b { animation-name: lb; }
+  .y { color: #ffd166; } .s { color: #f4a984; } .c { color: #8b91a3; } .k { color: #c4a7ff; }
+  .hl { border-radius: 6px; padding: 1px 4px; margin: -1px -4px; }
+  .h1 { animation-name: h1; } .h2 { animation-name: h2; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in            4–10%  intro card + ref chip
+     8–14%   editor in, create_session block types in (10–24%)
+     14–17%  scope 1 · 24–27% scope 2 (user:) · 34–37% scope 3 (app:) · 44–47% scope 4 (temp:)
+     50–54%  footnote
+     54–66%  agent block types in
+     68–72%  "user:user_preferred_language" set in state, pink
+     78–82%  {user:user_preferred_language} in the instruction, pink
+     94%     final frame            96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes intro { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes ed { 0%, 8% { opacity: 0; transform: translateX(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes la { 0%, 10% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes lb { 0%, 54% { opacity: 0 } 66%, 100% { opacity: 1 } }
+  @keyframes r1 { 0%, 14% { opacity: 0; transform: translateY(12px) } 17%, 100% { opacity: 1; transform: none } }
+  @keyframes r2 { 0%, 24% { opacity: 0; transform: translateY(12px) } 27%, 100% { opacity: 1; transform: none } }
+  @keyframes r3 { 0%, 34% { opacity: 0; transform: translateY(12px) } 37%, 100% { opacity: 1; transform: none } }
+  @keyframes r4 { 0%, 44% { opacity: 0; transform: translateY(12px) } 47%, 100% { opacity: 1; transform: none } }
+  @keyframes n2 { 0%, 68% { background: var(--stage); color: inherit } 72%, 100% { background: var(--pink); color: #fff } }
+  @keyframes note { 0%, 50% { opacity: 0 } 54%, 100% { opacity: 1 } }
+  @keyframes h1 { 0%, 68% { background: transparent; color: #f4a984 } 72%, 100% { background: var(--pink); color: #fff } }
+  @keyframes h2 { 0%, 78% { background: transparent; color: #f4a984 } 82%, 100% { background: var(--pink); color: #fff } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 4</small>Session state &amp; the <em>4 state layers</em></div>
+    <div class="ref">03a–03d · Art #3a–#3d</div>
+
+    <div class="card scopes">
+      <p>Instead of playing <i>"telephone"</i> through chat history, ADK agents read and write to <code>session.state</code> using 4 prefix scopes:</p>
+      <div class="row r1"><span class="n">1</span><p><b>Unprefixed</b> <code>state['destination']</code>: scoped to the current <code>session_id</code> only.**</p></div>
+      <div class="row r2"><span class="n">2</span><p><b>user:</b> <code>state['user:vehicle_fuel_type']</code>: scoped to <code>user_id</code>, persists across all future sessions of <u>that user</u>!</p></div>
+      <div class="row r3"><span class="n">3</span><p><b>app:</b> <code>state['app:system_banner']</code>: global across <u>all users</u> of the app.</p></div>
+      <div class="row r4"><span class="n">4</span><p><b>temp:</b> <code>state['temp:scratchpad']</code>: ephemeral, wiped automatically at the end of the <u>current turn</u>!</p></div>
+    </div>
+    <p class="note">** Unless you want to persist the Session State to an external Session Storage (Firestore, PostgreSQL etc.)</p>
+
+    <div class="ed">
+      <div class="ed-head"><i></i><i></i><i></i><span>Variable Injection in Instructions ({user:key?})</span></div>
+      <div class="code">
+        <div class="l a"><span class="k">await</span> session_service.create_session(</div>
+        <div class="l a">    <span class="y">app_name</span>=app_name,</div>
+        <div class="l a">    <span class="y">user_id</span>=<span class="s">"user_zelda"</span>,</div>
+        <div class="l a">    <span class="y">session_id</span>=<span class="s">"zelda_session_1"</span>,</div>
+        <div class="l a">    state={</div>
+        <div class="l a">        **global_app_config,</div>
+        <div class="l a">        <span class="hl h1">"user:user_preferred_language"</span>: <span class="s">"Italian"</span>,</div>
+        <div class="l a">    }</div>
+        <div class="l a">)</div>
+        <div class="l a"> </div>
+        <div class="l b">cameriere_agent = LlmAgent(</div>
+        <div class="l b">    name=<span class="s">"cameriere"</span>,</div>
+        <div class="l b">    model=<span class="s">"gemini-2.5-flash"</span>,</div>
+        <div class="l b">    <span class="c"># ADK dynamically injects session.state keys</span></div>
+        <div class="l b">    instruction=<span class="s">"""You are the SostaApp Maître D'.</span></div>
+        <div class="l b"><span class="s">    Active Traveler Profile from Blackboard:</span></div>
+        <div class="l b"><span class="s">    - User ID: </span><span class="hl h2">{user:user_preferred_language}</span></div>
+        <div class="l b"><span class="s">"""</span>,</div>
+        <div class="l b">)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

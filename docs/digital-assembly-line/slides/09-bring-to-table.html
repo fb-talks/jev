@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>09 · What AI brings to the table</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 09 of the original deck (docs/digital-assembly-line/speaker-notes.md, "09 · LLM, agents and agentic AI bring to the table").
+  Left: a laptop drawn in CSS (in place of the laptop GIF of the original) whose screen lights up with a spinning galaxy.
+  Right: the three promises, one pill at a time: more creativity, more impact, more possibilities (pink).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* Laptop */
+  .laptop { position: absolute; left: 120px; top: 240px; width: 980px; opacity: 0; animation-name: laptop; }
+  .lid { position: relative; width: 860px; height: 540px; margin: 0 auto; padding: 26px; border-radius: 30px 30px 8px 8px; background: #1b1b1f; box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); }
+  .lid::before { content: ""; position: absolute; left: 50%; top: 10px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: #3a3a42; }
+  .screen-d { position: relative; width: 100%; height: 100%; border-radius: 10px; overflow: hidden; background: radial-gradient(ellipse at 50% 60%, #2b3340 0%, #12151b 70%); }
+  .key { position: absolute; width: 170px; height: 130px; border-radius: 22px; background: linear-gradient(160deg, #3a4150, #20252e); box-shadow: inset 0 -8px 0 rgba(0,0,0,.35); }
+  .k1 { left: 30px; top: 40px; } .k2 { left: 600px; top: 40px; } .k3 { left: 30px; top: 330px; } .k4 { left: 600px; top: 330px; }
+  .k0 { left: 270px; top: 160px; width: 270px; height: 190px; display: grid; place-items: center; background: linear-gradient(160deg, #46506a, #262c39); }
+  .galaxy { width: 130px; height: 130px; border-radius: 50%; opacity: 0;
+    background: conic-gradient(from 0deg, transparent 0 10%, #ff9a3c 15%, transparent 30%, #7c6bff 45%, transparent 60%, #ff00bf 75%, transparent 90%), radial-gradient(circle, #fff 0 8%, #ffcf8a 14%, transparent 60%);
+    filter: blur(1.5px); box-shadow: 0 0 60px 10px rgba(124,107,255,.35); animation-name: galaxy; }
+  .base { width: 980px; height: 34px; margin-top: -2px; border-radius: 4px 4px 40px 40px; background: linear-gradient(#2c2c32, #18181c); }
+  .base::after { content: ""; display: block; width: 180px; height: 10px; margin: 0 auto; border-radius: 0 0 12px 12px; background: #45454d; }
+
+  .pill { position: absolute; left: 1260px; display: flex; align-items: center; gap: 20px; padding: 26px 40px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 38px; font-weight: 600; box-shadow: 0 18px 36px -18px rgba(0,0,0,.6); opacity: 0; }
+  .pill i { font-style: normal; font-size: 40px; }
+  .p1 { top: 340px; animation-name: p1; }
+  .p2 { top: 500px; animation-name: p2; }
+  .p3 { top: 660px; background: var(--pink); font-weight: 700; box-shadow: 0 18px 36px -18px rgba(255,0,191,.7); animation-name: p3; }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in + kicker        4–12%  laptop
+     14–30%  the galaxy key lights up and keeps spinning (to 100%)
+     34–40%  More creativity.   46–52%  More impact.   58–66%  More possibilities. (pink)
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes laptop { 0%, 4% { opacity: 0; transform: translateY(30px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes galaxy { 0%, 14% { opacity: 0; transform: rotate(0) scale(.4) } 30% { opacity: 1; transform: rotate(180deg) scale(1) } 100% { opacity: 1; transform: rotate(900deg) scale(1) } }
+  @keyframes p1 { 0%, 34% { opacity: 0; transform: translateX(40px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 46% { opacity: 0; transform: translateX(40px) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes p3 { 0%, 58% { opacity: 0; transform: translateX(40px) } 63% { opacity: 1; transform: scale(1.06) } 66%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Google · AI Community 2026</small>LLM, Agents and Agentic AI bring to the table</div>
+
+    <div class="laptop">
+      <div class="lid"><div class="screen-d">
+        <span class="key k1"></span><span class="key k2"></span><span class="key k3"></span><span class="key k4"></span>
+        <span class="key k0"><span class="galaxy"></span></span>
+      </div></div>
+      <div class="base"></div>
+    </div>
+
+    <div class="pill p1"><i>🪄</i>More creativity.</div>
+    <div class="pill p2"><i>👍</i>More impact.</div>
+    <div class="pill p3"><i>🧠</i>More possibilities.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

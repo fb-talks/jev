@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>25 · Structured handoffs</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 25 of the original deck (docs/digital-assembly-line/speaker-notes.md, "25 · Structured handoffs").
+  Statement slide for the second assembly line point: big title and the sentence
+  "The transfer of information between stations is standardized." Under it, two stations
+  pass each other the same standard package (a small JSON) along a belt.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 9s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .eyebrow { position: absolute; left: 80px; top: 64px; font-size: 22px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; opacity: 0; animation-name: eyebrow; }
+  .point { position: absolute; left: 0; right: 0; top: 190px; text-align: center; font-size: 24px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--pink); opacity: 0; animation-name: eyebrow; }
+  .title { position: absolute; left: 0; right: 0; top: 240px; margin: 0; text-align: center; font-family: var(--hand); font-size: 128px; font-weight: 400; line-height: 1.1; opacity: 0; animation-name: title; }
+  .title .underline-pink::after { width: 0; right: auto; animation-name: underline; }
+  .sub { position: absolute; left: 0; right: 0; top: 440px; text-align: center; font-size: 38px; opacity: 0; animation-name: sub; }
+  .sub b { color: var(--pink); }
+
+  /* ---------- The belt: station → package → station ---------- */
+  .belt { position: absolute; left: 520px; top: 760px; width: 880px; border-top: 4px dashed #cfd6e3; opacity: 0; animation-name: belt; }
+  .station { position: absolute; top: 650px; width: 300px; height: 210px; padding: 26px; text-align: center; opacity: 0; z-index: 1; }
+  .station i { display: block; font-style: normal; font-size: 64px; line-height: 1.2; }
+  .station b { display: block; margin-top: 8px; font-family: var(--hand); font-size: 38px; font-weight: 400; }
+  .st-a { left: 360px; animation-name: st-a; }
+  .st-b { left: 1260px; animation-name: st-b; }
+  .pkg { position: absolute; left: 680px; top: 722px; z-index: 2; font-size: 24px; padding: 10px 18px; opacity: 0; animation-name: pkg; }
+
+  /* ---------- Timeline (9s loop) ----------
+     0–4%    scene in                  4–10%  eyebrow + point label
+     8–18%   title, then pink underline (14–24%)
+     22–30%  sentence
+     30–36%  belt + station A          34–40% station B
+     42–70%  the package travels from A to B (standard format all the way)
+     94%     final frame               96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes eyebrow { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes title { 0%, 8% { opacity: 0; transform: translateY(24px) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes underline { 0%, 16% { width: 0 } 24%, 100% { width: 100% } }
+  @keyframes sub { 0%, 22% { opacity: 0; transform: translateY(14px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes belt { 0%, 30% { opacity: 0 } 36%, 100% { opacity: 1 } }
+  @keyframes st-a { 0%, 30% { opacity: 0; transform: translateY(20px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes st-b { 0%, 34% { opacity: 0; transform: translateY(20px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes pkg {
+    0%, 42% { opacity: 0; transform: translateX(0) }
+    46% { opacity: 1; transform: translateX(0) }
+    66% { opacity: 1; transform: translateX(190px) }
+    70%, 100% { opacity: 1; transform: translateX(190px) scale(1.06) }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <div class="point">Second assembly line point</div>
+    <h1 class="title"><span class="underline-pink">Structured handoffs</span></h1>
+    <div class="sub">The transfer of information between stations is <b>standardized</b>.</div>
+
+    <div class="belt"></div>
+    <div class="card station st-a"><i>🏭</i><b>Station A</b></div>
+    <div class="json pkg">{ "origin": "Milano", … }</div>
+    <div class="card station st-b"><i>🏭</i><b>Station B</b></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

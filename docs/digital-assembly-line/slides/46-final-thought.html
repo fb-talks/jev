@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>46 · AI is not the answer to everything</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 46 of the original deck (docs/digital-assembly-line/speaker-notes.md, "46 · Final thought: AI is not the answer to everything").
+  Four cards in the original 2×2 order, one at a time: explosive costs at scale, hidden environmental costs,
+  maintenance complexity, impossible debugging. The key phrase of each card is pink.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 13s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker .underline-pink { color: var(--pink); }
+  .kicker .underline-pink::after { bottom: -4px; height: 5px; width: 0; right: auto; animation-name: underline; }
+
+  .c { position: absolute; width: 800px; height: 300px; display: flex; gap: 28px; padding: 36px 40px; opacity: 0; }
+  .c .e { flex: none; font-size: 64px; line-height: 1; }
+  .c h2 { margin: 0 0 14px; font-family: var(--hand); font-size: 42px; font-weight: 400; line-height: 1.1; }
+  .c p { margin: 0; font-size: 27px; line-height: 1.42; }
+  .c b { color: var(--pink); }
+  .c1 { left: 110px; top: 250px; animation-name: c1; }
+  .c2 { left: 1010px; top: 250px; animation-name: c2; }
+  .c3 { left: 110px; top: 600px; animation-name: c3; }
+  .c4 { left: 1010px; top: 600px; animation-name: c4; }
+
+  /* ---------- Timeline (13s loop) ----------
+     0–4%    scene in        4–10%  title, "not" underlined 10–16%
+     16–22%  explosive costs at scale       34–40%  hidden environmental costs
+     52–58%  maintenance complexity         70–76%  impossible debugging
+     94%     final frame     96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes underline { 0%, 10% { width: 0 } 16%, 100% { width: 100% } }
+  @keyframes c1 { 0%, 16% { opacity: 0; transform: translateY(24px) } 22%, 100% { opacity: 1; transform: none } }
+  @keyframes c2 { 0%, 34% { opacity: 0; transform: translateY(24px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes c3 { 0%, 52% { opacity: 0; transform: translateY(24px) } 58%, 100% { opacity: 1; transform: none } }
+  @keyframes c4 { 0%, 70% { opacity: 0; transform: translateY(24px) } 76%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Final thought</small>AI is <span class="underline-pink">not</span> the answer to everything</div>
+
+    <div class="card c c1"><span class="e">💸</span><div><h2>Explosive costs at scale</h2><p>Multi-agent orchestration <b>costs more than microservices</b> and is even slower in some cases.</p></div></div>
+    <div class="card c c2"><span class="e">🌍</span><div><h2>Hidden environmental costs</h2><p>Each LLM inference <b>consumes 10–100x more energy</b> than a SQL query. Token = CO₂. The cost is not just monetary.</p></div></div>
+    <div class="card c c3"><span class="e">🔧</span><div><h2>Maintenance complexity</h2><p><b>Multiple agents = multiple failure points</b>, prompt drift, prompt versioning. The system degrades silently.</p></div></div>
+    <div class="card c c4"><span class="e">🔍</span><div><h2>Impossible debugging</h2><p>A SQL bug has a stack trace. A failing agent is a <b>black box</b>. You can't always understand why it said what it said.</p></div></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

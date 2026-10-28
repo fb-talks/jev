@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>47 · Q&amp;A</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 47 of the original deck (docs/digital-assembly-line/speaker-notes.md, "47 · Q&A").
+  Closing slide: big "Q&A" with the "what's my next task?" puppy GIF, and "Want to stay in contact…" with three
+  rows (QR code + logo) for LinkedIn, GitHub (with a Star badge) and Medium (with a claps badge).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 135px; top: 64px; font-size: 22px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+  .qa { position: absolute; left: 135px; top: 110px; margin: 0; font-family: var(--hand); font-size: 200px; font-weight: 400; line-height: 1; color: var(--pink); opacity: 0; animation-name: qa; }
+  .gif { position: absolute; left: 150px; top: 400px; padding: 18px; opacity: 0; animation-name: gif; }
+  .gif img { display: block; width: 440px; height: 440px; border-radius: 12px; }
+
+  .head { position: absolute; left: 1000px; top: 150px; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: head; }
+  .row { position: absolute; left: 1000px; width: 680px; height: 180px; display: flex; align-items: center; gap: 30px; padding: 16px 30px 16px 16px; opacity: 0; }
+  .row .qr { flex: none; width: 148px; height: 148px; }
+  .row .logo { flex: 1; height: 110px; display: grid; place-items: center; }
+  .row .logo img { max-width: 100%; max-height: 110px; }
+  .r1 { top: 250px; animation-name: r1; }
+  .r2 { top: 470px; animation-name: r2; }
+  .r3 { top: 690px; animation-name: r3; }
+  a.row { color: inherit; text-decoration: none; }
+  a.row:hover { border-color: var(--pink); }
+
+  .badge { position: absolute; left: 790px; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 12px; background: #fff; border: 1.5px solid #d5dbe6; font-size: 26px; font-weight: 600; color: #4b5563; opacity: 0; }
+  .badge span { padding: 2px 12px; border-radius: 999px; background: #eef1f6; font-variant-numeric: tabular-nums; }
+  .bd1 { top: 528px; animation-name: bd1; }
+  .bd2 { top: 748px; animation-name: bd2; }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in        4–12%  "Q&A"          10–18%  GIF
+     20–26%  "Want to stay in contact…"
+     28–36%  LinkedIn        40–48%  GitHub + Star badge (46–52)       56–64%  Medium + claps badge (62–68)
+     94%     final frame     96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes qa { 0%, 4% { opacity: 0; transform: scale(.85) } 10% { opacity: 1; transform: scale(1.04) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes gif { 0%, 10% { opacity: 0; transform: rotate(-4deg) scale(.9) } 18%, 100% { opacity: 1; transform: rotate(-2deg) } }
+  @keyframes head { 0%, 20% { opacity: 0; transform: translateY(14px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes r1 { 0%, 28% { opacity: 0; transform: translateX(30px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes r2 { 0%, 40% { opacity: 0; transform: translateX(30px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes r3 { 0%, 56% { opacity: 0; transform: translateX(30px) } 64%, 100% { opacity: 1; transform: none } }
+  @keyframes bd1 { 0%, 46% { opacity: 0; transform: scale(.8) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes bd2 { 0%, 62% { opacity: 0; transform: scale(.8) } 68%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <h1 class="qa">Q&amp;A</h1>
+    <div class="card gif"><img src="_shared/img/next-task.gif" alt="Puppy: what's my next task?"></div>
+
+    <div class="head">Want to stay in contact…</div>
+    <a class="card row r1" href="https://www.linkedin.com/in/zelda-ailine-luconi-051625123/" target="_blank" rel="noopener"><img class="qr" src="_shared/img/qr-linkedin.png" alt="LinkedIn QR code"><div class="logo"><img src="_shared/img/linkedin.png" alt="LinkedIn"></div></a>
+    <a class="card row r2" href="https://github.com/EilinLux" target="_blank" rel="noopener"><img class="qr" src="_shared/img/qr-github.png" alt="GitHub QR code"><div class="logo"><img src="_shared/img/github.png" alt="GitHub"></div></a>
+    <a class="card row r3" href="https://medium.com/@ailluzdatascience" target="_blank" rel="noopener"><img class="qr" src="_shared/img/qr-medium-profile.png" alt="Medium QR code"><div class="logo"><img src="_shared/img/medium.png" alt="Medium"></div></a>
+    <div class="badge bd1">☆ Star <span>0</span></div>
+    <div class="badge bd2">👏 <span>54</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

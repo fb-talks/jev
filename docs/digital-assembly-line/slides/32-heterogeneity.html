@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>32 · Technological heterogeneity</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 32 of the original deck (docs/digital-assembly-line/speaker-notes.md, "32 · Technological heterogeneity").
+  Statement slide for the third assembly line point: title and the sentence "Each station can use a different
+  language model, dedicated prompts, or specific tools (function calling, RAG, MCP etc.), reducing background
+  noise and optimizing the context window." Under it, three stations, each with its own model, prompt and tool
+  (illustrative: the labels are generic, not the talk's real configuration).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 80px; top: 64px; font-size: 22px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; opacity: 0; animation-name: eyebrow; }
+  .point { position: absolute; left: 0; right: 0; top: 170px; text-align: center; font-size: 24px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--pink); opacity: 0; animation-name: eyebrow; }
+  .title { position: absolute; left: 0; right: 0; top: 215px; margin: 0; text-align: center; font-family: var(--hand); font-size: 116px; font-weight: 400; line-height: 1.1; opacity: 0; animation-name: title; }
+  .title .underline-pink::after { width: 0; right: auto; animation-name: underline; }
+  .sub { position: absolute; left: 220px; right: 220px; top: 400px; text-align: center; font-size: 34px; line-height: 1.4; opacity: 0; animation-name: sub; }
+  .sub b { color: var(--pink); }
+
+  .belt { position: absolute; left: 300px; top: 770px; width: 1320px; border-top: 4px dashed #cfd6e3; opacity: 0; animation-name: belt; }
+  .st { position: absolute; top: 600px; width: 400px; padding: 24px 28px; z-index: 1; opacity: 0; }
+  .st b { display: block; font-family: var(--hand); font-size: 36px; font-weight: 400; margin-bottom: 12px; }
+  .st .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .st .chip { font-size: 21px; }
+  .st .chip--pink { background: var(--pink-bg); }
+  .s1 { left: 220px; animation-name: s1; } .s2 { left: 760px; animation-name: s2; } .s3 { left: 1300px; animation-name: s3; }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in            4–10%  eyebrow + point label
+     6–16%   title, pink underline (16–24%)
+     22–30%  sentence
+     32–38%  belt + station 1     42–48% station 2      52–58% station 3
+     94%     final frame         96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes eyebrow { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes title { 0%, 6% { opacity: 0; transform: translateY(24px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes underline { 0%, 16% { width: 0 } 24%, 100% { width: 100% } }
+  @keyframes sub { 0%, 22% { opacity: 0; transform: translateY(14px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes belt { 0%, 32% { opacity: 0 } 38%, 100% { opacity: 1 } }
+  @keyframes s1 { 0%, 32% { opacity: 0; transform: translateY(20px) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes s2 { 0%, 42% { opacity: 0; transform: translateY(20px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes s3 { 0%, 52% { opacity: 0; transform: translateY(20px) } 58%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <div class="point">Third assembly line point</div>
+    <h1 class="title"><span class="underline-pink">Technological Heterogeneity</span></h1>
+    <div class="sub">Each station can use a <b>different language model</b>, dedicated prompts, or specific tools (function calling, RAG, MCP etc.), reducing background noise and optimizing the context window.</div>
+
+    <div class="belt"></div>
+    <div class="card st s1"><b>Station 1</b><div class="chips"><span class="chip chip--pink">model A</span><span class="chip">prompt 1</span><span class="chip">function calling</span></div></div>
+    <div class="card st s2"><b>Station 2</b><div class="chips"><span class="chip chip--pink">model B</span><span class="chip">prompt 2</span><span class="chip">RAG</span></div></div>
+    <div class="card st s3"><b>Station 3</b><div class="chips"><span class="chip chip--pink">model C</span><span class="chip">prompt 3</span><span class="chip">MCP</span></div></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

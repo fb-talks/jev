@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 · The assembly line</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 12 of the original deck (docs/digital-assembly-line/speaker-notes.md, "12 · The assembly line").
+  The three main points of the talk: a 120-year-old manufacturing idea becoming the paradigm for AI systems at scale.
+  Left: the assembly line illustration and the thesis. Right: structured workflow, structured handoffs,
+  technological heterogeneity, one card at a time (what it means in a factory, then what to do with agents, in bold).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .pic { position: absolute; left: 80px; top: 230px; width: 780px; padding: 10px; opacity: 0; animation-name: pic; }
+  .pic img { display: block; width: 760px; border-radius: 16px; }
+  .thesis { position: absolute; left: 80px; top: 720px; width: 780px; margin: 0; font-family: var(--hand); font-size: 40px; line-height: 1.3; opacity: 0; animation-name: thesis; }
+  .thesis em { font-style: normal; color: var(--pink); }
+
+  .pt { position: absolute; left: 920px; width: 920px; padding: 22px 30px 22px 96px; font-size: 23px; line-height: 1.4; opacity: 0; }
+  .pt .n { position: absolute; left: 26px; top: 22px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 700; font-size: 22px; }
+  .pt h3 { margin: 0 0 6px; font-size: 30px; }
+  .pt p { margin: 0; color: #5b6475; }
+  .pt p b { color: var(--ink); }
+  .pt1 { top: 200px; animation-name: pt1; }
+  .pt2 { top: 455px; animation-name: pt2; }
+  .pt3 { top: 710px; animation-name: pt3; }
+  .pt1 .n { animation-name: n1; } .pt2 .n { animation-name: n2; } .pt3 .n { animation-name: n3; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in + kicker        4–12%  assembly line illustration
+     12–20%  thesis: a 120-year-old manufacturing idea…
+     24–30%  1 · Structured workflow          (number pink while it is the current point, 24–46%)
+     46–52%  2 · Structured handoffs          (46–68%)
+     68–74%  3 · Technological heterogeneity  (68–100%)
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes pic { 0%, 4% { opacity: 0; transform: translateY(24px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes thesis { 0%, 12% { opacity: 0 } 20%, 100% { opacity: 1 } }
+  @keyframes pt1 { 0%, 24% { opacity: 0; transform: translateX(30px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes pt2 { 0%, 46% { opacity: 0; transform: translateX(30px) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes pt3 { 0%, 68% { opacity: 0; transform: translateX(30px) } 74%, 100% { opacity: 1; transform: none } }
+  @keyframes n1 { 0%, 24% { background: var(--ink) } 26%, 46% { background: var(--pink) } 48%, 100% { background: var(--ink) } }
+  @keyframes n2 { 0%, 46% { background: var(--ink) } 48%, 68% { background: var(--pink) } 70%, 100% { background: var(--ink) } }
+  @keyframes n3 { 0%, 68% { background: var(--ink) } 70%, 100% { background: var(--pink) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Let's discuss about 3 main points of</small>The Assembly Line</div>
+
+    <div class="card pic"><img src="_shared/img/assembly-line.png" alt="Illustration: robots working along a digital assembly line"></div>
+    <p class="thesis">A <em>120-year-old</em> manufacturing idea is becoming the dominant paradigm for building AI systems at scale.</p>
+
+    <div class="card pt pt1"><span class="n">1</span><h3>Structured workflow</h3>
+      <p>Each station receives the output of its predecessor(s), applies its specific function, and passes the transformed artifact to the next station(s). <b>Split the workflow into different agents.</b></p></div>
+    <div class="card pt pt2"><span class="n">2</span><h3>Structured handoffs</h3>
+      <p>The transfer of information between stations is standardized. <b>Use <code>session.state</code> or input/output schemas</b>: clean key-value data that reduces background noise and optimizes the context window.</p></div>
+    <div class="card pt pt3"><span class="n">3</span><h3>Technological heterogeneity</h3>
+      <p>Each station can have different characteristics or tools. <b>Build your agents with different language models, dedicated prompts, or specific tools (functions, RAG, MCP, etc.).</b></p></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

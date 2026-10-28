@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>14 · Requirements &amp; UX</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 14 of the original deck (docs/digital-assembly-line/speaker-notes.md, "14 · Requirements & UX").
+  Start with the business problem: the user flowchart of the Sosta app draws itself on the right,
+  then the five requirements appear one by one on the left; MCP server and A2A protocol get a pink underline
+  (they come back later in the talk). Medium articles #0 and #1 as a chip.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+
+  /* ---------- Left: the five requirements ---------- */
+  .reqs { position: absolute; left: 80px; top: 230px; width: 920px; display: flex; flex-direction: column; gap: 18px; }
+  .req { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: start; padding: 20px 28px; opacity: 0; }
+  .req .n { font-family: var(--hand); font-size: 40px; line-height: 1; color: var(--pink); }
+  .req p { margin: 0; font-size: 26px; line-height: 1.38; }
+  .req code { font-family: var(--mono); font-size: 22px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .r1 { animation-name: r1; } .r2 { animation-name: r2; } .r3 { animation-name: r3; } .r4 { animation-name: r4; } .r5 { animation-name: r5; }
+  .key { position: relative; font-weight: 700; }
+  .key::after { content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 5px; border-radius: 3px; background: var(--pink); transform: scaleX(0); transform-origin: left; animation-name: key; }
+
+  .medium { position: absolute; left: 640px; top: 120px; display: inline-flex; align-items: center; gap: 12px; opacity: 0; animation-name: medium; }
+  .medium img { height: 28px; }
+
+  /* ---------- Right: the Sosta flowchart ---------- */
+  .flow { position: absolute; left: 1060px; top: 50px; padding: 10px; opacity: 0; animation-name: flow; }
+  .flow img { display: block; height: 900px; clip-path: inset(0 0 100% 0); animation-name: draw; }
+  .flow .label { position: absolute; left: 24px; top: 18px; font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in              4–10%  kicker
+     8–12%   flowchart card        10–28% flowchart draws top to bottom
+     26–32%  requirement 1         34–40% requirement 2       42–48% requirement 3
+     50–56%  requirement 4         58–64% requirement 5
+     66–72%  Medium chip           74–82% MCP server / A2A protocol underlined pink
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes flow { 0%, 8% { opacity: 0 } 12%, 100% { opacity: 1 } }
+  @keyframes draw { 0%, 10% { clip-path: inset(0 0 100% 0) } 28%, 100% { clip-path: inset(0 0 0 0) } }
+  @keyframes r1 { 0%, 26% { opacity: 0; transform: translateX(-24px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes r2 { 0%, 34% { opacity: 0; transform: translateX(-24px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes r3 { 0%, 42% { opacity: 0; transform: translateX(-24px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes r4 { 0%, 50% { opacity: 0; transform: translateX(-24px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes r5 { 0%, 58% { opacity: 0; transform: translateX(-24px) } 64%, 100% { opacity: 1; transform: none } }
+  @keyframes medium { 0%, 66% { opacity: 0 } 72%, 100% { opacity: 1 } }
+  @keyframes key { 0%, 74% { transform: scaleX(0) } 82%, 100% { transform: scaleX(1) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Start with the business problem</small>Requirements &amp; UX</div>
+
+    <div class="reqs">
+      <div class="card req r1"><span class="n">1</span><p><b>Registration system:</b> authenticate returning travelers or onboard new ones (before planning trips).</p></div>
+      <div class="card req r2"><span class="n">2</span><p><b>Save information on users:</b> persist user profiles (vehicle fuel/EV type, language, allergies) in a DB and synchronize when the user logs in.</p></div>
+      <div class="card req r3"><span class="n">3</span><p><b>Connect to resource(s) we do not own &amp; that may change:</b> decouple the external highway stops DB (<code>BigQuery</code>) behind an <span class="key">MCP server</span>.</p></div>
+      <div class="card req r4"><span class="n">4</span><p><b>Have reduced costs:</b> costs should be the lowest possible. So if we have parts that scale differently we may need to use an <span class="key">A2A protocol</span>.</p></div>
+      <div class="card req r5"><span class="n">5</span><p><b>Run on GCP via IaC:</b> provision managed Firestore, BigQuery, GCS etc. via Terraform IaC.</p></div>
+    </div>
+    <span class="chip medium"><img src="_shared/img/medium.png" alt="">Medium #0 &amp; #1</span>
+
+    <div class="card flow"><img src="_shared/img/flowchart.png" alt="Sosta app user flowchart"></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>40 · Testing, testing… evaluating</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 40 of the original deck (docs/digital-assembly-line/speaker-notes.md, "40 · Testing, testing… evaluating").
+  Statement slide: "Testing, Testing… Evaluating" word by word, then the sentence "Agents are non-deterministic
+  systems…". Under it, the same question is sent three times and comes back with three different answers.
+  The question and answers are illustrative, not from a real run.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 80px; top: 64px; font-size: 22px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+
+  .title { position: absolute; left: 0; right: 0; top: 170px; margin: 0; text-align: center; font-family: var(--hand); font-size: 120px; font-weight: 400; line-height: 1.1; }
+  .title span { display: inline-block; opacity: 0; }
+  .w1 { animation-name: w1; } .w2 { animation-name: w2; }
+  .w3 { color: var(--pink); animation-name: w3; }
+  .w3.underline-pink::after { width: 0; right: auto; animation-name: underline; }
+  .sub { position: absolute; left: 0; right: 0; top: 365px; text-align: center; font-size: 34px; font-weight: 600; opacity: 0; animation-name: sub; }
+
+  /* ---------- Same question, different answers ---------- */
+  .ask { position: absolute; left: 200px; top: 670px; width: 560px; padding: 28px 32px; opacity: 0; animation-name: ask; }
+  .label { font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+  .ask p { margin: 8px 0 0; font-size: 30px; font-style: italic; }
+  .runs { position: absolute; left: 770px; top: 590px; width: 180px; height: 330px; opacity: 0; animation-name: runs; }
+  .runs svg { width: 100%; height: 100%; fill: none; stroke: var(--ink); stroke-width: 3; stroke-dasharray: 8 8; }
+  .ans { position: absolute; left: 960px; width: 760px; padding: 20px 28px; display: flex; gap: 20px; align-items: center; font-size: 26px; opacity: 0; }
+  .ans b { flex: none; font-family: var(--mono); font-size: 20px; font-weight: 500; color: #8a93a6; }
+  .a1 { top: 560px; animation-name: a1; } .a2 { top: 705px; animation-name: a2; } .a3 { top: 850px; animation-name: a3; }
+  .neq { position: absolute; left: 1730px; top: 690px; font-family: var(--hand); font-size: 80px; color: var(--pink); opacity: 0; animation-name: neq; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in
+     6–12%   "Testing,"      14–20%  "Testing…"      24–32%  "Evaluating" in pink, underline 30–38%
+     36–44%  sentence: agents are non-deterministic
+     48–54%  the question     54–60%  three runs fan out
+     58–64%  answer 1         64–70%  answer 2        70–76%  answer 3
+     80–86%  pink ≠           94%  final frame        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes w1 { 0%, 6% { opacity: 0; transform: translateY(20px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes w2 { 0%, 14% { opacity: 0; transform: translateY(20px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes w3 { 0%, 24% { opacity: 0; transform: scale(.9) } 30% { opacity: 1; transform: scale(1.05) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes underline { 0%, 30% { width: 0 } 38%, 100% { width: 100% } }
+  @keyframes sub { 0%, 36% { opacity: 0; transform: translateY(14px) } 44%, 100% { opacity: 1; transform: none } }
+  @keyframes ask { 0%, 48% { opacity: 0; transform: translateX(-20px) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes runs { 0%, 54% { opacity: 0 } 60%, 100% { opacity: 1 } }
+  @keyframes a1 { 0%, 58% { opacity: 0; transform: translateX(20px) } 64%, 100% { opacity: 1; transform: none } }
+  @keyframes a2 { 0%, 64% { opacity: 0; transform: translateX(20px) } 70%, 100% { opacity: 1; transform: none } }
+  @keyframes a3 { 0%, 70% { opacity: 0; transform: translateX(20px) } 76%, 100% { opacity: 1; transform: none } }
+  @keyframes neq { 0%, 80% { opacity: 0; transform: scale(.6) } 86%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <h1 class="title"><span class="w1">Testing,</span> <span class="w2">Testing…</span> <span class="w3 underline-pink">Evaluating</span></h1>
+    <div class="sub">Agents are non-deterministic systems: even if you prompt the same question, the answer is not the same.</div>
+
+    <div class="card ask"><span class="label">Same question</span><p>"Find me a stop with EV charging"</p></div>
+    <div class="runs"><svg viewBox="0 0 180 330" preserveAspectRatio="none"><path d="M0 165 C 90 165, 90 35, 180 35"/><path d="M0 165 L 180 165"/><path d="M0 165 C 90 165, 90 295, 180 295"/></svg></div>
+    <div class="card ans a1"><b>run 1</b>Stop A has 4 EV chargers and a café.</div>
+    <div class="card ans a2"><b>run 2</b>I found 3 stops with charging: A, B and C.</div>
+    <div class="card ans a3"><b>run 3</b>Do you need a fast charger or a regular one?</div>
+    <div class="neq">≠</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

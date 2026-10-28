@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>34 · Model Context Protocol</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 34 of the original deck (docs/digital-assembly-line/speaker-notes.md, "34 · Model Context Protocol").
+  Top: definition of MCP and the Sosta App diagram rebuilt in CSS: Sosta App → Agent → MCP client ⇢ MCP ⇢
+  MCP server ⇢ BQ (db-stops), while the former direct function call (agent straight to the DB) is crossed out.
+  Bottom: the four advantages over direct function calling (DFC): framework-agnostic, infrastructure
+  flexibility, independent scalability, isolation.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .def { position: absolute; left: 1000px; top: 56px; width: 840px; margin: 0; text-align: right; font-size: 23px; line-height: 1.4; font-style: italic; color: #5b6475; opacity: 0; animation-name: def; }
+
+  /* ---------- Diagram (y 200–460) ---------- */
+  .n { position: absolute; top: 320px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 22px; font-weight: 600; opacity: 0; }
+  .n img { width: 54px; height: 54px; }
+  .n .em { font-size: 40px; line-height: 1.1; }
+  .n-app { left: 80px; width: 190px; animation-name: n1; }
+  .n-agent { left: 330px; width: 190px; animation-name: n2; }
+  .n-client { left: 600px; width: 190px; border-radius: 14px; background: #f1eefc; border: 2.5px solid #8b7fd6; animation-name: n3; }
+  .n-server { left: 910px; width: 230px; border-radius: 14px; background: var(--amber-bg); border: 2.5px solid var(--amber); animation-name: n4; }
+  .n-db { left: 1240px; width: 150px; animation-name: n5; }
+  .cyl { position: relative; width: 110px; height: 90px; }
+  .cyl::before, .cyl::after { content: ""; position: absolute; left: 0; right: 0; height: 30px; border-radius: 50%; border: 2.5px solid var(--ink); background: var(--blue-bg); }
+  .cyl::before { top: 0; z-index: 2; }
+  .cyl::after { bottom: 0; }
+  .cyl b { position: absolute; left: 0; right: 0; top: 15px; bottom: 15px; z-index: 1; border-left: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink); background: var(--blue-bg); display: grid; place-items: center; padding-top: 12px; font-size: 22px; }
+  .note { position: absolute; left: 1430px; top: 320px; width: 410px; padding: 16px 20px; font-size: 22px; line-height: 1.35; opacity: 0; animation-name: n5; }
+  .note code { font-family: var(--mono); font-weight: 700; color: var(--pink); }
+
+  .link { position: absolute; top: 378px; height: 0; border-top: 3px solid var(--ink); transform-origin: left; }
+  .link.dash { border-top-style: dashed; }
+  .link span { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); font-size: 18px; font-weight: 700; }
+  .k1 { left: 270px; width: 60px; animation-name: k1; }
+  .k2 { left: 520px; width: 80px; animation-name: k2; }
+  .k3 { left: 790px; width: 120px; animation-name: k3; }
+  .k4 { left: 1140px; width: 100px; animation-name: k4; }
+
+  /* the former direct function call: agent → DB, crossed out */
+  .former { position: absolute; left: 425px; top: 230px; width: 890px; height: 90px; border: 3px dashed var(--muted); border-bottom: 0; border-radius: 22px 22px 0 0; opacity: 0; animation-name: former; }
+  .former span { position: absolute; left: 50%; top: -18px; transform: translateX(-50%); padding: 0 12px; background: #fafbff; font-size: 20px; font-weight: 600; color: #8a93a6; white-space: nowrap; }
+  .former i { position: absolute; left: 50%; top: -8px; width: 330px; height: 4px; margin-left: -165px; border-radius: 2px; background: var(--red); transform: rotate(-6deg) scaleX(0); transform-origin: left; animation-name: strike; }
+
+  /* ---------- Cards ---------- */
+  .adv { position: absolute; width: 860px; height: 220px; padding: 22px 30px; opacity: 0; }
+  .adv b { display: block; font-size: 27px; color: var(--pink); margin-bottom: 8px; }
+  .adv p { margin: 0; font-size: 23px; line-height: 1.4; }
+  .adv strong { background: var(--pink-bg); padding: 0 4px; border-radius: 4px; }
+  .a1 { left: 80px; top: 500px; animation-name: a1; }
+  .a2 { left: 980px; top: 500px; animation-name: a2; }
+  .a3 { left: 80px; top: 740px; animation-name: a3; }
+  .a4 { left: 980px; top: 740px; animation-name: a4; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in             4–10%  definition
+     8–12%   "former direct function call" path (grey), crossed out at 30–34%
+     10–28%  diagram left to right: Sosta App, Agent, MCP client, MCP server, BQ + db-stops note
+     38–42%  framework-agnostic · 48–52% infrastructure flexibility · 58–62% independent scalability · 68–72% isolation
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes def { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes former { 0%, 8% { opacity: 0 } 12%, 100% { opacity: 1 } }
+  @keyframes strike { 0%, 30% { transform: rotate(-6deg) scaleX(0) } 34%, 100% { transform: rotate(-6deg) scaleX(1) } }
+  @keyframes n1 { 0%, 10% { opacity: 0; transform: translateY(14px) } 13%, 100% { opacity: 1; transform: none } }
+  @keyframes k1 { 0%, 12% { transform: scaleX(0) } 14%, 100% { transform: none } }
+  @keyframes n2 { 0%, 13% { opacity: 0; transform: translateY(14px) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes k2 { 0%, 16% { transform: scaleX(0) } 18%, 100% { transform: none } }
+  @keyframes n3 { 0%, 17% { opacity: 0; transform: translateY(14px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes k3 { 0%, 20% { transform: scaleX(0) } 22%, 100% { transform: none } }
+  @keyframes n4 { 0%, 21% { opacity: 0; transform: translateY(14px) } 24%, 100% { opacity: 1; transform: none } }
+  @keyframes k4 { 0%, 24% { transform: scaleX(0) } 26%, 100% { transform: none } }
+  @keyframes n5 { 0%, 25% { opacity: 0; transform: translateY(14px) } 28%, 100% { opacity: 1; transform: none } }
+  @keyframes a1 { 0%, 38% { opacity: 0; transform: translateY(18px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes a2 { 0%, 48% { opacity: 0; transform: translateY(18px) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes a3 { 0%, 58% { opacity: 0; transform: translateY(18px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes a4 { 0%, 68% { opacity: 0; transform: translateY(18px) } 72%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Third assembly line point · Technological Heterogeneity</small>Model Context Protocol</div>
+    <p class="def">The Model Context Protocol (MCP) is an open standard to standardize the way AI systems integrate and share data with external tools, systems, and data sources.</p>
+
+    <div class="former"><span>Former direct function call</span><i></i></div>
+    <div class="n n-app"><span class="em">💻</span>Sosta App</div>
+    <div class="link k1"></div>
+    <div class="n n-agent"><img src="_shared/img/agent-blue.png" alt="">Agent</div>
+    <div class="link k2"></div>
+    <div class="n n-client">MCP<br>Client</div>
+    <div class="link dash k3"><span>MCP</span></div>
+    <div class="n n-server"><span class="em">🗄️</span>MCP Server</div>
+    <div class="link dash k4"></div>
+    <div class="n n-db"><div class="cyl"><b>BQ</b></div></div>
+    <div class="card note"><code>db-stops</code>: all available dining options with coordinates and refueling types.</div>
+
+    <div class="card adv a1"><b>Fully framework-agnostic</b><p>Direct Function Calling is <strong>tied to a specific AI library/framework language</strong> (e.g. Python wrappers), MCP is not.</p></div>
+    <div class="card adv a2"><b>Infrastructure Flexibility</b><p>Unlike DFC, backend/DB <strong>updates happen strictly inside the MCP server</strong> without touching agent code.</p></div>
+    <div class="card adv a3"><b>Independent Scalability</b><p>In DFC, agent and tools share the same runtime/container, forcing monolithic scaling for heavy workloads. <strong>MCP scales independently from the Agent(s).</strong></p></div>
+    <div class="card adv a4"><b>Isolation</b><p>DFC is a shared execution environment where the agent holds full cloud/DB credentials, increasing risk during prompt injection. <strong>MCP is isolated from the Agent(s) it speaks with.</strong></p></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>30 · Why decouple?</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 30 of the original deck (docs/digital-assembly-line/speaker-notes.md, "30 · Why decouple?").
+  Statement slide: "Why should we decouple the architecture into a Distributed Multi-Agent System?"
+  Under the question, one monolithic block splits into four separate agents.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 9s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 80px; top: 64px; font-size: 22px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; opacity: 0; animation-name: eyebrow; }
+
+  .q { position: absolute; left: 100px; right: 100px; top: 220px; margin: 0; text-align: center; font-family: var(--hand); font-size: 84px; font-weight: 400; line-height: 1.2; }
+  .q > span { display: block; opacity: 0; }
+  .q .l1 { animation-name: l1; }
+  .q .l2 { animation-name: l2; }
+  .q .underline-pink::after { width: 0; right: auto; animation-name: underline; }
+
+  /* One block → four agents */
+  .mono { position: absolute; left: 660px; top: 640px; width: 600px; height: 200px; display: grid; place-items: center; border-radius: 24px; background: #eef1f6; border: 2.5px dashed var(--muted); font-size: 30px; font-weight: 600; color: #8a93a6; opacity: 0; animation-name: mono; }
+  .ag { position: absolute; top: 660px; width: 230px; height: 160px; padding: 22px 0; text-align: center; opacity: 0; }
+  .ag img { width: 72px; height: 72px; }
+  .ag b { display: block; margin-top: 6px; font-family: var(--hand); font-size: 30px; font-weight: 400; }
+  .a1 { left: 470px; animation-name: a1; } .a2 { left: 730px; animation-name: a2; } .a3 { left: 990px; animation-name: a3; } .a4 { left: 1250px; animation-name: a4; }
+  .a1, .a2, .a3, .a4 { border: 2.5px solid var(--pink); }
+
+  /* ---------- Timeline (9s loop) ----------
+     0–4%    scene in             4–10%  eyebrow
+     6–16%   question, line 1     16–26% line 2, then pink underline (26–34%)
+     36–42%  the monolith         48–54% it fades while the four agents spread out (50–66%)
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes eyebrow { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes l1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes l2 { 0%, 16% { opacity: 0; transform: translateY(24px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes underline { 0%, 26% { width: 0 } 34%, 100% { width: 100% } }
+  @keyframes mono { 0%, 36% { opacity: 0; transform: scale(.95) } 42%, 48% { opacity: 1; transform: none } 54%, 100% { opacity: 0; transform: scale(1.04) } }
+  @keyframes a1 { 0%, 50% { opacity: 0; transform: translateX(300px) } 58%, 100% { opacity: 1; transform: none } }
+  @keyframes a2 { 0%, 52% { opacity: 0; transform: translateX(100px) } 60%, 100% { opacity: 1; transform: none } }
+  @keyframes a3 { 0%, 54% { opacity: 0; transform: translateX(-100px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes a4 { 0%, 56% { opacity: 0; transform: translateX(-300px) } 64%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <h1 class="q"><span class="l1">Why should we decouple the architecture</span><span class="l2">into a <span class="underline-pink">Distributed Multi-Agent System</span>?</span></h1>
+
+    <div class="mono">one monolithic agent</div>
+    <div class="card ag a1"><img src="_shared/img/robot-head.png" alt=""><b>Agent 1</b></div>
+    <div class="card ag a2"><img src="_shared/img/robot-head.png" alt=""><b>Agent 2</b></div>
+    <div class="card ag a3"><img src="_shared/img/robot-head.png" alt=""><b>Agent 3</b></div>
+    <div class="card ag a4"><img src="_shared/img/robot-head.png" alt=""><b>Agent 4</b></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>19 · Concept 1: LlmAgent</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 19 of the original deck (docs/digital-assembly-line/speaker-notes.md, "19 · Concept 1: LlmAgent").
+  Left: what an LlmAgent is (identity, brain, behavior, tools and helpers). Right: the Gatekeeper agent of
+  branch 02b-multi-agent-workflow. Each property appears on the left while the matching lines light up in the code.
+  The branch chip links to the repo branch.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 28px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .branch { position: absolute; right: 80px; top: 92px; padding: 14px 24px; border-radius: 999px; background: #1e2230; color: #f7c97e; font-family: var(--mono); font-size: 20px; text-decoration: none; opacity: 0; animation-name: kicker; }
+  .branch:hover { color: #fff; }
+
+  /* ---------- Left: the properties ---------- */
+  .props { position: absolute; left: 80px; top: 210px; width: 680px; padding: 32px 36px; }
+  .props > p { margin: 0 0 18px; font-size: 25px; line-height: 1.4; opacity: 0; animation-name: intro; }
+  .props ul { margin: 0; padding: 0; list-style: none; }
+  .props li { position: relative; margin-top: 18px; padding-left: 26px; font-size: 23px; line-height: 1.4; opacity: 0; }
+  .props li::before { content: ""; position: absolute; left: 0; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+  .props code { font-family: var(--mono); font-size: 20px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .i1 { animation-name: i1; } .i2 { animation-name: i2; } .i3 { animation-name: i3; } .i4 { animation-name: i4; }
+
+  /* ---------- Right: the code ---------- */
+  .editor { position: absolute; left: 800px; top: 210px; width: 1040px; padding: 22px 30px 26px; border-radius: 24px; background: #1e2230; color: #e7e9f0; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); border: 2px solid var(--pink); opacity: 0; animation-name: editor; }
+  .tab { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .tab i { width: 13px; height: 13px; border-radius: 50%; background: #ff5f57; }
+  .tab i:nth-child(2) { background: #febc2e; } .tab i:nth-child(3) { background: #28c840; }
+  .tab span { margin-left: 12px; font-family: var(--mono); font-size: 20px; color: #f7c97e; }
+  .src { font-family: var(--mono); font-size: 20px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .k { color: #9db7ff; } .s { color: #a8dba8; } .p { color: var(--pink); }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; } .g4 { animation-name: g4; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in              4–10%  kicker + branch chip
+     8–14%   code card             12–18% intro sentence
+     20–26%  Identity  (name, description lit 22–34%)
+     34–40%  Brain     (model lit 36–48%)
+     48–54%  Behavior  (instruction lit 50–62%)
+     62–68%  Tools and helpers (tools, sub_agents lit 64–80%)
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes editor { 0%, 8% { opacity: 0; transform: translateX(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes intro { 0%, 12% { opacity: 0 } 18%, 100% { opacity: 1 } }
+  @keyframes i1 { 0%, 20% { opacity: 0; transform: translateX(-20px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes i2 { 0%, 34% { opacity: 0; transform: translateX(-20px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes i3 { 0%, 48% { opacity: 0; transform: translateX(-20px) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes i4 { 0%, 62% { opacity: 0; transform: translateX(-20px) } 68%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 22% { background: transparent; box-shadow: inset 4px 0 0 transparent } 24%, 32% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 34%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 36% { background: transparent; box-shadow: inset 4px 0 0 transparent } 38%, 46% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 48%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g3 { 0%, 50% { background: transparent; box-shadow: inset 4px 0 0 transparent } 52%, 60% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 62%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g4 { 0%, 64% { background: transparent; box-shadow: inset 4px 0 0 transparent } 66%, 78% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 80%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 1</small>What is an <em>LlmAgent</em> class?</div>
+    <a class="branch" href="https://github.com/EilinLux/adk2.0-medium/tree/02b-multi-agent-workflow" target="_blank" rel="noopener">02b-multi-agent-workflow · Art #2b</a>
+
+    <div class="card props">
+      <p>In ADK, an agent is a <b>declarative blueprint</b> (<code>LlmAgent</code>):</p>
+      <ul>
+        <li class="i1"><b>Identity</b> (<code>name</code> &amp; <code>description</code>): in a multi-agent system, <b>the parent agent reads each child's <code>description</code></b> to decide who gets the task!</li>
+        <li class="i2"><b>Brain</b> (<code>model</code>): decoupled model identifier (e.g. <code>gemini-2.5-flash</code>).</li>
+        <li class="i3"><b>Behavior</b> (<code>instruction</code>): system prompt supporting live <code>{state_key}</code> interpolation.</li>
+        <li class="i4"><b>Tools and helpers</b> (<code>tools</code> and <code>sub_agents</code>): supporting the agent in doing its tasks.</li>
+      </ul>
+    </div>
+
+    <div class="editor">
+      <div class="tab"><i></i><i></i><i></i><span>adk_agent_app/agent.py (Branch 02b-multi-agent-workflow)</span></div>
+      <div class="src">
+        <div class="l"><span class="k">from</span> google.adk.agents <span class="k">import</span> LlmAgent</div>
+        <div class="l"> </div>
+        <div class="l">root_agent = Agent(</div>
+        <div class="l grp g1">    <span class="p">name</span>=<span class="s">"Gatekeeper"</span>,</div>
+        <div class="l grp g2">    <span class="p">model</span>=<span class="s">"gemini-2.5-flash"</span>,</div>
+        <div class="l grp g1">    description=<span class="s">"Root agent for the Sosta app"</span>,</div>
+        <div class="grp g3">
+          <div class="l">    <span class="p">instruction</span>=<span class="s">"""</span></div>
+          <div class="l"><span class="s">    You are the welcoming Gatekeeper of the Sosta app.</span></div>
+          <div class="l"> </div>
+          <div class="l"><span class="s">    1. Greet the user politely and ask if they are already registered.</span></div>
+          <div class="l"><span class="s">    2. IF YES: Ask for their User ID and use 'is_registered_user_tool'</span></div>
+          <div class="l"><span class="s">       to check it.</span></div>
+          <div class="l"><span class="s">       - If it exists, transfer them to the 'Cameriere'.</span></div>
+          <div class="l"><span class="s">       - If not, inform them there was an error and ask to try again.</span></div>
+          <div class="l"><span class="s">    3. IF NO: Ask if they want to register.</span></div>
+          <div class="l"><span class="s">       - If yes, transfer them to the 'Registratore'.</span></div>
+          <div class="l"><span class="s">       - If no, politely say goodbye and end the conversation.</span></div>
+          <div class="l"><span class="s">    """</span>,</div>
+        </div>
+        <div class="grp g4">
+          <div class="l">    <span class="p">tools=[is_registered_user_tool],</span></div>
+          <div class="l">    <span class="p">sub_agents=[registratore_agent, cameriere_agent]</span></div>
+        </div>
+        <div class="l">)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

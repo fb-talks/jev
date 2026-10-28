@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>04 · Who am I</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 04 of the original deck (docs/digital-assembly-line/speaker-notes.md, "04 · Who am I").
+  The speaker: 8+ years in Cloud, Data and AI, the career steps one after the other as a timeline
+  (role in pink, company in bold), what she loves, and the "I am not Zelda…" cartoon on the right.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .intro { position: absolute; left: 135px; top: 210px; font-size: 32px; font-weight: 600; opacity: 0; animation-name: intro; }
+  .intro em { font-style: normal; color: var(--pink); }
+
+  .steps { position: absolute; left: 135px; top: 280px; width: 1000px; margin: 0; padding: 0 0 0 44px; list-style: none; border-left: 4px solid var(--line); }
+  .steps li { position: relative; margin: 0 0 18px; font-size: 29px; line-height: 1.35; opacity: 0; }
+  .steps li::before { content: ""; position: absolute; left: -58px; top: 9px; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 4px solid var(--muted); }
+  .steps li.now::before { border-color: var(--pink); background: var(--pink); }
+  .steps em { font-style: normal; color: var(--pink); font-weight: 700; }
+  .s1 { animation-name: s1; } .s2 { animation-name: s2; } .s3 { animation-name: s3; }
+  .s4 { animation-name: s4; } .s5 { animation-name: s5; } .s6 { animation-name: s6; }
+
+  .love { position: absolute; left: 135px; top: 780px; width: 1000px; font-size: 27px; line-height: 1.4; padding: 22px 30px; opacity: 0; animation-name: love; }
+
+  .pic { position: absolute; left: 1200px; top: 300px; width: 640px; height: 482px; overflow: hidden; padding: 0; background: #b5e3dc; opacity: 0; animation-name: pic; }
+  .pic img { display: block; width: 640px; }
+  .bubble { position: absolute; left: 1150px; top: 170px; padding: 22px 34px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); font-family: var(--hand); font-size: 42px; text-align: center; line-height: 1.1; z-index: 2; opacity: 0; animation-name: bubble; }
+  .bubble::after { content: ""; position: absolute; right: 30px; bottom: -26px; width: 30px; height: 30px; background: #fff; border-right: 3px solid var(--ink); border-bottom: 3px solid var(--ink); transform: skewX(30deg) rotate(30deg); }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in + kicker (name)
+     4–10%   cartoon             10–16% "I am not Zelda…" bubble pops
+     16–20%  "Over 8 years…"
+     22–62%  six career steps, one every ~8% (the last one, the current job, with a pink dot)
+     70–76%  "I love eating, traveling…"
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes pic { 0%, 4% { opacity: 0; transform: translateY(20px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes bubble { 0%, 10% { opacity: 0; transform: scale(.6) } 14% { opacity: 1; transform: scale(1.06) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes intro { 0%, 16% { opacity: 0 } 20%, 100% { opacity: 1 } }
+  @keyframes s1 { 0%, 22% { opacity: 0; transform: translateX(-16px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes s2 { 0%, 29% { opacity: 0; transform: translateX(-16px) } 33%, 100% { opacity: 1; transform: none } }
+  @keyframes s3 { 0%, 36% { opacity: 0; transform: translateX(-16px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes s4 { 0%, 43% { opacity: 0; transform: translateX(-16px) } 47%, 100% { opacity: 1; transform: none } }
+  @keyframes s5 { 0%, 50% { opacity: 0; transform: translateX(-16px) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes s6 { 0%, 57% { opacity: 0; transform: translateX(-16px) } 61%, 100% { opacity: 1; transform: none } }
+  @keyframes love { 0%, 70% { opacity: 0; transform: translateY(16px) } 76%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Who Am I</small>Zelda Ailine Luconi</div>
+
+    <div class="intro">Over <em>8 years</em> of experience in Cloud, Data, and AI.</div>
+    <ul class="steps">
+      <li class="s1">started as a <em>researcher</em> at the <b>University of Florence</b>.</li>
+      <li class="s2">worked for 3 years as an <em>AI Engineer</em> at <b>Samsung</b>.</li>
+      <li class="s3">then in consulting at <b>xTech BIP</b> as a <em>Data &amp; Cloud Engineer</em>.</li>
+      <li class="s4">collaborated with <b>CNR</b> (National Research Council).</li>
+      <li class="s5 now">currently working as a <em>Senior AI &amp; Cloud Architect</em> at <b>Datwave</b> (Google Partner).</li>
+      <li class="s6">collaborating as <em>Tech Speaker and Writer</em> at <b>Google</b> Events, <b>Coderful</b> Catania and many more.</li>
+    </ul>
+    <div class="card love">I love <b>eating, traveling</b>, and learning new <b>languages</b> — not only natural ones, but also programming languages.</div>
+
+    <div class="card pic"><img src="_shared/img/link.gif" alt="Cartoon of Link from Zelda"></div>
+    <div class="bubble">I am not<br>Zelda….</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

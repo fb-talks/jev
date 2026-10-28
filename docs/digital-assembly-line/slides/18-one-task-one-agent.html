@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>18 · One task, one agent</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 18 of the original deck (docs/digital-assembly-line/speaker-notes.md, "18 · One task, one agent").
+  First assembly line point. Left: "Divide the experience: one task, one agent" and the microservices analogy.
+  Right: the Sosta flowchart, split into four agents: Gatekeeper, Registratore, Cameriere and Suggeritore
+  are drawn on it one by one as dashed pink areas. "Let's talk code" badge of the original as a chip.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+
+  /* ---------- Left: the idea ---------- */
+  .idea { position: absolute; left: 80px; top: 270px; width: 840px; padding: 44px 50px; text-align: center; opacity: 0; animation-name: idea; }
+  .idea .emo { font-size: 64px; line-height: 1; }
+  .idea h2 { margin: 18px 0 0; font-family: var(--hand); font-size: 56px; font-weight: 400; line-height: 1.15; color: var(--pink); }
+  .idea h3 { margin: 4px 0 0; font-family: var(--hand); font-size: 56px; font-weight: 400; line-height: 1.15; opacity: 0; animation-name: one; }
+  .idea p { margin: 30px 0 0; font-size: 30px; line-height: 1.4; color: #5b6475; opacity: 0; animation-name: para; }
+  .idea p b { color: var(--ink); }
+  .talk { position: absolute; left: 80px; top: 860px; padding: 12px 24px; border-radius: 999px; background: var(--ink); color: #fff; font-family: var(--hand); font-size: 30px; opacity: 0; animation-name: talk; }
+
+  /* ---------- Right: the flowchart split into agents (drawn in the image's own 1100×1416 px, scaled) ---------- */
+  .flow { position: absolute; left: 990px; top: 40px; width: 768px; height: 984px; padding: 10px; opacity: 0; animation-name: flow; }
+  .fc { position: absolute; left: 10px; top: 10px; width: 1100px; height: 1416px; transform: scale(.68); transform-origin: 0 0; }
+  .fc img { position: absolute; inset: 0; width: 1100px; height: 1416px; }
+  .zone { position: absolute; border: 5px dashed var(--pink); border-radius: 30px; background: rgba(255,0,191,.05); opacity: 0; }
+  .zone b { position: absolute; padding: 6px 26px; border-radius: 999px; background: #fff; border: 4px solid var(--pink); font-family: var(--hand); font-size: 40px; font-weight: 400; white-space: nowrap; }
+  .z1 { left: 222px; top: 4px; width: 660px; height: 470px; animation-name: z1; }
+  .z1 b { right: -20px; top: -10px; }
+  .z2 { left: 26px; top: 372px; width: 262px; height: 512px; animation-name: z2; }
+  .z2 b { left: 20px; bottom: -36px; }
+  .z3 { left: 612px; top: 496px; width: 322px; height: 330px; animation-name: z3; }
+  .z3 b { left: -260px; top: 60px; }
+  .z4 { left: 602px; top: 852px; width: 494px; height: 556px; animation-name: z4; }
+  .z4 b { left: -270px; top: 300px; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in                 4–10%  kicker
+     6–12%   flowchart                10–18% idea card + "Divide the experience"
+     18–24%  "one task, one agent."   26–32% microservices sentence
+     36–42%  Gatekeeper   46–52% Registratore   56–62% Cameriere   66–72% Suggeritore
+     78–84%  "Let's talk code"
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes flow { 0%, 6% { opacity: 0 } 12%, 100% { opacity: 1 } }
+  @keyframes idea { 0%, 10% { opacity: 0; transform: translateY(20px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes one { 0%, 18% { opacity: 0; transform: scale(.9) } 24%, 100% { opacity: 1; transform: none } }
+  @keyframes para { 0%, 26% { opacity: 0 } 32%, 100% { opacity: 1 } }
+  @keyframes z1 { 0%, 36% { opacity: 0; transform: scale(1.04) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes z2 { 0%, 46% { opacity: 0; transform: scale(1.04) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes z3 { 0%, 56% { opacity: 0; transform: scale(1.04) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes z4 { 0%, 66% { opacity: 0; transform: scale(1.04) } 72%, 100% { opacity: 1; transform: none } }
+  @keyframes talk { 0%, 78% { opacity: 0; transform: translateY(12px) } 84%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>First assembly line point</small>Structured workflow</div>
+
+    <div class="card idea">
+      <div class="emo">🛠️🤖</div>
+      <h2>Divide the experience:</h2>
+      <h3><span class="underline-pink">one task, one agent.</span></h3>
+      <p>It is the <b>microservices paradigm applied to AI</b>: small, autonomous, and hyper-specialized modules collaborating to solve a complex problem.</p>
+    </div>
+    <div class="talk">Let's talk code</div>
+
+    <div class="card flow">
+      <div class="fc">
+        <img src="_shared/img/flowchart.png" alt="Sosta app user flowchart">
+        <div class="zone z1"><b>Gatekeeper</b></div>
+        <div class="zone z2"><b>Registratore</b></div>
+        <div class="zone z3"><b>Cameriere</b></div>
+        <div class="zone z4"><b>Suggeritore</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

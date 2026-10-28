@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>29 · Demo time: session state</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 29 of the original deck (docs/digital-assembly-line/speaker-notes.md, "29 · Demo time: session state").
+  Second demo: the three things to watch (four persistence scopes, instruction injection with the optional ?,
+  context hydration, with Firestore as external storage), and the QR code + links to the two repo branches
+  03a-session-state and 03d-session-state-sostaapp.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .items { position: absolute; left: 80px; top: 230px; width: 1060px; display: flex; flex-direction: column; gap: 24px; }
+  .item { display: flex; gap: 24px; align-items: flex-start; padding: 26px 32px; opacity: 0; }
+  .item i { flex: none; font-style: normal; font-size: 46px; line-height: 1; }
+  .item p { margin: 0; font-size: 27px; line-height: 1.4; }
+  .item b { display: block; font-size: 30px; margin-bottom: 4px; }
+  .item code { font-family: var(--mono); font-size: 25px; color: var(--pink); }
+  .item em { color: #5b6475; }
+  .i1 { animation-name: i1; } .i2 { animation-name: i2; } .i3 { animation-name: i3; }
+
+  /* Firestore: a small database cylinder next to "context hydration" */
+  .db { position: relative; flex: none; margin-left: auto; width: 170px; height: 110px; align-self: center; }
+  .db::before, .db::after { content: ""; position: absolute; left: 0; right: 0; border: 2.5px solid var(--ink); border-radius: 50%; height: 36px; background: var(--amber-bg); }
+  .db::before { top: 0; z-index: 1; }
+  .db::after { bottom: 0; }
+  .db span { position: absolute; left: 0; right: 0; top: 18px; bottom: 18px; border-left: 2.5px solid var(--ink); border-right: 2.5px solid var(--ink); background: var(--amber-bg); display: grid; place-items: center; z-index: 2; padding-top: 14px; font-weight: 700; font-size: 22px; }
+
+  /* ---------- Right: QR + branches ---------- */
+  .qr { position: absolute; left: 1250px; top: 200px; width: 520px; padding: 30px; text-align: center; opacity: 0; animation-name: qr; }
+  .qr img { display: block; width: 400px; height: 400px; margin: 0 auto; }
+  .qr .label { margin-top: 14px; font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+  .branches { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+  .branches a { display: block; padding: 12px 16px; border-radius: 12px; background: #1f1f1f; color: #ffd166; font-family: var(--mono); font-size: 22px; text-decoration: none; }
+  .branches a.main { box-shadow: 0 0 0 3px var(--pink); }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in                 6–12%  QR card + branch links
+     14–20%  persistence scopes       30–36% instruction injection     46–52% context hydration + Firestore
+     94%     final frame              96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes qr { 0%, 6% { opacity: 0; transform: scale(.94) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes i1 { 0%, 14% { opacity: 0; transform: translateX(-24px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes i2 { 0%, 30% { opacity: 0; transform: translateX(-24px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes i3 { 0%, 46% { opacity: 0; transform: translateX(-24px) } 52%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Google · AI Community 2026</small>Demo time: session state</div>
+
+    <div class="items">
+      <div class="card item i1"><i>🗂️</i><p><b>The Four Persistence Scopes</b>prefixed keys (<code>user:</code>, <code>app:</code>, <code>temp:</code>) for scoped variables.</p></div>
+      <div class="card item i2"><i>💉</i><p><b>Instruction Injection</b>master the <code>{variable}</code> template syntax. <em>Note: optional flags (<code>?</code>) prevent runtime <code>KeyError</code> crashes.</em></p></div>
+      <div class="card item i3"><i>💧</i><p><b>Context Hydration</b>how to add information to the Agent Context.</p><div class="db"><span>Firestore</span></div></div>
+    </div>
+
+    <div class="card qr">
+      <img src="_shared/img/qr-03d.png" alt="QR code: repo branch 03d-session-state-sostaapp">
+      <div class="label">Scan · branch 03d</div>
+      <div class="branches">
+        <a href="https://github.com/EilinLux/adk2.0-medium/tree/03a-session-state" target="_blank" rel="noopener">03a-session-state</a>
+        <a class="main" href="https://github.com/EilinLux/adk2.0-medium/tree/03d-session-state-sostaapp" target="_blank" rel="noopener">03d-session-state-sostaapp</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

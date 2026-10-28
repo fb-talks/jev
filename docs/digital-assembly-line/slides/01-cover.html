@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>01 · The digital assembly line</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Cover of the talk (docs/digital-assembly-line/speaker-notes.md, "01 · Cover"), from slide 1 of the original deck.
+  Left: event, title on three lines, speaker and a Start button that opens the next slide (data-next, set by anim.js).
+  Right: the assembly line in miniature: a request enters, passes four agent stations one after the other
+  and comes out as a finished answer.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Left: event, title, speaker, Start ---------- */
+  .eyebrow { position: absolute; left: 135px; top: 230px; display: flex; align-items: center; gap: 16px; font-size: 22px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #8a93a6; opacity: 0; animation-name: eyebrow; }
+  .eyebrow img { height: 40px; }
+  .title { position: absolute; left: 135px; top: 290px; width: 900px; margin: 0; font-family: var(--hand); font-size: 92px; font-weight: 400; line-height: 1.12; }
+  .title span { display: block; opacity: 0; }
+  .title .l1 { animation-name: line1; }
+  .title .l2 { animation-name: line2; }
+  .title .l2 em { font-style: normal; color: var(--pink); }
+  .sub { position: absolute; left: 135px; top: 545px; width: 860px; font-size: 32px; line-height: 1.35; color: #5b6475; opacity: 0; animation-name: sub; }
+  .sub b { color: var(--ink); }
+  .speaker { position: absolute; left: 135px; top: 680px; opacity: 0; animation-name: speaker; }
+  .speaker b { display: block; font-size: 32px; }
+  .speaker span { font-size: 24px; color: #8a93a6; }
+  .start {
+    position: absolute; left: 135px; top: 800px; display: inline-flex; align-items: center; gap: 16px; padding: 22px 44px;
+    border-radius: 999px; background: var(--pink); color: #fff; text-decoration: none; font-size: 32px; font-weight: 700;
+    box-shadow: 0 18px 36px -18px rgba(255,0,191,.7); opacity: 0; animation-name: start; transition: filter .2s;
+  }
+  .start:hover { filter: brightness(1.08); }
+  .start svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- Right: the line, top to bottom ---------- */
+  .label { position: absolute; font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+  .belt { position: absolute; left: 1395px; top: 150px; width: 0; height: 790px; border-left: 4px dashed #cfd6e3; opacity: 0; animation-name: belt; }
+  .in, .out { position: absolute; left: 1180px; width: 450px; padding: 22px 30px; opacity: 0; }
+  .in { top: 110px; animation-name: in; }
+  .in p { margin: 6px 0 0; font-size: 24px; font-style: italic; }
+  .in .label, .out .label { position: static; }
+  .station { position: absolute; left: 1220px; width: 350px; height: 104px; display: flex; align-items: center; gap: 20px; padding: 0 26px; opacity: 0; }
+  .station i { font-style: normal; font-size: 40px; }
+  .station b { font-family: var(--hand); font-size: 36px; font-weight: 400; }
+  .station small { display: block; font-size: 19px; color: #8a93a6; font-family: var(--sans); }
+  .s1 { top: 290px; animation-name: s1; } .s2 { top: 420px; animation-name: s2; } .s3 { top: 550px; animation-name: s3; } .s4 { top: 680px; animation-name: s4; }
+  .out { top: 830px; border: 2.5px solid var(--pink); animation-name: out; }
+  .out p { margin: 6px 0 0; font-size: 26px; font-weight: 600; }
+  .dot { position: absolute; left: 1384px; top: 215px; width: 26px; height: 26px; border-radius: 50%; background: var(--pink); opacity: 0; animation-name: dot; }
+  .in, .out, .station { z-index: 1; }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in             4–8%   eyebrow
+     6–12%   title, first line    12–18% second line      20–26% subtitle
+     26–32%  speaker              32–38% Start button
+     8–12%   request card + belt
+     14–40%  the four stations light up, one every ~7%, as the dot moves down the belt (14–72%)
+     72–78%  answer card, pink: the finished product
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes eyebrow { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
+  @keyframes line1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes line2 { 0%, 12% { opacity: 0; transform: translateY(24px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes sub { 0%, 20% { opacity: 0 } 26%, 100% { opacity: 1 } }
+  @keyframes speaker { 0%, 26% { opacity: 0; transform: translateY(14px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes start { 0%, 32% { opacity: 0; transform: scale(.9) } 36% { opacity: 1; transform: scale(1.04) } 38%, 100% { opacity: 1; transform: none } }
+
+  @keyframes belt { 0%, 8% { opacity: 0 } 12%, 100% { opacity: 1 } }
+  @keyframes in { 0%, 8% { opacity: 0; transform: translateY(20px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes s1 { 0%, 14% { opacity: 0; transform: translateX(30px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes s2 { 0%, 26% { opacity: 0; transform: translateX(30px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes s3 { 0%, 38% { opacity: 0; transform: translateX(30px) } 44%, 100% { opacity: 1; transform: none } }
+  @keyframes s4 { 0%, 50% { opacity: 0; transform: translateX(30px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes dot {
+    0%, 14% { opacity: 0; transform: none }
+    15% { opacity: 1; transform: none }
+    72% { opacity: 1; transform: translateY(600px) }
+    74%, 100% { opacity: 0; transform: translateY(600px) }
+  }
+  @keyframes out { 0%, 72% { opacity: 0; transform: translateY(20px) } 78%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow"><img src="_shared/img/ai-community.png" alt="">Google · AI Community 2026</div>
+    <h1 class="title"><span class="l1">The digital</span><span class="l2"><em class="underline-pink">assembly line</em></span></h1>
+    <div class="sub">Designing <b>AI agents</b> that work like <b>Ford's factory</b></div>
+    <div class="speaker"><b>Zelda Ailine Luconi</b><span>Senior Cloud Architect, Datwave</span></div>
+    <a class="start" href="02-what-we-do.html" data-next>Start <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+
+    <div class="belt"></div>
+    <div class="card in"><span class="label">Request</span><p>"Find the best stops for my trip"</p></div>
+    <div class="card station s1"><i>🚪</i><b>Gatekeeper<small>checks who you are</small></b></div>
+    <div class="card station s2"><i>📝</i><b>Registratore<small>saves your profile</small></b></div>
+    <div class="card station s3"><i>🍽️</i><b>Cameriere<small>takes your order</small></b></div>
+    <div class="card station s4"><i>🧭</i><b>Suggeritore<small>plans the stops</small></b></div>
+    <div class="dot"></div>
+    <div class="card out"><span class="label">Answer</span><p>3 stops on your route ✓</p></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

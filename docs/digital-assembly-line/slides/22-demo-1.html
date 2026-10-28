@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>22 · Demo time: multi-agent workflow</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 22 of the original deck (docs/digital-assembly-line/speaker-notes.md, "22 · Demo time: multi-agent workflow").
+  The demo checklist (folder structure, adk web, Gatekeeper/Registratore/Cameriere workflow, tools and sub-agents)
+  ticked one item at a time, next to the QR code of branch 02b-multi-agent-workflow (also a link).
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+
+  .big { position: absolute; left: 135px; top: 230px; margin: 0; font-family: var(--hand); font-size: 110px; font-weight: 400; line-height: 1; opacity: 0; animation-name: big; }
+  .big em { font-style: normal; color: var(--pink); }
+
+  /* ---------- Checklist ---------- */
+  .list { position: absolute; left: 135px; top: 400px; width: 960px; margin: 0; padding: 0; list-style: none; }
+  .list li { display: grid; grid-template-columns: 56px 1fr; gap: 20px; align-items: start; margin-bottom: 30px; font-size: 36px; line-height: 1.3; opacity: 0; }
+  .list li i { position: relative; width: 48px; height: 48px; margin-top: 0; border-radius: 12px; border: 3px solid #cfd6e3; background: #fff; }
+  .list li i::after { content: ""; position: absolute; left: 13px; top: 3px; width: 13px; height: 25px; border: solid var(--pink); border-width: 0 6px 6px 0; transform: rotate(45deg) scale(0); }
+  .list code { font-family: var(--mono); font-size: 32px; font-weight: 700; background: var(--stage); padding: 2px 10px; border-radius: 8px; }
+  .c1 { animation-name: c1; } .c2 { animation-name: c2; } .c3 { animation-name: c3; } .c4 { animation-name: c4; }
+  .c1 i::after { animation-name: k1; } .c2 i::after { animation-name: k2; } .c3 i::after { animation-name: k3; } .c4 i::after { animation-name: k4; }
+
+  /* ---------- QR ---------- */
+  .qr { position: absolute; left: 1290px; top: 210px; width: 470px; height: 470px; padding: 25px; opacity: 0; animation-name: qr; }
+  .qr img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  .corner { position: absolute; width: 60px; height: 60px; border: 0 solid var(--pink); opacity: 0; animation-name: corner; }
+  .tl { left: -24px; top: -24px; border-width: 6px 0 0 6px; border-radius: 14px 0 0 0; }
+  .tr { right: -24px; top: -24px; border-width: 6px 6px 0 0; border-radius: 0 14px 0 0; }
+  .bl { left: -24px; bottom: -24px; border-width: 0 0 6px 6px; border-radius: 0 0 0 14px; }
+  .br { right: -24px; bottom: -24px; border-width: 0 6px 6px 0; border-radius: 0 0 14px 0; }
+  .branch { position: absolute; left: 1290px; top: 730px; width: 470px; padding: 16px 24px; border-radius: 999px; background: #1e2230; color: #f7c97e; text-align: center; font-family: var(--mono); font-size: 20px; text-decoration: underline; opacity: 0; animation-name: branch; }
+  .branch:hover { color: #fff; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in              4–10%  kicker      6–14% "Demo time"
+     12–20%  QR card, 18–24% pink scan corners          22–28% branch link
+     30–36%  item 1 (ticked 36–40)  42–48% item 2 (48–52)  54–60% item 3 (60–64)  66–72% item 4 (72–76)
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes big { 0%, 6% { opacity: 0; transform: scale(.9) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes qr { 0%, 12% { opacity: 0; transform: scale(.9) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes corner { 0%, 18% { opacity: 0; transform: scale(1.4) } 24%, 100% { opacity: 1; transform: none } }
+  @keyframes branch { 0%, 22% { opacity: 0 } 28%, 100% { opacity: 1 } }
+  @keyframes c1 { 0%, 30% { opacity: 0; transform: translateX(-20px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes c2 { 0%, 42% { opacity: 0; transform: translateX(-20px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes c3 { 0%, 54% { opacity: 0; transform: translateX(-20px) } 60%, 100% { opacity: 1; transform: none } }
+  @keyframes c4 { 0%, 66% { opacity: 0; transform: translateX(-20px) } 72%, 100% { opacity: 1; transform: none } }
+  @keyframes k1 { 0%, 36% { transform: rotate(45deg) scale(0) } 40%, 100% { transform: rotate(45deg) scale(1) } }
+  @keyframes k2 { 0%, 48% { transform: rotate(45deg) scale(0) } 52%, 100% { transform: rotate(45deg) scale(1) } }
+  @keyframes k3 { 0%, 60% { transform: rotate(45deg) scale(0) } 64%, 100% { transform: rotate(45deg) scale(1) } }
+  @keyframes k4 { 0%, 72% { transform: rotate(45deg) scale(0) } 76%, 100% { transform: rotate(45deg) scale(1) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Google · AI Community 2026</small>Multi-agent workflow</div>
+    <h1 class="big"><em class="underline-pink">Demo time</em>:</h1>
+
+    <ul class="list">
+      <li class="c1"><i></i><span><b>Agent folder</b> structure</span></li>
+      <li class="c2"><i></i><span>Run <code>adk web</code> command</span></li>
+      <li class="c3"><i></i><span><b><em>Multi-agent workflows</em></b> with Gatekeeper, Registratore and Cameriere</span></li>
+      <li class="c4"><i></i><span><b><em>Tools and sub-agents</em></b></span></li>
+    </ul>
+
+    <div class="card qr">
+      <img src="_shared/img/qr-02b.png" alt="QR code: branch 02b-multi-agent-workflow">
+      <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    </div>
+    <a class="branch" href="https://github.com/EilinLux/adk2.0-medium/tree/02b-multi-agent-workflow" target="_blank" rel="noopener">02b-multi-agent-workflow · Art #2b</a>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

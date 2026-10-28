@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>08 · This was not a test</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 08 of the original deck (docs/digital-assembly-line/speaker-notes.md, "08 · This was not a test").
+  Statement slide: "This was a test" appears, then "not" drops in, in pink, and the reason follows:
+  the questions calibrate the workshop pace to the room's real experience.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 8s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .title { position: absolute; left: 0; right: 0; top: 330px; margin: 0; text-align: center; font-family: var(--hand); font-size: 150px; font-weight: 400; line-height: 1.1; white-space: nowrap; }
+  .title .a { display: inline-block; opacity: 0; animation-name: a; }
+  .title .not { display: inline-block; max-width: 0; overflow: visible; color: var(--pink); opacity: 0; animation-name: not; vertical-align: bottom; }
+  .sub { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font-size: 44px; font-weight: 700; opacity: 0; animation-name: sub; }
+  .sub em { font-style: normal; }
+
+  /* ---------- Timeline (8s loop) ----------
+     0–4%    scene in        4–14%  "This was a test"
+     24–40%  "not" opens a gap and drops in, pink, with an underline
+     50–60%  "it is how I calibrate the workshop pace to your real experience!"
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes a { 0%, 4% { opacity: 0; transform: translateY(24px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes not {
+    0%, 24% { max-width: 0; opacity: 0; transform: translateY(-80px) }
+    32% { max-width: 400px; opacity: 0; transform: translateY(-80px) }
+    38% { max-width: 400px; opacity: 1; transform: translateY(8px) }
+    40%, 100% { max-width: 400px; opacity: 1; transform: none }
+  }
+  @keyframes sub { 0%, 50% { opacity: 0; transform: translateY(16px) } 60%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <h1 class="title"><span class="a">This was&nbsp;</span><span class="not"><span class="underline-pink">not</span>&nbsp;</span><span class="a">a test</span></h1>
+    <div class="sub">it is how I calibrate the workshop pace to <em class="underline-pink">your real experience!</em></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

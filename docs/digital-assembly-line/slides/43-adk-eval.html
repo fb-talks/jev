@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>43 · adk eval</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 43 of the original deck (docs/digital-assembly-line/speaker-notes.md, "43 · Concept 8: adk eval").
+  Left: .evalset.json, eval_config.json with its two axes (tool_trajectory_avg_score, response_match_score),
+  --print_detailed_results and Web UI evals. Right: the real eval_config.json and the adk eval command; the part of
+  each point lights up pink while the point appears. The original text says response_match_score (0.5) while its
+  code says 0.45: both kept as in the original.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 30px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .tag { position: absolute; right: 80px; top: 74px; padding: 14px 28px; border-radius: 999px; background: #1d1f27; color: #f5c542; font-family: var(--mono); font-size: 22px; }
+
+  /* ---------- Left ---------- */
+  .txt { position: absolute; left: 80px; top: 190px; width: 740px; padding: 32px 36px; font-size: 23px; line-height: 1.38; }
+  .pt { position: relative; margin: 0 0 15px; padding-left: 26px; opacity: 0; }
+  .pt:last-child { margin-bottom: 0; }
+  .pt::before { content: ""; position: absolute; left: 0; top: 12px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+  .pt.sub { margin-left: 40px; }
+  .pt.sub::before { background: none; border: 2.5px solid var(--pink); width: 6px; height: 6px; }
+  .pt code { font-family: var(--mono); font-size: 20px; font-weight: 700; }
+  .p1 { animation-name: p1; } .p2 { animation-name: p2; } .p3 { animation-name: p3; } .p4 { animation-name: p4; } .p5 { animation-name: p5; } .p6 { animation-name: p6; }
+
+  /* ---------- Right: code ---------- */
+  .codecard { position: absolute; left: 860px; top: 250px; width: 920px; padding: 22px 28px 26px; border-radius: 24px; background: #1d1f27; border: 3px solid var(--pink); box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: codecard; }
+  .tabbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-family: var(--mono); font-size: 20px; color: #f5c542; }
+  .tabbar i { width: 11px; height: 11px; border-radius: 50%; background: #f5c542; }
+  .tabbar span { margin-left: 14px; }
+  .src { font-variant-ligatures: none; font-family: var(--mono); font-size: 20px; line-height: var(--lh); color: #e7e9ee; }
+  .l { white-space: pre; min-height: var(--lh); }
+  .c { color: #8d96a8; } .p { color: #ff5cd6; } .s { color: #9fe0b0; }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; } .g4 { animation-name: g4; } .g5 { animation-name: g5; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in              4–10%  code card
+     8–12%   .evalset.json         → evalset path lit 8–22%
+     22–26%  eval_config.json      → criteria block lit 22–34%
+     34–38%  tool_trajectory (1.0) → line lit 34–46%
+     46–50%  response_match        → line lit 46–58%
+     58–62%  --print_detailed_results → flag lit 58–94%
+     70–74%  Web UI evals
+     94%     final frame           96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes codecard { 0%, 4% { opacity: 0; transform: translateX(30px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes p1 { 0%, 8% { opacity: 0; transform: translateX(-16px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 22% { opacity: 0; transform: translateX(-16px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes p3 { 0%, 34% { opacity: 0; transform: translateX(-16px) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes p4 { 0%, 46% { opacity: 0; transform: translateX(-16px) } 50%, 100% { opacity: 1; transform: none } }
+  @keyframes p5 { 0%, 58% { opacity: 0; transform: translateX(-16px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes p6 { 0%, 70% { opacity: 0; transform: translateX(-16px) } 74%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 8% { background: transparent; box-shadow: inset 4px 0 0 transparent } 10%, 20% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 22%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 22% { background: transparent; box-shadow: inset 4px 0 0 transparent } 24%, 32% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 34%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g3 { 0%, 34% { background: transparent; box-shadow: inset 4px 0 0 transparent } 36%, 44% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 46%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g4 { 0%, 46% { background: transparent; box-shadow: inset 4px 0 0 transparent } 48%, 56% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 58%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g5 { 0%, 58% { background: transparent; box-shadow: inset 4px 0 0 transparent } 60%, 100% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 8 · Google · AI Community 2026</small>Agent Evaluations (<em>adk eval</em>)</div>
+    <div class="tag">04a, 04b &amp; 07a–c</div>
+
+    <div class="card txt">
+      <p class="pt p1"><code>.evalset.json</code>: tests written in JSON format containing multi-turn conversations.</p>
+      <p class="pt p2"><code>eval_config.json</code>: grades every multi-turn conversation of the <code>.evalset.json</code> on two axes:</p>
+      <p class="pt sub p3"><code>tool_trajectory_avg_score (1.0)</code>: verifies the exact sequence of tools and sub-agent transfers executed.</p>
+      <p class="pt sub p4"><code>response_match_score (0.5)</code>: measures semantic/ROUGE similarity against golden reference responses.</p>
+      <p class="pt p5"><code>--print_detailed_results</code>: to have a comparison table.</p>
+      <p class="pt p6"><b>Web UI evals:</b> you can create evals from the Web UI, but you will probably have to revisit them (<code>user_id</code> example in Registratore's tool).</p>
+    </div>
+
+    <div class="codecard">
+      <div class="tabbar"><i></i><i></i><i></i><span>eval_config.json &amp; Terminal</span></div>
+      <div class="src">
+        <div class="grp g2">
+          <div class="l">{</div>
+          <div class="l">  <span class="s">"criteria"</span>: {</div>
+          <div class="grp g3"><div class="l">    <span class="s">"tool_trajectory_avg_score"</span>: <span class="p">1.0</span>,</div></div>
+          <div class="grp g4"><div class="l">    <span class="s">"response_match_score"</span>: <span class="p">0.45</span></div></div>
+          <div class="l">  }</div>
+          <div class="l">}</div>
+        </div>
+        <div class="l"> </div>
+        <div class="l"><span class="c"># Run automated evaluation suite:</span></div>
+        <div class="l">$ uv run <span class="p">adk eval</span> adk_agent_app \</div>
+        <div class="grp g1"><div class="l">    adk_agent_app/evals/eval_set_4_full_workflow_a2a.evalset.json \</div></div>
+        <div class="l">    <span class="p">--config_file_path</span> adk_agent_app/evals/eval_config.json \</div>
+        <div class="grp g5"><div class="l">    <span class="p">--print_detailed_results</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

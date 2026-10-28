@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>36 · MCP, server side</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 36 of the original deck (docs/digital-assembly-line/speaker-notes.md, "36 · Concept 6: MCP, server side").
+  Left: the question (an external team owns the BigQuery highway stops table) and four points: the problem with
+  direct tools, the MCP solution, dual transport, logging. Right: the real MCP server code of branch 05d, the lines
+  of each point light up pink while the point appears. Closing line from the speaker notes: MCP as USB-C.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 29px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .tag { position: absolute; right: 80px; top: 74px; padding: 14px 28px; border-radius: 999px; background: #1d1f27; color: #f5c542; font-family: var(--mono); font-size: 22px; }
+
+  /* ---------- Left: question + points ---------- */
+  .txt { position: absolute; left: 80px; top: 180px; width: 730px; padding: 34px 38px; font-size: 24px; line-height: 1.4; }
+  .q { margin: 0 0 22px; opacity: 0; animation-name: q; }
+  .pt { position: relative; margin: 0 0 16px; padding-left: 26px; opacity: 0; }
+  .pt:last-child { margin-bottom: 0; }
+  .pt::before { content: ""; position: absolute; left: 0; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+  .pt code { font-family: var(--mono); font-size: 21px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .p1 { animation-name: p1; } .p2 { animation-name: p2; } .p3 { animation-name: p3; } .p4 { animation-name: p4; }
+
+  .caption { position: absolute; left: 80px; width: 730px; top: 860px; text-align: center; white-space: nowrap; font-family: var(--hand); font-size: 36px; line-height: 1.2; opacity: 0; animation-name: caption; }
+
+  /* ---------- Right: code ---------- */
+  .codecard { position: absolute; left: 850px; top: 180px; width: 930px; padding: 22px 28px 26px; border-radius: 24px; background: #1d1f27; border: 3px solid var(--pink); box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: codecard; }
+  .tabbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-family: var(--mono); font-size: 20px; color: #f5c542; }
+  .tabbar i { width: 11px; height: 11px; border-radius: 50%; background: #f5c542; }
+  .tabbar span { margin-left: 14px; }
+  .src { font-variant-ligatures: none; font-family: var(--mono); font-size: 20px; line-height: var(--lh); color: #e7e9ee; }
+  .l { white-space: pre; min-height: var(--lh); }
+  .c { color: #8d96a8; } .p { color: #ff5cd6; } .s { color: #9fe0b0; }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; } .g4 { animation-name: g4; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in               4–10%  question            6–12%  code card
+     12–16%  point 1 (direct tools)  → bigquery lines lit 12–28%
+     28–32%  point 2 (MCP solution)  → MCPServer + @mcp.tool lit 28–46%
+     46–50%  point 3 (dual transport) → __main__ block lit 46–64%
+     64–68%  point 4 (logging)       → logging to stderr lit 64–94%
+     80–86%  caption: MCP is the USB-C between agents and data
+     94%     final frame            96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes q { 0%, 4% { opacity: 0; transform: translateY(14px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes codecard { 0%, 6% { opacity: 0; transform: translateX(30px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes p1 { 0%, 12% { opacity: 0; transform: translateX(-16px) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 28% { opacity: 0; transform: translateX(-16px) } 32%, 100% { opacity: 1; transform: none } }
+  @keyframes p3 { 0%, 46% { opacity: 0; transform: translateX(-16px) } 50%, 100% { opacity: 1; transform: none } }
+  @keyframes p4 { 0%, 64% { opacity: 0; transform: translateX(-16px) } 68%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 12% { background: transparent; box-shadow: inset 4px 0 0 transparent } 14%, 26% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 28%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 28% { background: transparent; box-shadow: inset 4px 0 0 transparent } 30%, 44% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 46%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g3 { 0%, 46% { background: transparent; box-shadow: inset 4px 0 0 transparent } 48%, 62% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 64%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g4 { 0%, 64% { background: transparent; box-shadow: inset 4px 0 0 transparent } 66%, 100% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes caption { 0%, 80% { opacity: 0; transform: translateY(12px) } 86%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 6 · Google · AI Community 2026</small>What is <em>MCP</em> (Server Side)?</div>
+    <div class="tag">05b and 05d · Art #5b and #5d</div>
+
+    <div class="card txt">
+      <p class="q">What if the highway stops database in <b>BigQuery</b> is owned by an external infrastructure team that changes table schemas every quarter?</p>
+      <p class="pt p1"><b>The problem with direct tools:</b> embedding raw BigQuery SQL inside your agent repository couples your agent lifecycle to an external database.</p>
+      <p class="pt p2"><b>The MCP solution:</b> wrap the external database query in a standalone <i>MCP Server</i> (<code>@mcp.tool()</code>).</p>
+      <p class="pt p3"><b>Dual transport:</b> run over <code>stdio</code> locally (<code>05b</code>) or expose over <b>HTTP SSE</b> (<code>port=8002</code> in <code>05d</code>) so any authorized agent can discover and call tools dynamically!</p>
+      <p class="pt p4"><b>Logging:</b> MCP stdio servers communicate over stdout, so all logs MUST go to <b>stderr</b>.</p>
+    </div>
+    <div class="caption">MCP: the <span class="underline-pink">USB-C</span> between agents and data</div>
+
+    <div class="codecard">
+      <div class="tabbar"><i></i><i></i><i></i><span>suggeritore_agent_bq_mcp_soste_tool.py (Branch 05d)</span></div>
+      <div class="src">
+        <div class="l">from mcp.server.mcpserver import MCPServer</div>
+        <div class="grp g1"><div class="l">from google.cloud import bigquery</div></div>
+        <div class="grp g4">
+          <div class="l">logging.basicConfig(level=logging.INFO,</div>
+          <div class="l">    format=<span class="s">"%(levelname)s: %(message)s"</span>,</div>
+          <div class="l">    <span class="p">stream=sys.stderr</span>,)</div>
+        </div>
+        <div class="l"> </div>
+        <div class="grp g2">
+          <div class="l">mcp = <span class="p">MCPServer</span>(<span class="s">"Soste_BigQuery_MCP_Server"</span>)</div>
+          <div class="l"><span class="c"># mcp = MCPServer("BigQuery-Soste-Server")</span></div>
+          <div class="l"> </div>
+          <div class="l"><span class="p">@mcp.tool()</span></div>
+          <div class="l">def <span class="p">find_soste_by_fuel_and_location</span>(</div>
+          <div class="l">    candidate_stops: list[str], fuel_type: str</div>
+          <div class="l">) -&gt; dict:</div>
+          <div class="l">    <span class="s">"""Queries BigQuery db_soste for stops matching fuel/EV needs."""</span></div>
+        </div>
+        <div class="grp g1"><div class="l">    rows = bq_client.query(sql, job_config=cfg).result()</div></div>
+        <div class="l">    return {<span class="s">"status"</span>: <span class="s">"success"</span>,</div>
+        <div class="l">            <span class="s">"matched_stops"</span>: [dict(r) for r in rows]}</div>
+        <div class="l"> </div>
+        <div class="grp g3">
+          <div class="l">if __name__ == <span class="s">"__main__"</span>:</div>
+          <div class="l">    <span class="c"># from STDIO to SSE so it runs as a persistent</span></div>
+          <div class="l">    mcp_port = int(os.getenv(<span class="s">"MCP_PORT"</span>, <span class="s">"8002"</span>))</div>
+          <div class="l">    <span class="c"># mcp.run(transport="stdio")</span></div>
+          <div class="l">    <span class="p">mcp.run(transport="sse", host="127.0.0.1", port=mcp_port)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>45 · The final architecture</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 45 of the original deck (docs/digital-assembly-line/speaker-notes.md, "45 · The final architecture").
+  The Sosta app flowchart with the agents drawn over it, as in the original: the Coordinator box (Gatekeeper),
+  the Registratore and Cameriere sub-agents, Suggeritore reached over the A2A protocol, and the MCP with BigQuery
+  call at "Search optimal stopover". Each part is outlined and labelled in turn.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { top: 80px; font-size: 64px; }
+  .kicker em { font-style: normal; color: var(--pink); }
+
+  /* Flowchart: 1100×1416 shown at 746×960 (scale .678), top-left at 620,70 */
+  .flow { position: absolute; left: 620px; top: 70px; width: 746px; height: 960px; opacity: 0; animation-name: flow; }
+  .flow img { mix-blend-mode: multiply; display: block; width: 100%; height: 100%; }
+
+  .box { position: absolute; border-radius: 18px; opacity: 0; }
+  .solid { border: 4px solid #1e3a6e; }
+  .dash { border: 3px dashed var(--pink); border-radius: 14px; }
+  .b-coord { left: 606px; top: 60px; width: 666px; height: 582px; animation-name: s1; }
+  .b-gate  { left: 632px; top: 72px; width: 600px; height: 318px; animation-name: s1; }
+  .b-reg   { left: 646px; top: 328px; width: 168px; height: 340px; animation-name: s2; }
+  .b-cam   { left: 1042px; top: 404px; width: 206px; height: 226px; animation-name: s3; }
+  .b-sug   { left: 1026px; top: 650px; width: 244px; height: 380px; animation-name: s4; }
+  .b-mcp   { left: 1038px; top: 726px; width: 198px; height: 44px; border-radius: 10px; border: 4px solid var(--pink); background: rgba(255,0,191,.08); animation-name: s5; }
+
+  .pill { position: absolute; padding: 6px 18px; border-radius: 999px; background: #fff; border: 2.5px solid var(--pink); font-size: 22px; font-weight: 600; opacity: 0; z-index: 2; }
+  .pl-gate { left: 1110px; top: 56px; animation-name: s1; }
+  .pl-reg  { left: 660px; top: 670px; animation-name: s2; }
+  .pl-cam  { left: 1150px; top: 384px; animation-name: s3; }
+  .pl-sug  { left: 880px; top: 960px; animation-name: s4; }
+
+  /* Pointers on the sides: pink arrow + hand label */
+  .lab { position: absolute; display: flex; align-items: center; gap: 18px; font-family: var(--hand); font-size: 38px; opacity: 0; }
+  .lab i { position: relative; flex: none; width: 90px; height: 24px; background: var(--pink); border-radius: 4px; }
+  .lab i::after { content: ""; position: absolute; top: -14px; border: 26px solid transparent; }
+  .lab.r i::after { left: -40px; border-right: 30px solid var(--pink); border-left: 0; }
+  .lab.l i::after { right: -40px; border-left: 30px solid var(--pink); border-right: 0; }
+  .lab.r i { margin-left: 30px; }
+  .lab.l i { margin-right: 30px; }
+  .lb-coord { left: 1290px; top: 150px; animation-name: s1; }
+  .lb-reg   { left: 330px; top: 470px; animation-name: s2; }
+  .lb-cam   { left: 1290px; top: 490px; animation-name: s3; }
+  .lb-a2a   { left: 1290px; top: 640px; animation-name: s4; }
+  .lb-mcp   { left: 1290px; top: 750px; animation-name: s5; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in        2–10%  title       4–12%  flowchart
+     14–22%  Coordinator box + Gatekeeper
+     30–38%  Registratore = SubAgent
+     44–52%  Cameriere = SubAgent
+     58–66%  Suggeritore over the A2A protocol
+     72–80%  "Search optimal stopover" = MCP with BQ
+     94%     final frame     96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes flow { 0%, 4% { opacity: 0; transform: translateY(20px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes s1 { 0%, 14% { opacity: 0; transform: scale(.97) } 22%, 100% { opacity: 1; transform: none } }
+  @keyframes s2 { 0%, 30% { opacity: 0; transform: scale(.97) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes s3 { 0%, 44% { opacity: 0; transform: scale(.97) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes s4 { 0%, 58% { opacity: 0; transform: scale(.97) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes s5 { 0%, 72% { opacity: 0; transform: scale(.97) } 80%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Google · AI Community 2026</small>The final<br><em>Architecture</em></div>
+
+    <div class="flow"><img src="_shared/img/flowchart.png" alt="Sosta app flowchart"></div>
+
+    <div class="box solid b-coord"></div>
+    <div class="box dash b-gate"></div>
+    <div class="box dash b-reg"></div>
+    <div class="box dash b-cam"></div>
+    <div class="box solid b-sug"></div>
+    <div class="box b-mcp"></div>
+
+    <div class="pill pl-gate">Gatekeeper</div>
+    <div class="pill pl-reg">Registratore</div>
+    <div class="pill pl-cam">Cameriere</div>
+    <div class="pill pl-sug">Suggeritore</div>
+
+    <div class="lab r lb-coord"><i></i>Coordinator</div>
+    <div class="lab l lb-reg">SubAgent<i></i></div>
+    <div class="lab r lb-cam"><i></i>SubAgent</div>
+    <div class="lab r lb-a2a"><i></i>A2A Protocol</div>
+    <div class="lab r lb-mcp"><i></i>MCP with BQ</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

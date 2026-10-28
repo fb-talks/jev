@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>33 · Expanding to MCP and A2A</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 33 of the original deck (docs/digital-assembly-line/speaker-notes.md, "33 · Expanding to MCP and A2A").
+  Two cards side by side. MCP: Agent → Data, the agent semantically queries data, key role: standardizes how
+  tools declare capabilities and schemas to the LLM through JSON-RPC. A2A: Agent → Agent, decoupled communication
+  between agents not within the same system, key role: dynamic discovery over HTTP/REST with Agent Cards
+  (.well-known/agent.json). Each card draws its own little arrow diagram.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 13s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .proto { position: absolute; top: 230px; width: 840px; height: 640px; padding: 36px 44px; text-align: center; opacity: 0; }
+  .mcp { left: 80px; animation-name: c1; }
+  .a2a { left: 1000px; animation-name: c2; }
+  .proto .ico { font-size: 60px; line-height: 1; }
+  .proto h2 { margin: 12px 0 0; font-size: 36px; color: var(--pink); }
+
+  .flow { display: flex; align-items: center; justify-content: center; gap: 0; margin: 34px 0 30px; }
+  .node { padding: 14px 26px; border-radius: 14px; border: 2.5px solid var(--ink); font-family: var(--hand); font-size: 32px; background: #fff; }
+  .node.data { background: var(--amber-bg); }
+  .node.peer { background: var(--blue-bg); }
+  .arrow { position: relative; width: 150px; height: 4px; background: var(--ink); transform-origin: left; }
+  .arrow::after { content: ""; position: absolute; right: -2px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
+  .mcp .arrow { animation-name: ar1; }
+  .a2a .arrow { animation-name: ar2; }
+
+  .proto p { margin: 0 0 22px; font-size: 29px; line-height: 1.4; }
+  .proto .role { margin-top: 36px; padding: 24px 28px; border-radius: 16px; background: var(--stage); font-size: 27px; line-height: 1.4; text-align: left; opacity: 0; }
+  .mcp .role { animation-name: role1; }
+  .a2a .role { animation-name: role2; }
+  .proto code { font-family: var(--mono); font-size: 23px; }
+
+  /* ---------- Timeline (13s loop) ----------
+     0–4%    scene in
+     6–12%   MCP card      12–20%  Agent → Data arrow draws     24–30% key role
+     36–42%  A2A card      42–50%  Agent → Agent arrow draws    54–60% key role
+     94%     final frame   96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes c1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes c2 { 0%, 36% { opacity: 0; transform: translateY(24px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes ar1 { 0%, 12% { transform: scaleX(0) } 20%, 100% { transform: none } }
+  @keyframes ar2 { 0%, 42% { transform: scaleX(0) } 50%, 100% { transform: none } }
+  @keyframes role1 { 0%, 24% { opacity: 0 } 30%, 100% { opacity: 1 } }
+  @keyframes role2 { 0%, 54% { opacity: 0 } 60%, 100% { opacity: 1 } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Third assembly line point · Technological Heterogeneity</small>Expanding to…</div>
+
+    <div class="card proto mcp">
+      <div class="ico">🔌</div>
+      <h2>Model Context Protocol (MCP)</h2>
+      <div class="flow"><span class="node">Agent</span><span class="arrow"></span><span class="node data">Data</span></div>
+      <p>The <b>agent</b> semantically queries <b>data</b>.</p>
+      <div class="role"><b>Key role:</b> standardizes how tools declare their capabilities and schemas to the LLM, through <b class="underline-pink">JSON-RPC</b>.</div>
+    </div>
+
+    <div class="card proto a2a">
+      <div class="ico">🌐</div>
+      <h2>The A2A (Agent-to-Agent) Protocol</h2>
+      <div class="flow"><span class="node">Agent</span><span class="arrow"></span><span class="node peer">Agent</span></div>
+      <p><b>Decoupled</b>: establishes <b>communication between agents</b> that are <u>not within the same system</u>.</p>
+      <div class="role"><b>Key role:</b> uses <b>dynamic discovery</b> (via HTTP / REST with <b class="underline-pink">Agent Cards</b> <code>.well-known/agent.json</code>).</div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>42 · Evaluation best practice</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 42 of the original deck (docs/digital-assembly-line/speaker-notes.md, "42 · Evaluation best practice").
+  "Evaluating in production": three practices (beyond binary pass/fail, re-recording golden baselines, cost
+  optimization strategy with its three rules: per commit, per PR/merge, num_runs > 1) appear one by one,
+  next to the Homer "this is just a test" GIF of the original.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .txt { position: absolute; left: 80px; top: 220px; width: 1080px; padding: 40px 46px; font-size: 27px; line-height: 1.42; }
+  .sec { margin: 0 0 26px; opacity: 0; }
+  .sec:last-child { margin-bottom: 0; }
+  .sec > b { color: var(--ink); }
+  .sec1 { animation-name: sec1; } .sec2 { animation-name: sec2; } .sec3 { animation-name: sec3; }
+  .rules { margin: 14px 0 0; padding: 0; list-style: none; }
+  .rules li { position: relative; display: flex; gap: 18px; align-items: baseline; margin-top: 12px; padding: 12px 18px; border-radius: 14px; background: var(--stage); opacity: 0; }
+  .rules .when { flex: none; width: 190px; font-family: var(--mono); font-size: 21px; color: var(--pink); }
+  .rules code { font-family: var(--mono); font-size: 23px; }
+  .r1 { animation-name: r1; } .r2 { animation-name: r2; } .r3 { animation-name: r3; }
+
+  .gif { position: absolute; left: 1220px; top: 250px; width: 600px; padding: 20px; opacity: 0; animation-name: gif; }
+  .gif img { display: block; width: 560px; height: 420px; border-radius: 12px; object-fit: cover; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in          6–14%  GIF
+     12–18%  beyond binary pass/fail
+     28–34%  re-recording golden baselines
+     44–50%  cost optimization strategy
+     52–58%  per commit        62–68%  per PR / merge      72–78%  num_runs > 1
+     94%     final frame       96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes gif { 0%, 6% { opacity: 0; transform: rotate(3deg) scale(.92) } 14%, 100% { opacity: 1; transform: rotate(2deg) } }
+  @keyframes sec1 { 0%, 12% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes sec2 { 0%, 28% { opacity: 0; transform: translateY(14px) } 34%, 100% { opacity: 1; transform: none } }
+  @keyframes sec3 { 0%, 44% { opacity: 0; transform: translateY(14px) } 50%, 100% { opacity: 1; transform: none } }
+  @keyframes r1 { 0%, 52% { opacity: 0; transform: translateX(-16px) } 58%, 100% { opacity: 1; transform: none } }
+  @keyframes r2 { 0%, 62% { opacity: 0; transform: translateX(-16px) } 68%, 100% { opacity: 1; transform: none } }
+  @keyframes r3 { 0%, 72% { opacity: 0; transform: translateX(-16px) } 78%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Evaluating in production</small>Evaluation Best Practice</div>
+
+    <div class="card txt">
+      <p class="sec sec1"><b>Beyond binary pass/fail:</b> a passing test might hide non-standard logic, while a failing test might just be a formatting change (bullet list vs paragraphs).</p>
+      <p class="sec sec2"><b>Re-recording golden baselines:</b> keep test datasets updated whenever agent instructions or system workflows evolve.</p>
+      <div class="sec sec3"><b class="underline-pink">Cost optimization strategy:</b>
+        <ul class="rules">
+          <li class="r1"><span class="when">every commit</span><span>Run single evaluation tests (fast &amp; inexpensive).</span></li>
+          <li class="r2"><span class="when">PRs &amp; merges</span><span>Reserve full evaluation matrix suites for them.</span></li>
+          <li class="r3"><span class="when">variance</span><span>Set <code>num_runs &gt; 1</code> only when measuring non-deterministic variance for statistical confidence.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card gif"><img src="_shared/img/just-a-test.gif" alt="Homer Simpson: this is just a test"></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

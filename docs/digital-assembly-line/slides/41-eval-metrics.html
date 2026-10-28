@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>41 · Evaluation metrics</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 41 of the original deck (docs/digital-assembly-line/speaker-notes.md, "41 · Evaluation metrics").
+  "Evaluating following two trajectories": two cards, tool_trajectory_avg_score (execution order, agent targets,
+  tool arguments) and response_match_score (text similarity against reference strings). Each card shows a small
+  example: the expected vs actual steps get checked one by one; the response is compared with the reference and a
+  similarity bar fills. The example steps, texts and scores are illustrative, not measured.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 13s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .m { position: absolute; top: 300px; width: 790px; padding: 44px 46px; opacity: 0; }
+  .m1 { left: 115px; animation-name: m1; }
+  .m2 { left: 1015px; animation-name: m2; }
+  .m h2 { margin: 0; font-family: var(--mono); font-size: 32px; font-weight: 500; color: var(--pink); }
+  .m .desc { margin: 14px 0 0; font-size: 28px; font-style: italic; line-height: 1.4; }
+  .ex { margin-top: 34px; padding: 26px 28px; }
+  .label { font-size: 19px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+
+  /* Card 1: steps compared */
+  .row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+  .row .label { width: 104px; flex: none; }
+  .step { padding: 8px 14px; border-radius: 10px; background: #fff; border: 1.5px solid #d5dbe6; font-family: var(--mono); font-size: 21px; }
+  .arrow { color: #8a93a6; font-size: 22px; }
+  .row.act .s1 { animation-name: chk1; } .row.act .s2 { animation-name: chk2; } .row.act .s3 { animation-name: chk3; }
+  .score { margin-top: 22px; display: flex; align-items: baseline; gap: 14px; font-size: 24px; opacity: 0; }
+  .score b { font-family: var(--mono); font-size: 40px; font-weight: 500; color: var(--pink); }
+  .sc1 { animation-name: sc1; } .sc2 { animation-name: sc2; }
+
+  /* Card 2: texts compared */
+  .txt { margin: 6px 0 16px; font-size: 25px; line-height: 1.35; }
+  .bar { margin-top: 6px; }
+  .bar > i { width: 0; animation-name: fill; }
+
+  /* ---------- Timeline (13s loop) ----------
+     0–4%    scene in
+     6–14%   card 1: tool_trajectory_avg_score      14–20%  its example
+     20–26%  actual step 1 checked, 26–32% step 2, 32–38% step 3     38–44% score 1.0
+     46–54%  card 2: response_match_score           54–60%  its example
+     62–74%  similarity bar fills                   74–80%  score
+     94%     final frame        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes m1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes m2 { 0%, 46% { opacity: 0; transform: translateY(24px) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes ex1 { 0%, 14% { opacity: 0 } 20%, 100% { opacity: 1 } }
+  @keyframes ex2 { 0%, 54% { opacity: 0 } 60%, 100% { opacity: 1 } }
+  @keyframes chk1 { 0%, 20% { border-color: #d5dbe6; background: #fff } 24%, 100% { border-color: var(--green); background: var(--green-bg) } }
+  @keyframes chk2 { 0%, 26% { border-color: #d5dbe6; background: #fff } 30%, 100% { border-color: var(--green); background: var(--green-bg) } }
+  @keyframes chk3 { 0%, 32% { border-color: #d5dbe6; background: #fff } 36%, 100% { border-color: var(--green); background: var(--green-bg) } }
+  @keyframes sc1 { 0%, 38% { opacity: 0 } 44%, 100% { opacity: 1 } }
+  @keyframes fill { 0%, 62% { width: 0 } 74%, 100% { width: 72% } }
+  @keyframes sc2 { 0%, 74% { opacity: 0 } 80%, 100% { opacity: 1 } }
+  .m1 .ex { opacity: 0; animation-name: ex1; }
+  .m2 .ex { opacity: 0; animation-name: ex2; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Evaluating the following two trajectories</small>Evaluation Metrics</div>
+
+    <div class="card m m1">
+      <h2>tool_trajectory_avg_score</h2>
+      <p class="desc">Evaluates function execution order, correct agent targets, and tool arguments.</p>
+      <div class="screen ex">
+        <div class="row"><span class="label">expected</span><span class="step">Gatekeeper</span><span class="arrow">→</span><span class="step">Cameriere</span><span class="arrow">→</span><span class="step">Suggeritore</span></div>
+        <div class="row act"><span class="label">actual</span><span class="step s1">Gatekeeper</span><span class="arrow">→</span><span class="step s2">Cameriere</span><span class="arrow">→</span><span class="step s3">Suggeritore</span></div>
+        <div class="score sc1">same steps, same order <b>1.0</b></div>
+      </div>
+    </div>
+
+    <div class="card m m2">
+      <h2>response_match_score</h2>
+      <p class="desc">Measures text similarity against target reference strings.</p>
+      <div class="screen ex">
+        <div class="label">reference</div>
+        <p class="txt">"Here are 3 stops on your route with EV charging."</p>
+        <div class="label">response</div>
+        <p class="txt">"I found 3 stops with EV chargers along your route."</p>
+        <div class="bar"><i></i></div>
+        <div class="score sc2">similar, not identical <b>0.72</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

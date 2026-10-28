@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06 · Agent Developer Kit</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 06 of the original deck (docs/digital-assembly-line/speaker-notes.md, "06 · Agent Developer Kit: what and why").
+  Left: what ADK is (open source, Apache 2.0, Python / Go / Java) and the four reasons to use it, one card at a time.
+  Right: a dark editor where a hello-world ADK agent.py (currency agent with tools) writes itself line by line,
+  in place of the scrolling-code GIF of the original.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; --lh: 37px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .what { position: absolute; left: 80px; top: 215px; width: 900px; display: flex; gap: 24px; align-items: center; padding: 22px 28px; opacity: 0; animation-name: what; }
+  .what img { width: 84px; height: 84px; flex: none; }
+  .what p { margin: 0; font-size: 25px; line-height: 1.4; }
+  .what b { color: var(--pink); }
+
+  .why { position: absolute; left: 80px; width: 900px; padding: 20px 28px 20px 92px; font-size: 24px; line-height: 1.38; opacity: 0; }
+  .why .n { position: absolute; left: 24px; top: 20px; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 700; font-size: 22px; }
+  .why b { display: block; font-size: 27px; margin-bottom: 2px; }
+  .w1 { top: 365px; animation-name: w1; }
+  .w2 { top: 510px; animation-name: w2; }
+  .w3 { top: 655px; animation-name: w3; }
+  .w4 { top: 800px; animation-name: w4; border: 2.5px solid var(--pink); }
+  .w4 .n { background: var(--pink); }
+
+  /* Dark editor */
+  .editor { position: absolute; left: 1030px; top: 56px; width: 830px; height: 900px; border-radius: 24px; background: #1e1e22; box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); overflow: hidden; opacity: 0; animation-name: editor; }
+  .bar-top { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #2a2a30; font-family: var(--mono); font-size: 20px; color: #9aa0ae; }
+  .bar-top i { width: 13px; height: 13px; border-radius: 50%; background: #4a4a52; }
+  .bar-top span { margin-left: 14px; }
+  .code { padding: 22px 28px; font-size: 22px; line-height: var(--lh); color: #e6e6ea; }
+  .l { height: var(--lh); white-space: pre; overflow: hidden; opacity: 0; animation-name: ln; animation-delay: calc(var(--i) * .26s); }
+  .l::before { content: attr(data-n); display: inline-block; width: 46px; color: #5c6070; }
+  .k { color: #ff7ad9; } .s { color: #b9a1ff; } .fn { color: #ffd479; } .c { color: #c9a7ff; }
+  .tool { background: rgba(255,0,191,.18); border-radius: 6px; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in + kicker               4–10%  editor card
+     6–12%   what it is: open source, Apache 2.0, Python / Go / Java
+     10–50%  code writes itself, one line every .26s (lines 1–19)
+     18–24%  [1] Polymorphism   34–40%  [2] Kit tool   50–56%  [3] Orchestration   66–72%  [4] State Management (pink)
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes editor { 0%, 4% { opacity: 0; transform: translateX(30px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes what { 0%, 6% { opacity: 0; transform: translateY(16px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes ln { 0%, 10% { opacity: 0 } 11%, 100% { opacity: 1 } }
+  @keyframes w1 { 0%, 18% { opacity: 0; transform: translateY(20px) } 24%, 100% { opacity: 1; transform: none } }
+  @keyframes w2 { 0%, 34% { opacity: 0; transform: translateY(20px) } 40%, 100% { opacity: 1; transform: none } }
+  @keyframes w3 { 0%, 50% { opacity: 0; transform: translateY(20px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes w4 { 0%, 66% { opacity: 0; transform: translateY(20px) } 72%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>What is it and Why use it?</small>Agent Developer Kit</div>
+
+    <div class="card what"><img src="_shared/img/adk.png" alt="ADK logo"><p>An <b>open-source</b> framework (Apache 2.0) for building AI agents that supports <b>Python</b> (which we'll use), Go, and Java.</p></div>
+
+    <div class="card why w1"><span class="n">1</span><b>The "Polymorphism" Benefit</b>ADK forces you to stick to a unified interface, which makes swapping out components a breeze.</div>
+    <div class="card why w2"><span class="n">2</span><b>Kit tool</b>A mix of tools (prebuilt and custom) to create agents that range from deterministic to non-deterministic ones.</div>
+    <div class="card why w3"><span class="n">3</span><b>Orchestration</b>Compose small, specialized agents into complex, hierarchical systems.</div>
+    <div class="card why w4"><span class="n">4</span><b>State Management</b>Raw LLM APIs are stateless; ADK tracks, stores and updates an agent's data, context, progress and memory across steps.</div>
+
+    <div class="editor">
+      <div class="bar-top"><i></i><i></i><i></i><span>hello2x › hello1 › agent.py</span></div>
+      <div class="code">
+<div class="l" data-n="1" style="--i:0"><span class="s">"""Hello world agent which can convert currency."""</span></div>
+<div class="l" data-n="2" style="--i:1"> </div>
+<div class="l" data-n="3" style="--i:2"><span class="k">from</span> datetime <span class="k">import</span> date, timedelta</div>
+<div class="l" data-n="4" style="--i:3"><span class="k">import</span> requests</div>
+<div class="l" data-n="5" style="--i:4"> </div>
+<div class="l" data-n="6" style="--i:5"><span class="k">def</span> <span class="fn tool">get_today_date</span>():</div>
+<div class="l" data-n="7" style="--i:6">    <span class="s">"""Returns today's date in YYYY-MM-DD format."""</span></div>
+<div class="l" data-n="8" style="--i:7">    today = date.today()</div>
+<div class="l" data-n="9" style="--i:8">    <span class="k">return</span> today.strftime(<span class="s">"%Y-%m-%d"</span>)</div>
+<div class="l" data-n="10" style="--i:9"> </div>
+<div class="l" data-n="11" style="--i:10"><span class="k">def</span> <span class="fn tool">get_date_plus_days</span>(days: int):</div>
+<div class="l" data-n="12" style="--i:11">    <span class="s">"""Returns a date in YYYY-MM-DD format, plus or mi</span></div>
+<div class="l" data-n="13" style="--i:12">    <span class="s">Args: days (int): The number of days to add or subtr</span></div>
+<div class="l" data-n="14" style="--i:13">    <span class="s">Returns: str: A date in YYYY-MM-DD format."""</span></div>
+<div class="l" data-n="15" style="--i:14">    today = date.today()</div>
+<div class="l" data-n="16" style="--i:15">    <span class="k">return</span> (today + timedelta(days=days)).strftime(<span class="s">"%Y-</span></div>
+<div class="l" data-n="17" style="--i:16"> </div>
+<div class="l" data-n="18" style="--i:17"><span class="k">def</span> <span class="fn tool">get_exchange_rate</span>(currency_from: str, currency_to:</div>
+<div class="l" data-n="19" style="--i:18">    <span class="s">"""Retrieves the exchange rate between two currenc</span></div>
+<div class="l" data-n="20" style="--i:19">    <span class="s">Args: currency_from (str): The source currency code.</span></div>
+<div class="l" data-n="21" style="--i:20">    <span class="s">      currency_to (str): The target currency code."""</span></div>
+<div class="l" data-n="22" style="--i:21">    ...</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

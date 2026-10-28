@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13 · Let's take an example</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 13 of the original deck (docs/digital-assembly-line/speaker-notes.md, "13 · Let's take an example").
+  The use case of the talk: "Find the best stops based on the user's food preferences, their location,
+  and the type of car". The three inputs become chips that flow into the goal (best stops, pink).
+  Right: the dark editor with agent.py writing itself, in place of the scrolling-code GIF of the original.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; --lh: 37px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .title { position: absolute; left: 80px; top: 150px; margin: 0; font-family: var(--hand); font-size: 84px; font-weight: 400; color: var(--pink); opacity: 0; animation-name: title; }
+  .quote { position: absolute; left: 80px; top: 310px; width: 900px; margin: 0; font-size: 40px; font-style: italic; line-height: 1.45; opacity: 0; animation-name: quote; }
+  .quote b { font-weight: 800; }
+
+  .inputs { position: absolute; left: 80px; top: 640px; display: flex; flex-direction: column; gap: 18px; }
+  .in { font-size: 28px; padding: 14px 24px; opacity: 0; }
+  .in1 { animation-name: in1; } .in2 { animation-name: in2; } .in3 { animation-name: in3; }
+  .arrow { position: absolute; left: 470px; top: 735px; width: 150px; height: 6px; border-radius: 3px; background: var(--ink); transform-origin: left; transform: scaleX(0); animation-name: arrow; }
+  .arrow::after { content: ""; position: absolute; right: -4px; top: -9px; border: 12px solid transparent; border-left: 18px solid var(--ink); border-right: 0; }
+  .goal { position: absolute; left: 650px; top: 690px; padding: 22px 32px; font-size: 34px; font-weight: 700; border: 3px solid var(--pink); background: var(--pink-bg); opacity: 0; animation-name: goal; }
+
+  .editor { position: absolute; left: 1060px; top: 56px; width: 800px; height: 900px; border-radius: 24px; background: #1e1e22; box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); overflow: hidden; opacity: 0; animation-name: editor; }
+  .bar-top { height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 22px; background: #2a2a30; font-family: var(--mono); font-size: 20px; color: #9aa0ae; }
+  .bar-top i { width: 13px; height: 13px; border-radius: 50%; background: #4a4a52; }
+  .bar-top span { margin-left: 14px; }
+  .code { padding: 22px 28px; font-size: 22px; line-height: var(--lh); color: #e6e6ea; }
+  .l { height: var(--lh); white-space: pre; overflow: hidden; opacity: 0; animation-name: ln; animation-delay: calc(var(--i) * .2s); }
+  .l::before { content: attr(data-n); display: inline-block; width: 46px; color: #5c6070; }
+  .k { color: #ff7ad9; } .s { color: #b9a1ff; } .fn { color: #ffd479; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in        4–10%  editor        6–12%  "Let's Take an Example:"
+     10–48%  code writes itself, one line every .2s
+     14–24%  the request (quote)
+     32–38%  🍽️ food preferences    40–46%  📍 location    48–54%  🚗 type of car
+     58–64%  arrow draws            64–70%  → best stops (pink)
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes editor { 0%, 4% { opacity: 0; transform: translateX(30px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes ln { 0%, 10% { opacity: 0 } 11%, 100% { opacity: 1 } }
+  @keyframes title { 0%, 6% { opacity: 0; transform: translateY(20px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes quote { 0%, 14% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes in1 { 0%, 32% { opacity: 0; transform: translateX(-20px) } 38%, 100% { opacity: 1; transform: none } }
+  @keyframes in2 { 0%, 40% { opacity: 0; transform: translateX(-20px) } 46%, 100% { opacity: 1; transform: none } }
+  @keyframes in3 { 0%, 48% { opacity: 0; transform: translateX(-20px) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes arrow { 0%, 58% { transform: scaleX(0) } 64%, 100% { transform: scaleX(1) } }
+  @keyframes goal { 0%, 64% { opacity: 0; transform: scale(.85) } 68% { opacity: 1; transform: scale(1.05) } 70%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <h1 class="title">Let's Take an Example:</h1>
+    <p class="quote">“Find the <b>best stops</b> based on the user's <b>food preferences</b>, their <b>location</b>, and the <b>type of car</b> (electric, LPG, etc.)”</p>
+
+    <div class="inputs">
+      <span class="chip in in1">🍽️ food preferences</span>
+      <span class="chip in in2">📍 location</span>
+      <span class="chip in in3">🚗 type of car</span>
+    </div>
+    <div class="arrow"></div>
+    <div class="card goal">⛽ best stops</div>
+
+    <div class="editor">
+      <div class="bar-top"><i></i><i></i><i></i><span>hello2x › hello1 › agent.py</span></div>
+      <div class="code">
+<div class="l" data-n="1" style="--i:0"><span class="s">"""Hello world agent which can convert currency."""</span></div>
+<div class="l" data-n="2" style="--i:1"> </div>
+<div class="l" data-n="3" style="--i:2"><span class="k">from</span> datetime <span class="k">import</span> date, timedelta</div>
+<div class="l" data-n="4" style="--i:3"><span class="k">import</span> requests</div>
+<div class="l" data-n="5" style="--i:4"> </div>
+<div class="l" data-n="6" style="--i:5"><span class="k">def</span> <span class="fn">get_today_date</span>():</div>
+<div class="l" data-n="7" style="--i:6">    <span class="s">"""Returns today's date in YYYY-MM-DD format."""</span></div>
+<div class="l" data-n="8" style="--i:7">    today = date.today()</div>
+<div class="l" data-n="9" style="--i:8">    <span class="k">return</span> today.strftime(<span class="s">"%Y-%m-%d"</span>)</div>
+<div class="l" data-n="10" style="--i:9"> </div>
+<div class="l" data-n="11" style="--i:10"><span class="k">def</span> <span class="fn">get_date_plus_days</span>(days: int):</div>
+<div class="l" data-n="12" style="--i:11">    <span class="s">"""Returns a date in YYYY-MM-DD format, plus or mi</span></div>
+<div class="l" data-n="13" style="--i:12">    <span class="s">Args: days (int): The number of days to add or subtr</span></div>
+<div class="l" data-n="14" style="--i:13">    <span class="s">Returns: str: A date in YYYY-MM-DD format."""</span></div>
+<div class="l" data-n="15" style="--i:14">    today = date.today()</div>
+<div class="l" data-n="16" style="--i:15">    <span class="k">return</span> (today + timedelta(days=days)).strftime(<span class="s">"%Y-</span></div>
+<div class="l" data-n="17" style="--i:16"> </div>
+<div class="l" data-n="18" style="--i:17"><span class="k">def</span> <span class="fn">get_exchange_rate</span>(currency_from: str, currency_to:</div>
+<div class="l" data-n="19" style="--i:18">    <span class="s">"""Retrieves the exchange rate between two currenc</span></div>
+<div class="l" data-n="20" style="--i:19">    <span class="s">Args: currency_from (str): The source currency code.</span></div>
+<div class="l" data-n="21" style="--i:20">    <span class="s">      currency_to (str): The target currency code."""</span></div>
+<div class="l" data-n="22" style="--i:21">    ...</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

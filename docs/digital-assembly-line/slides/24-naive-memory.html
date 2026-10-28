@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>24 · The naive approach to agent memory</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 24 of the original deck (docs/digital-assembly-line/speaker-notes.md, "24 · The naive approach to agent memory").
+  Right: the naive approach (stuff everything into the context window) and the "Don't even worry about it" GIF.
+  Left: the three reasons it breaks in production (finite, expensive, not all memory has the same scope),
+  one card at a time; the two memory scopes of the last card get a pink underline.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+
+  /* ---------- Right: the naive approach + GIF ---------- */
+  .naive { position: absolute; left: 1230px; top: 210px; width: 610px; margin: 0; font-size: 25px; line-height: 1.4; font-style: italic; color: #5b6475; text-align: right; opacity: 0; animation-name: naive; }
+  .naive b { color: var(--ink); }
+  .gif { position: absolute; left: 1230px; top: 450px; width: 610px; padding: 10px; opacity: 0; animation-name: gif; }
+  .gif img { display: block; width: 100%; border-radius: 16px; }
+
+  /* ---------- Left: three reasons ---------- */
+  .reasons { position: absolute; left: 80px; top: 210px; width: 1100px; display: flex; flex-direction: column; gap: 20px; }
+  .why { display: grid; grid-template-columns: 52px 1fr; gap: 12px; padding: 22px 30px; opacity: 0; }
+  .why .n { font-family: var(--hand); font-size: 42px; line-height: 1; color: var(--pink); }
+  .why p { margin: 0; font-size: 24px; line-height: 1.42; }
+  .w1 { animation-name: w1; } .w2 { animation-name: w2; } .w3 { animation-name: w3; }
+  .u { position: relative; }
+  .u::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 4px; border-radius: 2px; background: var(--pink); transform: scaleX(0); transform-origin: left; }
+  .u1::after { animation-name: u1; } .u2::after { animation-name: u2; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in               4–10%  kicker
+     10–18%  the naive approach     16–24% GIF
+     28–34%  1. finite              42–48% 2. expensive       56–62% 3. not the same scope
+     68–76%  "persist across sessions…" underlined   76–84% "live only for the current run" underlined
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes naive { 0%, 10% { opacity: 0 } 18%, 100% { opacity: 1 } }
+  @keyframes gif { 0%, 16% { opacity: 0; transform: scale(.92) } 24%, 100% { opacity: 1; transform: none } }
+  @keyframes w1 { 0%, 28% { opacity: 0; transform: translateX(-24px) } 34%, 100% { opacity: 1; transform: none } }
+  @keyframes w2 { 0%, 42% { opacity: 0; transform: translateX(-24px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes w3 { 0%, 56% { opacity: 0; transform: translateX(-24px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes u1 { 0%, 68% { transform: scaleX(0) } 76%, 100% { transform: scaleX(1) } }
+  @keyframes u2 { 0%, 76% { transform: scaleX(0) } 84%, 100% { transform: scaleX(1) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Stuff everything into the LLM's context window. What is the problem?</small>The naive approach to agent memory</div>
+
+    <p class="naive"><b>Stuff everything into the LLM's context window:</b> include the full conversation history, all relevant facts, all prior outputs, but this breaks in production for three compounding reasons.</p>
+    <div class="card gif"><img src="_shared/img/dont-worry.gif" alt="Don't even worry about it"></div>
+
+    <div class="reasons">
+      <div class="card why w1"><span class="n">1</span><p><b>Context windows are finite.</b> Even large windows (128K tokens) fill up quickly in long-running conversations or pipelines with verbose intermediate outputs. Once full, you must truncate, and truncation decisions are where information silently disappears.</p></div>
+      <div class="card why w2"><span class="n">2</span><p><b>Context windows are expensive.</b> Sending 50,000 tokens of history on every turn costs real money and adds latency. In a high-throughput pipeline this compounds quickly.</p></div>
+      <div class="card why w3"><span class="n">3</span><p><b>Not all memory has the same scope.</b> A user's language preference should <span class="u u1">persist across sessions and even across different agents</span>. The intermediate output of a research step should <span class="u u2">live only for the duration of the current run</span>. The number of times a user has invoked a feature might need to be shared across all users of an app.</p></div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

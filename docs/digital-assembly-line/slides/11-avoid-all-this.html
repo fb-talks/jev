@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 · How to avoid all of this?</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 11 of the original deck (docs/digital-assembly-line/speaker-notes.md, "11 · How to avoid all of this?").
+  Statement slide: the question, then the answer "from Ford to today… with the digital assembly line",
+  while a small assembly line runs underneath: four stations light up as a piece travels along the belt.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 10s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .title { position: absolute; left: 0; right: 0; top: 270px; margin: 0; text-align: center; font-family: var(--hand); font-size: 130px; font-weight: 400; line-height: 1.1; opacity: 0; animation-name: title; }
+  .sub { position: absolute; left: 0; right: 0; top: 470px; text-align: center; font-size: 46px; font-weight: 700; opacity: 0; animation-name: sub; }
+  .sub em { font-style: normal; color: var(--pink); }
+
+  .belt { position: absolute; left: 360px; top: 800px; width: 1200px; height: 0; border-top: 6px dashed #cfd6e3; opacity: 0; animation-name: belt; }
+  .st { position: absolute; top: 680px; width: 150px; height: 96px; display: grid; place-items: center; font-size: 46px; border: 2.5px solid var(--line); opacity: 0; }
+  .st1 { left: 450px; animation-name: st1; } .st2 { left: 710px; animation-name: st2; } .st3 { left: 970px; animation-name: st3; } .st4 { left: 1230px; animation-name: st4; }
+  .piece { position: absolute; left: 360px; top: 780px; width: 40px; height: 40px; border-radius: 10px; background: var(--muted); opacity: 0; animation-name: piece; }
+
+  /* ---------- Timeline (10s loop) ----------
+     0–4%    scene in        4–14%  "How to avoid all of this?"
+     22–32%  "from Ford to today… with the digital assembly line"
+     34–40%  belt + four stations
+     42–82%  a piece travels the belt; each station lights pink as it passes (≈48, 58, 68, 78%)
+     82–86%  the piece leaves the line, finished (pink)
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes title { 0%, 4% { opacity: 0; transform: translateY(24px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes sub { 0%, 22% { opacity: 0 } 32%, 100% { opacity: 1 } }
+  @keyframes belt { 0%, 34% { opacity: 0 } 38%, 100% { opacity: 1 } }
+  @keyframes st1 { 0%, 34% { opacity: 0 } 38%, 47% { opacity: 1; border-color: var(--line) } 49%, 100% { opacity: 1; border-color: var(--pink) } }
+  @keyframes st2 { 0%, 35% { opacity: 0 } 39%, 57% { opacity: 1; border-color: var(--line) } 59%, 100% { opacity: 1; border-color: var(--pink) } }
+  @keyframes st3 { 0%, 36% { opacity: 0 } 40%, 67% { opacity: 1; border-color: var(--line) } 69%, 100% { opacity: 1; border-color: var(--pink) } }
+  @keyframes st4 { 0%, 37% { opacity: 0 } 41%, 77% { opacity: 1; border-color: var(--line) } 79%, 100% { opacity: 1; border-color: var(--pink) } }
+  @keyframes piece {
+    0%, 40% { opacity: 0; transform: none; background: var(--muted) }
+    42% { opacity: 1; transform: none; background: var(--muted) }
+    82% { opacity: 1; transform: translateX(1100px); background: var(--muted) }
+    86%, 100% { opacity: 1; transform: translateX(1160px) scale(1.4); background: var(--pink) }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <h1 class="title">How to avoid <span class="underline-pink">all of this</span>?</h1>
+    <div class="sub">from Ford to today… with <em>the digital assembly line</em></div>
+
+    <div class="belt"></div>
+    <div class="card st st1">🚗</div>
+    <div class="card st st2">⚙️</div>
+    <div class="card st st3">🤖</div>
+    <div class="card st st4">✅</div>
+    <div class="piece"></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

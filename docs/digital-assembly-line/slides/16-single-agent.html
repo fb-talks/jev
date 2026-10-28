@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16 · Hellish single agent pattern</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 16 of the original deck (docs/digital-assembly-line/speaker-notes.md, "16 · Hellish single agent pattern").
+  The single agent strip (User → Agent → AI model / tools) and the "you're all going to hell" GIF, then the four
+  problems of a single agent appear one by one; at each one the agent strip shakes a little more.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+
+  /* ---------- Top row: the single agent and the GIF ---------- */
+  .strip { position: absolute; left: 80px; top: 220px; width: 1100px; height: 358px; display: grid; place-items: center; opacity: 0; animation-name: strip; }
+  .strip img { width: 1050px; animation-name: shake; }
+  .hell { position: absolute; left: 1220px; top: 220px; width: 620px; height: 358px; padding: 10px; opacity: 0; animation-name: hell; }
+  .hell img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 16px; }
+
+  /* ---------- Bottom row: the four problems ---------- */
+  .probs { position: absolute; left: 80px; top: 612px; width: 1760px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .prob { padding: 22px 26px; opacity: 0; }
+  .prob h3 { margin: 0 0 10px; font-family: var(--hand); font-size: 34px; font-weight: 400; color: var(--pink); line-height: 1.1; }
+  .prob p { margin: 0; font-size: 22px; line-height: 1.4; }
+  .p1 { animation-name: p1; } .p2 { animation-name: p2; } .p3 { animation-name: p3; } .p4 { animation-name: p4; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in               4–10%  kicker
+     8–14%   single agent strip     12–18% GIF
+     22–28%  Context dilution       36–42% Lack of specialization
+     50–56%  Lack of parallelization 64–70% Confirmation bias
+             the strip shakes at each card (28, 42, 56, 70%)
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes strip { 0%, 8% { opacity: 0; transform: translateY(20px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes hell { 0%, 12% { opacity: 0; transform: scale(.92) } 18%, 100% { opacity: 1; transform: none } }
+  @keyframes p1 { 0%, 22% { opacity: 0; transform: translateY(24px) } 28%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 36% { opacity: 0; transform: translateY(24px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes p3 { 0%, 50% { opacity: 0; transform: translateY(24px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes p4 { 0%, 64% { opacity: 0; transform: translateY(24px) } 70%, 100% { opacity: 1; transform: none } }
+  @keyframes shake {
+    0%, 27% { transform: none } 28% { transform: translateX(-6px) } 29% { transform: translateX(6px) } 30%, 41% { transform: none }
+    42% { transform: translateX(-9px) rotate(-.4deg) } 43% { transform: translateX(9px) rotate(.4deg) } 44%, 55% { transform: none }
+    56% { transform: translateX(-12px) rotate(-.6deg) } 57% { transform: translateX(12px) rotate(.6deg) } 58%, 69% { transform: none }
+    70% { transform: translateX(-16px) rotate(-.8deg) } 71% { transform: translateX(16px) rotate(.8deg) } 72% { transform: translateX(-8px) } 73%, 100% { transform: none }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>What is the most common, and often worst scenario?</small>Hellish single agent pattern</div>
+
+    <div class="card strip"><img src="_shared/img/single-agent.png" alt="User → Agent → AI model and tools"></div>
+    <div class="card hell"><img src="_shared/img/hell.gif" alt="You're all going to hell"></div>
+
+    <div class="probs">
+      <div class="card prob p1"><h3>Context dilution</h3><p><b>The longer and more varied the prompt, the higher the risk</b> that the AI suffers from context dilution, forgetting instructions or <b>hallucinating</b>.</p></div>
+      <div class="card prob p2"><h3>Lack of specialization</h3><p>A single agent will <b>struggle to excel simultaneously in different types of tasks</b> (creative tasks, rigorous logical analysis, and mathematical calculations).</p></div>
+      <div class="card prob p3"><h3>Lack of parallelization</h3><p>You <b>cannot run tasks in parallel if a single brain</b> has to supervise every micro-step in sequence.</p></div>
+      <div class="card prob p4"><h3>Confirmation bias</h3><p>A single <b>agent tends to confirm its own errors</b>. If it makes a mistake at the beginning of its reasoning, it will struggle to correct itself on its own.</p></div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

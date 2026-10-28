@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>17 · Structured workflow</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 17 of the original deck (docs/digital-assembly-line/speaker-notes.md, "17 · Structured workflow").
+  Statement slide: "Structured workflow" and its definition, then a small line of three stations:
+  an artifact enters, each station transforms it (shape and color change) and passes it on, until it comes out pink.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 80px; top: 60px; font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+
+  .title { position: absolute; left: 0; right: 0; top: 170px; margin: 0; text-align: center; font-family: var(--hand); font-size: 128px; font-weight: 400; opacity: 0; animation-name: title; }
+  .title em { font-style: normal; color: var(--pink); }
+  .def { position: absolute; left: 260px; right: 260px; top: 380px; margin: 0; text-align: center; font-size: 36px; line-height: 1.4; color: #4b5263; opacity: 0; animation-name: def; }
+  .def b { color: var(--ink); }
+
+  /* ---------- The line ---------- */
+  .belt { position: absolute; left: 220px; width: 1490px; top: 777px; border-top: 4px dashed #cfd6e3; opacity: 0; animation-name: line; }
+  .end { position: absolute; top: 742px; width: 180px; height: 72px; border-radius: 16px; background: #fff; border: 2px dashed #cfd6e3; display: grid; place-items: center; font-size: 22px; font-weight: 600; color: #8a93a6; opacity: 0; animation-name: line; }
+  .end.in { left: 130px; }
+  .end.out { left: 1620px; }
+  .st { position: absolute; top: 710px; width: 280px; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; opacity: 0; }
+  .st b { font-family: var(--hand); font-size: 38px; font-weight: 400; }
+  .st span { font-size: 21px; color: #8a93a6; }
+  .s1 { left: 400px; animation-name: s1; } .s2 { left: 820px; animation-name: s2; } .s3 { left: 1240px; animation-name: s3; }
+
+  .tok { position: absolute; left: 198px; top: 626px; width: 48px; height: 48px; opacity: 0; animation-name: tok; }
+  .tok i { display: block; width: 100%; height: 100%; animation-name: shape; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in                  4–14%  title        14–24% definition
+     24–30%  belt, in/out              26–36% the three stations, one after the other
+     36–40%  artifact appears at "input"
+     40–48%  → station 1 (it changes: grey circle → blue square)   48–50% station 1 pink
+     52–60%  → station 2 (amber diamond)  60–62% station 2 pink
+     64–72%  → station 3 (pink star)      72–74% station 3 pink
+     76–84%  → output, the output label turns pink
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes title { 0%, 4% { opacity: 0; transform: translateY(24px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes def { 0%, 14% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes line { 0%, 24% { opacity: 0 } 30%, 100% { opacity: 1 } }
+  @keyframes s1 { 0%, 26% { opacity: 0; transform: translateY(16px) } 30%, 48% { opacity: 1; transform: none; border-color: #edf0f7 } 50%, 100% { opacity: 1; transform: none; border-color: var(--pink) } }
+  @keyframes s2 { 0%, 29% { opacity: 0; transform: translateY(16px) } 33%, 60% { opacity: 1; transform: none; border-color: #edf0f7 } 62%, 100% { opacity: 1; transform: none; border-color: var(--pink) } }
+  @keyframes s3 { 0%, 32% { opacity: 0; transform: translateY(16px) } 36%, 72% { opacity: 1; transform: none; border-color: #edf0f7 } 74%, 100% { opacity: 1; transform: none; border-color: var(--pink) } }
+  .st { border-width: 3px; }
+  @keyframes tok {
+    0%, 36% { opacity: 0; transform: none }
+    40% { opacity: 1; transform: none }
+    48%, 52% { opacity: 1; transform: translateX(318px) }
+    60%, 64% { opacity: 1; transform: translateX(738px) }
+    72%, 76% { opacity: 1; transform: translateX(1158px) }
+    84%, 100% { opacity: 1; transform: translateX(1488px) }
+  }
+  @keyframes shape {
+    0%, 46% { border-radius: 50%; background: var(--muted); transform: none; clip-path: none }
+    48%, 58% { border-radius: 8px; background: var(--blue); transform: none; clip-path: none }
+    60%, 70% { border-radius: 6px; background: var(--amber); transform: rotate(45deg) scale(.85); clip-path: none }
+    72%, 100% { border-radius: 0; background: var(--pink); transform: scale(1.25); clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%) }
+  }
+  .end.out b { font-weight: 600; animation-name: outlabel; }
+  @keyframes outlabel { 0%, 82% { color: #8a93a6 } 86%, 100% { color: var(--pink) } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <h1 class="title">Structured <em class="underline-pink">workflow</em></h1>
+    <p class="def">Each station <b>receives the output of its predecessor(s)</b>, applies its specific function, and <b>passes the transformed artifact</b> to the next station(s).</p>
+
+    <div class="belt"></div>
+    <div class="end in">input</div>
+    <div class="card st s1"><b>Station 1</b><span>its function</span></div>
+    <div class="card st s2"><b>Station 2</b><span>its function</span></div>
+    <div class="card st s3"><b>Station 3</b><span>its function</span></div>
+    <div class="end out"><b>artifact</b></div>
+    <div class="tok"><i></i></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

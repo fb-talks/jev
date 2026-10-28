@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10 · AI project graveyard</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 10 of the original deck (docs/digital-assembly-line/speaker-notes.md, "10 · AI project graveyard").
+  Left: the RIP tombstone GIF. Right: the definition of the AI project graveyard, then "How to avoid it?"
+  with the two remedies: start from the business problem, build for production from day one.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .rip { position: absolute; left: 135px; top: 250px; width: 600px; height: 600px; padding: 0; overflow: hidden; opacity: 0; animation-name: rip; }
+  .rip img { display: block; width: 600px; height: 600px; image-rendering: auto; }
+
+  .quote { position: absolute; left: 840px; top: 230px; width: 960px; margin: 0; padding-left: 34px; border-left: 6px solid var(--muted); font-size: 32px; font-style: italic; line-height: 1.45; color: #4a5263; opacity: 0; animation-name: quote; }
+
+  .how { position: absolute; left: 840px; top: 500px; font-family: var(--hand); font-size: 54px; opacity: 0; animation-name: how; }
+  .tip { position: absolute; left: 840px; width: 960px; padding: 24px 32px 24px 94px; font-size: 26px; line-height: 1.4; opacity: 0; }
+  .tip .n { position: absolute; left: 26px; top: 24px; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--pink); color: #fff; font-weight: 700; font-size: 22px; }
+  .tip b { display: block; margin-bottom: 4px; font-size: 29px; color: var(--pink); }
+  .tip span { font-style: italic; }
+  .t1 { top: 600px; animation-name: t1; }
+  .t2 { top: 790px; animation-name: t2; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in + kicker        4–12%  RIP tombstone
+     14–26%  definition (quote)
+     36–42%  "How to avoid it?"
+     46–52%  1 · start from the business problem      62–68%  2 · build for production from day one
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes rip { 0%, 4% { opacity: 0; transform: translateY(30px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes quote { 0%, 14% { opacity: 0; clip-path: inset(0 0 100% 0) } 26%, 100% { opacity: 1; clip-path: inset(0 0 0 0) } }
+  @keyframes how { 0%, 36% { opacity: 0 } 42%, 100% { opacity: 1 } }
+  @keyframes t1 { 0%, 46% { opacity: 0; transform: translateY(20px) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes t2 { 0%, 62% { opacity: 0; transform: translateY(20px) } 68%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Not all that glitters is gold…</small>AI project graveyard</div>
+
+    <div class="card rip"><img src="_shared/img/graveyard.gif" alt="Cartoon: a ghost leaves flowers on a RIP tombstone"></div>
+
+    <p class="quote">“The fate of many ambitious AI initiatives that begin with excitement but ultimately fail to deliver real business value, typically getting abandoned or stuck in the pilot phase”</p>
+
+    <div class="how">How to avoid it?</div>
+    <div class="card tip t1"><span class="n">1</span><b>Start from the business problem, not the technology</b><span>Define the specific challenge you aim to solve and use AI <u>only</u> if it is necessary.</span></div>
+    <div class="card tip t2"><span class="n">2</span><b>Build for production from day one</b><span>Design the product from the very beginning, following best practices.</span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

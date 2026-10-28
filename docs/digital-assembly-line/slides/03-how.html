@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>03 · How are we going to do it?</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 03 of the original deck (docs/digital-assembly-line/speaker-notes.md, "03 · How are we going to do it?").
+  The ADK 2.0 101 tutorial series: 1 concept = 1 Medium article = 1 Git branch, three rules as cards,
+  then the two references on the right (GitHub repo, branch 01-first-agent, and the Medium list) with their QR codes.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 12s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  .series { position: absolute; left: 135px; top: 250px; font-family: var(--hand); font-size: 50px; color: var(--pink); opacity: 0; animation-name: series; }
+
+  .rule { position: absolute; left: 135px; width: 980px; padding: 26px 32px 26px 100px; font-size: 28px; line-height: 1.4; opacity: 0; }
+  .rule .n { position: absolute; left: 28px; top: 24px; width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-weight: 700; font-size: 24px; }
+  .r1 { top: 350px; animation-name: r1; }
+  .r2 { top: 520px; animation-name: r2; }
+  .r3 { top: 700px; animation-name: r3; }
+  .eq { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .eq .chip { font-size: 26px; }
+  .eq .chip--pink { background: var(--pink-bg); }
+  .eq i { font-style: normal; font-size: 30px; font-weight: 700; opacity: .5; }
+  .r3 .like { color: var(--pink); font-weight: 700; }
+
+  .ref { position: absolute; left: 1200px; width: 620px; height: 270px; padding: 24px; display: flex; align-items: center; gap: 28px; color: inherit; text-decoration: none; opacity: 0; }
+  .ref .qr { width: 220px; height: 220px; flex: none; }
+  .ref .logo { display: block; }
+  .ref small { display: block; margin-top: 14px; font-family: var(--mono); font-size: 20px; color: #6b7280; }
+  .ref-gh { top: 300px; animation-name: ref1; }
+  .ref-gh .logo { width: 300px; }
+  .ref-md { top: 610px; animation-name: ref2; }
+  .ref-md .logo { width: 320px; border-radius: 12px; }
+
+  /* ---------- Timeline (12s loop) ----------
+     0–4%    scene in + kicker        6–12%  "ADK 2.0 101 Tutorial Series on Medium:"
+     14–20%  [1] 1 Concept = 1 Medium Article = 1 Git Branch
+     30–36%  [2] explore some, look for references on the right
+     40–46%  GitHub reference         48–54%  Medium reference
+     62–68%  [3] star the repo, clap on Medium if you like the workshop
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes series { 0%, 6% { opacity: 0; transform: translateY(16px) } 12%, 100% { opacity: 1; transform: none } }
+  @keyframes r1 { 0%, 14% { opacity: 0; transform: translateY(20px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes r2 { 0%, 30% { opacity: 0; transform: translateY(20px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes r3 { 0%, 62% { opacity: 0; transform: translateY(20px) } 68%, 100% { opacity: 1; transform: none } }
+  @keyframes ref1 { 0%, 40% { opacity: 0; transform: translateX(30px) } 46%, 100% { opacity: 1; transform: none } }
+  @keyframes ref2 { 0%, 48% { opacity: 0; transform: translateX(30px) } 54%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Repo and Medium Reference</small>How are we going to do it?</div>
+
+    <div class="series">ADK 2.0 101 Tutorial Series on Medium:</div>
+
+    <div class="card rule r1"><span class="n">1</span>
+      <div class="eq"><span class="chip">1 Concept</span><i>=</i><span class="chip">1 Medium Article</span><i>=</i><span class="chip chip--pink">1 Git Branch</span></div>
+    </div>
+    <div class="card rule r2"><span class="n">2</span>We are going to explore some of these: look for the <b>Medium</b> and <b>Branch</b> reference on the right →</div>
+    <div class="card rule r3"><span class="n">3</span>There is more in the repo to explore, therefore <b>star the GitHub repo</b> and <b>clap on Medium</b> <span class="like">if you like the workshop</span></div>
+
+    <a class="card ref ref-gh" href="https://github.com/EilinLux/adk2.0-medium/tree/01-first-agent" target="_blank" rel="noopener">
+      <img class="qr" src="_shared/img/qr-repo.png" alt="QR code of the GitHub repo">
+      <div><img class="logo" src="_shared/img/github.png" alt="GitHub"><small>EilinLux/adk2.0-medium<br>branch 01-first-agent</small></div>
+    </a>
+    <a class="card ref ref-md" href="https://medium.com/@ailluzdatascience/list/agent-developer-kit-adk-5d957c62e9a9" target="_blank" rel="noopener">
+      <img class="qr" src="_shared/img/qr-medium.png" alt="QR code of the Medium ADK list">
+      <div><img class="logo" src="_shared/img/medium.png" alt="Medium"><small>ADK 2.0 101 list</small></div>
+    </a>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

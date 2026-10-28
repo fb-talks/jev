@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>28 · Typed contracts</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 28 of the original deck (docs/digital-assembly-line/speaker-notes.md, "28 · Typed contracts").
+  Concept 5: typed contracts with input_schema / output_schema / output_key. Left: why (500 words of chat
+  between agents cost tokens and break parsing) and the three parameters, one at a time. Right: the real
+  suggeritore_schemas.py; each parameter lights up with the Pydantic model it points to, and at the end
+  the validated JSON lands in session.state['planned_route'].
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker em { font-style: normal; font-family: var(--mono); font-size: 36px; color: var(--pink); }
+  .ref { position: absolute; right: 80px; top: 92px; padding: 12px 22px; border-radius: 12px; background: #1f1f1f; color: #ffd166; font-family: var(--mono); font-size: 22px; opacity: 0; animation-name: intro; }
+
+  /* ---------- Left ---------- */
+  .why { position: absolute; left: 80px; top: 215px; width: 820px; padding: 30px 34px; opacity: 0; animation-name: intro; }
+  .why > p { margin: 0 0 14px; font-size: 25px; line-height: 1.4; }
+  .why code, .row code { font-family: var(--mono); font-size: 21px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .row { display: flex; gap: 18px; align-items: flex-start; padding: 16px 0; border-top: 1px solid var(--line); opacity: 0; }
+  .row .n { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: var(--stage); font-weight: 700; font-size: 21px; }
+  .row p { margin: 0; font-size: 23px; line-height: 1.38; }
+  .row b { display: block; font-family: var(--mono); font-size: 23px; color: var(--pink); margin-bottom: 4px; }
+  .r1 { animation-name: r1; } .r2 { animation-name: r2; } .r3 { animation-name: r3; }
+
+  .state { position: absolute; left: 80px; top: 830px; width: 820px; padding: 20px 26px; border: 2.5px solid var(--pink); opacity: 0; animation-name: state; }
+  .state .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+  .state div { margin-top: 6px; font-family: var(--mono); font-size: 22px; white-space: nowrap; }
+  .state .key { color: var(--pink); }
+
+  /* ---------- Right: code ---------- */
+  .ed { position: absolute; left: 940px; top: 200px; width: 900px; padding: 26px 34px 30px; border-radius: 24px; background: #1f1f1f; color: #e8e8ee; box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: ed; }
+  .ed-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; font-family: var(--mono); font-size: 20px; color: #ffd166; }
+  .ed-head i { width: 12px; height: 12px; border-radius: 50%; background: #ffd166; }
+  .ed-head span { margin-left: 10px; }
+  .code { font-family: var(--mono); font-size: 20px; line-height: 34px; }
+  .l { white-space: pre; height: 34px; }
+  .s { color: #f4a984; } .k { color: #c4a7ff; } .y { color: #ffd166; }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in                 4–10%  "why" card + ref chip     8–14%  code
+     16–19%  input_schema row  · 18–34% SuggeritoreInput + input_schema line highlighted
+     34–37%  output_schema row · 36–52% RouteCandidateStopsOutput + output_schema line highlighted
+     52–55%  output_key row    · 54%→   output_key line highlighted (stays)
+     66–72%  session.state['planned_route'] card, pink
+     94%     final frame              96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes intro { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes ed { 0%, 8% { opacity: 0; transform: translateX(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes r1 { 0%, 16% { opacity: 0; transform: translateY(12px) } 19%, 100% { opacity: 1; transform: none } }
+  @keyframes r2 { 0%, 34% { opacity: 0; transform: translateY(12px) } 37%, 100% { opacity: 1; transform: none } }
+  @keyframes r3 { 0%, 52% { opacity: 0; transform: translateY(12px) } 55%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 18% { background: transparent; box-shadow: inset 4px 0 0 transparent } 20%, 32% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 34%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 36% { background: transparent; box-shadow: inset 4px 0 0 transparent } 38%, 50% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 52%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g3 { 0%, 54% { background: transparent; box-shadow: inset 4px 0 0 transparent } 56%, 100% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes state { 0%, 66% { opacity: 0; transform: translateY(16px) } 72%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 5</small>Typed contracts <em>(input_schema &amp; output_schema)</em></div>
+    <div class="ref">03a &amp; 05a · Art #3a &amp; #5a</div>
+
+    <div class="card why">
+      <p>If Agent A passes 500 words of conversational text to Agent B, you pay extra token costs and risk parsing errors. Schemas enforce strict data contracts:</p>
+      <div class="row r1"><span class="n">1</span><p><b>input_schema=MyInputModel</b>Forces callers (or <code>AgentTool</code> supervisors) to pass a validated Pydantic payload.</p></div>
+      <div class="row r2"><span class="n">2</span><p><b>output_schema=MyOutputModel</b>Forces the agent's decoding layer to emit guaranteed JSON matching your Pydantic class.</p></div>
+      <div class="row r3"><span class="n">3</span><p><b>output_key='state_var'</b>Automatically writes that validated JSON into <code>session.state['state_var']</code> for downstream agents!</p></div>
+    </div>
+
+    <div class="card state">
+      <span class="label">session.state, ready for the next agent</span>
+      <div><span class="key">["planned_route"]</span> = { highway_corridor, candidate_stops }</div>
+    </div>
+
+    <div class="ed">
+      <div class="ed-head"><i></i><i></i><i></i><span>adk_agent_app/schemas/suggeritore_schemas.py</span></div>
+      <div class="code">
+        <div class="l"><span class="k">from</span> pydantic <span class="k">import</span> BaseModel, Field</div>
+        <div class="l"> </div>
+        <div class="grp g1">
+          <div class="l"><span class="k">class</span> <span class="y">SuggeritoreInput</span>(BaseModel):</div>
+          <div class="l">    origin: str = Field(description=<span class="s">"Departure city"</span>)</div>
+          <div class="l">    destination: str = Field(description=<span class="s">"Arrival city"</span>)</div>
+          <div class="l">    fuel_type: str = Field(description=<span class="s">"EV, Petrol, Diesel, LPG"</span>)</div>
+          <div class="l">    dietary_preferences: list[str] = Field(default_factory=list)</div>
+        </div>
+        <div class="l"> </div>
+        <div class="grp g2">
+          <div class="l"><span class="k">class</span> <span class="y">RouteCandidateStopsOutput</span>(BaseModel):</div>
+          <div class="l">    highway_corridor: str</div>
+          <div class="l">    candidate_stops: list[str]</div>
+        </div>
+        <div class="l"> </div>
+        <div class="l">route_planner_agent = LlmAgent(</div>
+        <div class="l">    name=<span class="s">"RoutePlannerAgent"</span>,</div>
+        <div class="grp g1"><div class="l">    <span class="y">input_schema</span>=SuggeritoreInput,</div></div>
+        <div class="grp g2"><div class="l">    <span class="y">output_schema</span>=RouteCandidateStopsOutput,</div></div>
+        <div class="grp g3"><div class="l">    <span class="y">output_key</span>=<span class="s">"planned_route"</span>,</div></div>
+        <div class="l">)</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

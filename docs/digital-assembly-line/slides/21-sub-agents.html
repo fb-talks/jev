@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>21 · Concept 3: sub-agents &amp; MAS</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 21 of the original deck (docs/digital-assembly-line/speaker-notes.md, "21 · Concept 3: sub-agents & MAS").
+  Left: the three orchestration topologies of ADK (sub_agents, AgentTool, Workflow graph).
+  Right: sub_agents (02b) vs AgentTool (05a) in code; topologies 1 and 2 light up their lines,
+  topology 3 has no code on the original slide: a small graph with a human-in-the-loop pause stands for it.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 32px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .branch { position: absolute; right: 80px; top: 92px; padding: 14px 24px; border-radius: 999px; background: #1e2230; color: #f7c97e; font-family: var(--mono); font-size: 20px; opacity: 0; animation-name: kicker; }
+
+  /* ---------- Left: the three topologies ---------- */
+  .props { position: absolute; left: 80px; top: 210px; width: 800px; padding: 30px 36px; }
+  .props > p { margin: 0; font-size: 25px; line-height: 1.4; opacity: 0; animation-name: intro; }
+  .topo { display: grid; grid-template-columns: 44px 1fr; gap: 8px; margin-top: 22px; opacity: 0; }
+  .topo .n { font-family: var(--hand); font-size: 40px; line-height: 1; color: var(--pink); }
+  .topo p { margin: 0; font-size: 23px; line-height: 1.4; }
+  .topo code { font-family: var(--mono); font-size: 20px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .topo code.p { color: var(--pink); font-weight: 700; }
+  .t1 { animation-name: t1; } .t2 { animation-name: t2; } .t3 { animation-name: t3; }
+
+  /* ---------- Right: the code ---------- */
+  .editor { position: absolute; left: 920px; top: 210px; width: 920px; padding: 22px 30px 26px; border-radius: 24px; background: #1e2230; color: #e7e9f0; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); border: 2px solid var(--pink); opacity: 0; animation-name: editor; }
+  .tab { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .tab i { width: 13px; height: 13px; border-radius: 50%; background: #ff5f57; }
+  .tab i:nth-child(2) { background: #febc2e; } .tab i:nth-child(3) { background: #28c840; }
+  .tab span { margin-left: 12px; font-family: var(--mono); font-size: 20px; color: #f7c97e; }
+  .src { font-family: var(--mono); font-size: 20px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .s { color: #a8dba8; } .c { color: #8b93a7; } .p { color: var(--pink); }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; }
+
+  /* ---------- Right, below: the workflow graph ---------- */
+  .wf { position: absolute; left: 920px; top: 800px; width: 920px; height: 120px; display: flex; align-items: center; justify-content: center; gap: 14px; opacity: 0; animation-name: wf; }
+  .wf .node { padding: 12px 18px; border-radius: 12px; border: 2px solid #d5dbe6; font-family: var(--mono); font-size: 20px; background: #fff; white-space: nowrap; }
+  .wf .node.h { border-color: var(--pink); color: var(--pink); animation-name: pause; }
+  .wf .arr { font-size: 26px; color: #8a93a6; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in              4–10%  kicker + chip
+     8–14%   code card             12–18% intro
+     22–28%  1. sub_agents         (sub_agents line lit 24–40%)
+     42–48%  2. AgentTool          (AgentTool lines lit 44–60%)
+     62–68%  3. Workflow graph     68–74% the graph appears, the RequestInput pause pulses 76–84%
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes editor { 0%, 8% { opacity: 0; transform: translateX(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes intro { 0%, 12% { opacity: 0 } 18%, 100% { opacity: 1 } }
+  @keyframes t1 { 0%, 22% { opacity: 0; transform: translateX(-20px) } 28%, 100% { opacity: 1; transform: none } }
+  @keyframes t2 { 0%, 42% { opacity: 0; transform: translateX(-20px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes t3 { 0%, 62% { opacity: 0; transform: translateX(-20px) } 68%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 24% { background: transparent; box-shadow: inset 4px 0 0 transparent } 26%, 38% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 40%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 44% { background: transparent; box-shadow: inset 4px 0 0 transparent } 46%, 58% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 60%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes wf { 0%, 68% { opacity: 0; transform: translateY(16px) } 74%, 100% { opacity: 1; transform: none } }
+  @keyframes pause { 0%, 76% { transform: none } 78% { transform: scale(1.1) } 80% { transform: none } 82% { transform: scale(1.1) } 84%, 100% { transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 3</small><em>Sub-agents</em> &amp; multi-agent systems (MAS)</div>
+    <div class="branch">02b &amp; 05a · Art #2</div>
+
+    <div class="card props">
+      <p>ADK supports <b>3 orchestration topologies</b>:</p>
+      <div class="topo t1"><span class="n">1</span><p><code class="p">sub_agents=[...]</code> <b>(peer handoff)</b>: the parent transfers full control of the conversation turn to a specialist child (<code>Gatekeeper</code> → <code>Registratore</code> or <code>Cameriere</code>).</p></div>
+      <div class="topo t2"><span class="n">2</span><p><code class="p">AgentTool(agent=...)</code> <b>(supervisor consultation)</b>: a coordinator invokes a specialist like a function call, gets structured JSON back, and keeps control (<code>Suggeritore</code>).</p></div>
+      <div class="topo t3"><span class="n">3</span><p><code class="p">Workflow</code> <b>graph (deterministic DAG)</b>: explicit Python <code>Edge</code> routing + <code>RequestInput</code> human-in-the-loop pauses when LLM routing is too loose (github branch <code>02c</code>).</p></div>
+    </div>
+
+    <div class="editor">
+      <div class="tab"><i></i><i></i><i></i><span>Comparing sub_agents (02b) vs AgentTool (05a)</span></div>
+      <div class="src">
+        <div class="l"><span class="c"># 1. Conversational Handoff (sub_agents)</span></div>
+        <div class="l">gatekeeper_agent = LlmAgent(</div>
+        <div class="l">    name=<span class="s">"gatekeeper"</span>,</div>
+        <div class="l grp g1">    <span class="p">sub_agents=[registratore_agent, cameriere_agent],</span></div>
+        <div class="l">)</div>
+        <div class="l"> </div>
+        <div class="l"><span class="c"># 2. Supervisor Pipeline (AgentTool)</span></div>
+        <div class="l">suggeritore_soste_agent = LlmAgent(</div>
+        <div class="l">    name=<span class="s">"suggeritore_soste"</span>,</div>
+        <div class="l">    tools=[</div>
+        <div class="grp g2">
+          <div class="l">        <span class="p">AgentTool(agent=route_planner_agent),</span></div>
+          <div class="l">        AgentTool(agent=soste_search_agent),</div>
+          <div class="l">        AgentTool(agent=menu_checker_agent),</div>
+        </div>
+        <div class="l">    ],</div>
+        <div class="l">)</div>
+      </div>
+    </div>
+
+    <div class="wf">
+      <span class="node">agent</span><span class="arr">→ Edge →</span>
+      <span class="node h">⏸ RequestInput</span><span class="arr">→ Edge →</span>
+      <span class="node">agent</span>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

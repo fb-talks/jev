@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>20 · Concept 2: Tool</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 20 of the original deck (docs/digital-assembly-line/speaker-notes.md, "20 · Concept 2: Tool").
+  Left: what a Tool is and its three rules (type hints + docstrings, dict returns with a status, ToolContext).
+  Right: is_registered_user from gatekeeper_tools.py; each rule lights up its lines in the code.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; --lh: 32px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker { opacity: 0; animation-name: kicker; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .branch { position: absolute; right: 80px; top: 92px; padding: 14px 24px; border-radius: 999px; background: #1e2230; color: #f7c97e; font-family: var(--mono); font-size: 20px; opacity: 0; animation-name: kicker; }
+
+  /* ---------- Left: the rules ---------- */
+  .props { position: absolute; left: 80px; top: 210px; width: 800px; padding: 30px 36px; }
+  .props > p { margin: 0 0 6px; font-size: 24px; line-height: 1.4; opacity: 0; animation-name: intro; }
+  .props ul { margin: 0; padding: 0; list-style: none; }
+  .props li { position: relative; margin-top: 18px; padding-left: 26px; font-size: 23px; line-height: 1.4; opacity: 0; }
+  .props li::before { content: ""; position: absolute; left: 0; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+  .props code { font-family: var(--mono); font-size: 20px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .i1 { animation-name: i1; } .i2 { animation-name: i2; } .i3 { animation-name: i3; }
+
+  /* ---------- Right: the code ---------- */
+  .editor { position: absolute; left: 920px; top: 210px; width: 920px; padding: 22px 30px 26px; border-radius: 24px; background: #1e2230; color: #e7e9f0; box-shadow: 0 30px 60px -30px rgba(0,0,0,.5); border: 2px solid var(--pink); opacity: 0; animation-name: editor; }
+  .tab { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .tab i { width: 13px; height: 13px; border-radius: 50%; background: #ff5f57; }
+  .tab i:nth-child(2) { background: #febc2e; } .tab i:nth-child(3) { background: #28c840; }
+  .tab span { margin-left: 12px; font-family: var(--mono); font-size: 20px; color: #f7c97e; }
+  .src { font-family: var(--mono); font-size: 20px; line-height: var(--lh); }
+  .l { white-space: pre; height: var(--lh); }
+  .k { color: #9db7ff; } .s { color: #a8dba8; } .c { color: #8b93a7; } .p { color: var(--pink); }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; } .g3 { animation-name: g3; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in              4–10%  kicker + branch chip
+     8–14%   code card             12–20% definition
+     24–30%  type hints + docstrings (signature, docstring lit 26–40%)
+     42–48%  structured dict returns (return lines lit 44–58%)
+     60–66%  ToolContext           (tool_context lines lit 62–80%)
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes kicker { 0%, 4% { opacity: 0; transform: translateY(12px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes editor { 0%, 8% { opacity: 0; transform: translateX(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes intro { 0%, 12% { opacity: 0 } 20%, 100% { opacity: 1 } }
+  @keyframes i1 { 0%, 24% { opacity: 0; transform: translateX(-20px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes i2 { 0%, 42% { opacity: 0; transform: translateX(-20px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes i3 { 0%, 60% { opacity: 0; transform: translateX(-20px) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 26% { background: transparent; box-shadow: inset 4px 0 0 transparent } 28%, 38% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 40%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 44% { background: transparent; box-shadow: inset 4px 0 0 transparent } 46%, 56% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 58%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g3 { 0%, 62% { background: transparent; box-shadow: inset 4px 0 0 transparent } 64%, 78% { background: rgba(255,0,191,.22); box-shadow: inset 4px 0 0 var(--pink) } 80%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 2</small>What is a <em>Tool</em>?</div>
+    <div class="branch">02b &amp; 05a · Art #2b &amp; #5a</div>
+
+    <div class="card props">
+      <p>A Tool is a <b>deterministic Python function</b> wrapped in <code>FunctionTool</code>. ADK automatically converts your Python type hints and docstring into a tool declaration.</p>
+      <ul>
+        <li class="i1"><b>Type hints + docstrings are prompt engineering:</b> an agent decides <b>when</b> and <b>how</b> to call your tool purely from its signature and docstring.</li>
+        <li class="i2"><b>Structured dict returns:</b> always return a dictionary with a clear <code>status</code> key (<code>{'status': 'found', 'profile': ...}</code>) so the LLM can reason on success vs error.</li>
+        <li class="i3"><b>Hidden superpower for stateful tools — <code>tool_context: ToolContext</code>:</b> add a parameter typed as <code>ToolContext</code> and ADK automatically injects the current execution context, letting your tool read/write <code>session.state</code> directly!</li>
+      </ul>
+    </div>
+
+    <div class="editor">
+      <div class="tab"><i></i><i></i><i></i><span>adk_agent_app/tools/gatekeeper_tools.py</span></div>
+      <div class="src">
+        <div class="l"><span class="k">from</span> google.adk.tools <span class="k">import</span> FunctionTool, ToolContext</div>
+        <div class="l"> </div>
+        <div class="l grp g1"><span class="k">def</span> is_registered_user(</div>
+        <div class="l grp g1">    user_id: str,</div>
+        <div class="l grp g3">    <span class="p">tool_context: ToolContext</span>,  <span class="c"># &lt;-- Auto-injected by ADK!</span></div>
+        <div class="l grp g1">) -&gt; dict:</div>
+        <div class="grp g1">
+          <div class="l"><span class="s">    """Verifies if a traveler user_id exists in Firestore.</span></div>
+          <div class="l"><span class="s">    Args:</span></div>
+          <div class="l"><span class="s">        user_id: Unique ID of the traveler (e.g. usr_0a8f67).</span></div>
+          <div class="l"><span class="s">    """</span></div>
+        </div>
+        <div class="l">    doc = db.collection(<span class="s">"users"</span>).document(user_id).get()</div>
+        <div class="l">    <span class="k">if</span> doc.exists:</div>
+        <div class="l grp g3">        <span class="p">tool_context.state</span>[<span class="s">"user:user_id"</span>] = user_id</div>
+        <div class="l grp g2">        <span class="k">return</span> {<span class="p">"status"</span>: <span class="p">"found"</span>, <span class="s">"user_profile"</span>: doc.to_dict()}</div>
+        <div class="l grp g2">    <span class="k">return</span> {<span class="p">"status"</span>: <span class="p">"not_found"</span>}</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

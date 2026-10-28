@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>35 · Agent to Agent (A2A)</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 35 of the original deck (docs/digital-assembly-line/speaker-notes.md, "35 · Agent to Agent (A2A)").
+  Top: definition of A2A and the diagram rebuilt in CSS: End-User → Frontend & Host Agent → A2A Client
+  (Cameriere agent) → A2A Protocol → A2A Servers (remote Suggeritore agents: ADK, LangGraph, CrewAI…),
+  plus what an Agent Card is. Bottom: the four advantages over agent/sub-agents: agnostic, infrastructure
+  flexibility, independent scalability, security.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 17s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .def { position: absolute; left: 1000px; top: 52px; width: 840px; margin: 0; text-align: right; font-size: 22px; line-height: 1.4; font-style: italic; color: #5b6475; opacity: 0; animation-name: def; }
+
+  /* ---------- Diagram (y 200–540) ---------- */
+  .n { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 21px; font-weight: 600; line-height: 1.25; opacity: 0; }
+  .n .em { font-size: 52px; line-height: 1.1; }
+  .n small { font-size: 17px; font-weight: 600; color: var(--pink); }
+  .n-user { left: 70px; top: 300px; width: 140px; height: 150px; animation-name: n1; }
+  .n-front { left: 250px; top: 300px; width: 210px; height: 150px; animation-name: n2; }
+  .n-client { left: 495px; top: 290px; width: 260px; height: 170px; padding: 12px; animation-name: n3; }
+  .n-client img { width: 56px; height: 56px; }
+  .link { position: absolute; top: 375px; height: 0; border-top: 3px dotted var(--ink); transform-origin: left; }
+  .k1 { left: 200px; width: 50px; animation-name: k1; }
+  .k2 { left: 455px; width: 45px; animation-name: k2; }
+
+  .fan { position: absolute; left: 750px; top: 250px; width: 250px; height: 260px; overflow: visible; }
+  .fan path { fill: none; stroke: var(--pink); stroke-width: 3.5; stroke-dasharray: 1; stroke-dashoffset: 1; animation-name: fan; }
+  .fan-label { position: absolute; left: 790px; top: 225px; font-size: 18px; font-weight: 700; color: var(--pink); opacity: 0; animation-name: fanl; }
+
+  .servers { position: absolute; left: 1000px; top: 200px; width: 450px; opacity: 0; animation-name: servers; }
+  .servers .label { font-size: 18px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; margin-bottom: 8px; height: 30px; }
+  .srv { display: flex; align-items: center; gap: 16px; height: 76px; margin-bottom: 14px; padding: 0 18px; }
+  .srv .logo { width: 120px; height: 44px; display: grid; place-items: center; }
+  .srv .logo img { max-width: 120px; max-height: 44px; }
+  .srv p { margin: 0; font-size: 21px; font-weight: 600; }
+  .srv p span { display: block; font-weight: 400; color: #5b6475; }
+  .srv.more { height: 30px; margin: 0; justify-content: center; box-shadow: none; border: 0; background: none; font-size: 24px; }
+
+  .acard { position: absolute; left: 1490px; top: 235px; width: 350px; padding: 20px 22px; border: 2.5px solid var(--pink); opacity: 0; animation-name: acard; }
+  .acard b { display: block; font-family: var(--hand); font-size: 32px; font-weight: 400; }
+  .acard p { margin: 6px 0 10px; font-size: 21px; line-height: 1.35; }
+  .acard code { font-family: var(--mono); font-size: 19px; background: var(--stage); padding: 2px 6px; border-radius: 6px; }
+
+  /* ---------- Cards ---------- */
+  .adv { position: absolute; width: 840px; height: 200px; padding: 20px 28px; opacity: 0; }
+  .adv b { display: block; font-size: 26px; color: var(--pink); margin-bottom: 6px; }
+  .adv p { margin: 0; font-size: 22px; line-height: 1.4; }
+  .adv strong { background: var(--pink-bg); padding: 0 4px; border-radius: 4px; }
+  .a1 { left: 80px; top: 575px; animation-name: a1; }
+  .a2 { left: 960px; top: 575px; animation-name: a2; }
+  .a3 { left: 80px; top: 795px; animation-name: a3; }
+  .a4 { left: 960px; top: 795px; animation-name: a4; }
+
+  /* ---------- Timeline (17s loop) ----------
+     0–4%    scene in             4–10%  definition
+     8–20%   End-User → Frontend & Host Agent → A2A Client (Cameriere)
+     20–26%  A2A Protocol lines fan out    24–30% A2A servers     30–36% Agent Card
+     40–44%  agnostic · 50–54% infrastructure flexibility · 60–64% independent scalability · 70–74% security
+     94%     final frame          96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes def { 0%, 4% { opacity: 0 } 10%, 100% { opacity: 1 } }
+  @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 11%, 100% { opacity: 1; transform: none } }
+  @keyframes k1 { 0%, 11% { transform: scaleX(0) } 13%, 100% { transform: none } }
+  @keyframes n2 { 0%, 12% { opacity: 0; transform: translateY(14px) } 15%, 100% { opacity: 1; transform: none } }
+  @keyframes k2 { 0%, 15% { transform: scaleX(0) } 17%, 100% { transform: none } }
+  @keyframes n3 { 0%, 16% { opacity: 0; transform: translateY(14px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes fan { 0%, 20% { stroke-dashoffset: 1 } 26%, 100% { stroke-dashoffset: 0 } }
+  @keyframes fanl { 0%, 20% { opacity: 0 } 24%, 100% { opacity: 1 } }
+  @keyframes servers { 0%, 24% { opacity: 0; transform: translateX(20px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes acard { 0%, 30% { opacity: 0; transform: translateY(14px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes a1 { 0%, 40% { opacity: 0; transform: translateY(18px) } 44%, 100% { opacity: 1; transform: none } }
+  @keyframes a2 { 0%, 50% { opacity: 0; transform: translateY(18px) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes a3 { 0%, 60% { opacity: 0; transform: translateY(18px) } 64%, 100% { opacity: 1; transform: none } }
+  @keyframes a4 { 0%, 70% { opacity: 0; transform: translateY(18px) } 74%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Third assembly line point · Technological Heterogeneity</small>Agent to Agent (A2A)</div>
+    <p class="def">The A2A protocol allows different AI agents (e.g. from ADK, CrewAI, LangGraph) to "speak the same language" (a common protocol) and follow specific processes to complete tasks together.</p>
+
+    <div class="n n-user"><span class="em">🧔</span>End-User</div>
+    <div class="link k1"></div>
+    <div class="n n-front"><span class="em">💻</span>Frontend &amp;<br>Host Agent</div>
+    <div class="link k2"></div>
+    <div class="card n n-client"><img src="_shared/img/agent-orange.png" alt="">Client/Router Agent<small>A2A Client (Cameriere Agent)</small></div>
+
+    <div class="fan-label">A2A Protocol</div>
+    <svg class="fan" viewBox="0 0 250 260" aria-hidden="true">
+      <path pathLength="1" d="M0 125 C 120 125, 130 26, 250 26"/>
+      <path pathLength="1" d="M0 125 C 120 125, 130 116, 250 116"/>
+      <path pathLength="1" d="M0 125 C 120 125, 130 206, 250 206"/>
+    </svg>
+
+    <div class="servers">
+      <div class="label">A2A Servers (Remote Suggeritore Agent)</div>
+      <div class="card srv"><span class="logo"><img src="_shared/img/adk.png" alt="ADK"></span><p>Specialized Agent 1 <span>(e.g. ADK)</span></p></div>
+      <div class="card srv"><span class="logo"><img src="_shared/img/langgraph.png" alt="LangGraph"></span><p>Specialized Agent 2 <span>(e.g. LangGraph)</span></p></div>
+      <div class="card srv"><span class="logo"><img src="_shared/img/crewai.png" alt="CrewAI"></span><p>Specialized Agent N <span>(e.g. CrewAI)</span></p></div>
+    </div>
+
+    <div class="card acard"><b>Agent Card</b><p>A machine-readable JSON metadata file that acts as a digital "business card" for an AI agent.</p><code>.well-known/agent.json</code></div>
+
+    <div class="card adv a1"><b>Agnostic</b><p>Sub-agents are <strong>tied to the specific AI library/framework language</strong> (e.g. Python wrappers) of the main agent, A2A is not.</p></div>
+    <div class="card adv a2"><b>Infrastructure Flexibility</b><p>Unlike agent/sub-agents, code <strong>updates happen strictly inside the agent</strong> that is involved, keeping the others untouched.</p></div>
+    <div class="card adv a3"><b>Independent Scalability</b><p>Agent and sub-agents share the same runtime/container, forcing monolithic scaling for heavy workloads. <strong>In A2A, agents scale independently.</strong></p></div>
+    <div class="card adv a4"><b>Security</b><p>Agent and sub-agents share an execution environment. In A2A, <strong>agents are isolated from each other</strong>: if one is compromised or misconfigured, the others are not.</p></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

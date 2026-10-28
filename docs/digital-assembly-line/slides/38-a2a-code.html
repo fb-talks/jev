@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>38 · A2A protocol</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 38 of the original deck (docs/digital-assembly-line/speaker-notes.md, "38 · Concept 7: A2A protocol").
+  Left: the question (host Suggeritore on another machine) and the two sides, A2A server (to_a2a) and
+  A2A client (RemoteA2aAgent). Right: the real code of branch 05d, server lines then client lines light up,
+  and under it a small diagram: Suggeritore becomes a service on port 8001 with its agent card,
+  Cameriere (port 8000) reads the card and delegates over JSON-RPC.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 15s; --lh: 30px; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .kicker em { font-style: normal; color: var(--pink); }
+  .tag { position: absolute; right: 80px; top: 74px; padding: 14px 28px; border-radius: 999px; background: #1d1f27; color: #f5c542; font-family: var(--mono); font-size: 22px; }
+
+  /* ---------- Left ---------- */
+  .txt { position: absolute; left: 80px; top: 200px; width: 730px; padding: 34px 38px; font-size: 25px; line-height: 1.42; }
+  .q { margin: 0 0 24px; opacity: 0; animation-name: q; }
+  .pt { position: relative; margin: 0 0 18px; padding-left: 26px; opacity: 0; }
+  .pt:last-child { margin-bottom: 0; }
+  .pt::before { content: ""; position: absolute; left: 0; top: 13px; width: 10px; height: 10px; border-radius: 50%; background: var(--pink); }
+  .pt code, .q code { font-family: var(--mono); font-size: 21px; background: var(--stage); padding: 1px 6px; border-radius: 6px; }
+  .p1 { animation-name: p1; } .p2 { animation-name: p2; }
+
+  /* ---------- Right: code ---------- */
+  .codecard { position: absolute; left: 850px; top: 180px; width: 930px; padding: 22px 28px 24px; border-radius: 24px; background: #1d1f27; border: 3px solid var(--pink); box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: codecard; }
+  .tabbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; font-family: var(--mono); font-size: 20px; color: #f5c542; }
+  .tabbar i { width: 11px; height: 11px; border-radius: 50%; background: #f5c542; }
+  .tabbar span { margin-left: 14px; }
+  .src { font-variant-ligatures: none; font-family: var(--mono); font-size: 20px; line-height: var(--lh); color: #e7e9ee; }
+  .l { white-space: pre; min-height: var(--lh); }
+  .c { color: #8d96a8; } .p { color: #ff5cd6; } .s { color: #9fe0b0; }
+  .grp { margin: 0 -14px; padding: 0 14px; border-radius: 8px; }
+  .g1 { animation-name: g1; } .g2 { animation-name: g2; }
+
+  /* ---------- Right: diagram ---------- */
+  .node { position: absolute; top: 720px; width: 330px; padding: 22px 26px; opacity: 0; z-index: 1; }
+  .node b { display: block; font-family: var(--hand); font-size: 38px; font-weight: 400; }
+  .node span { display: block; margin-top: 4px; font-size: 22px; color: #6b7280; }
+  .node code { font-family: var(--mono); font-size: 20px; }
+  .n-srv { left: 1450px; border: 2.5px solid var(--pink); animation-name: n-srv; }
+  .n-cli { left: 870px; animation-name: n-cli; }
+  .acard { position: absolute; left: 1475px; top: 630px; padding: 10px 16px; font-family: var(--mono); font-size: 20px; border-radius: 12px; background: var(--pink-bg); border: 2px solid var(--pink); opacity: 0; animation-name: acard; }
+  .wire { position: absolute; left: 1200px; top: 790px; width: 250px; height: 4px; background: var(--ink); transform-origin: left; transform: scaleX(0); animation-name: wire; }
+  .wire::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
+  .wlabel { position: absolute; left: 1200px; width: 250px; top: 812px; text-align: center; font-family: var(--mono); font-size: 22px; color: var(--pink); opacity: 0; animation-name: wlabel; }
+
+  /* ---------- Timeline (15s loop) ----------
+     0–4%    scene in                 4–10%  question       8–14%  code card
+     18–22%  point 1: A2A server      → server lines lit 18–44%
+     24–30%  Suggeritore service node (port 8001)    30–36%  its agent card
+     44–48%  point 2: A2A client      → client lines lit 44–94%
+     50–56%  Cameriere node (port 8000)
+     58–68%  arrow draws Cameriere → Suggeritore     66–72%  "JSON-RPC"
+     94%     final frame              96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes q { 0%, 4% { opacity: 0; transform: translateY(14px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes codecard { 0%, 8% { opacity: 0; transform: translateX(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes p1 { 0%, 18% { opacity: 0; transform: translateX(-16px) } 22%, 100% { opacity: 1; transform: none } }
+  @keyframes p2 { 0%, 44% { opacity: 0; transform: translateX(-16px) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes g1 { 0%, 18% { background: transparent; box-shadow: inset 4px 0 0 transparent } 20%, 42% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } 44%, 100% { background: transparent; box-shadow: inset 4px 0 0 transparent } }
+  @keyframes g2 { 0%, 44% { background: transparent; box-shadow: inset 4px 0 0 transparent } 46%, 100% { background: rgba(255,0,191,.2); box-shadow: inset 4px 0 0 var(--pink) } }
+  @keyframes n-srv { 0%, 24% { opacity: 0; transform: translateY(20px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes acard { 0%, 30% { opacity: 0; transform: translateY(10px) } 36%, 100% { opacity: 1; transform: none } }
+  @keyframes n-cli { 0%, 50% { opacity: 0; transform: translateY(20px) } 56%, 100% { opacity: 1; transform: none } }
+  @keyframes wire { 0%, 58% { transform: scaleX(0) } 68%, 100% { transform: scaleX(1) } }
+  @keyframes wlabel { 0%, 66% { opacity: 0 } 72%, 100% { opacity: 1 } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Concept 7 · Google · AI Community 2026</small><em>A2A</em> Protocol</div>
+    <div class="tag">04a, 04b &amp; 05d · Art #4 &amp; #5d</div>
+
+    <div class="card txt">
+      <p class="q">What if we want to host our <b>Suggeritore</b> agent on a different machine, since it needs higher computation resources? Let us scale across network boundaries using the Agent to Agent Protocol (or <code>A2A</code>):</p>
+      <p class="pt p1"><b>A2A Server (<code>to_a2a</code>):</b> turns <code>Suggeritore</code> into an independent HTTP microservice (<code>port=8001</code>) publishing <code>/.well-known/agent-card.json</code>, so that it is searchable.</p>
+      <p class="pt p2"><b>A2A Client (<code>RemoteA2aAgent</code>):</b> <code>Cameriere</code> connects to <code>Suggeritore</code> reading its data from the agent card and delegates tasks to it over <b>JSON-RPC</b>!</p>
+    </div>
+
+    <div class="codecard">
+      <div class="tabbar"><i></i><i></i><i></i><span>adk_agent_app_suggeritore/agent.py &amp; cameriere_agent.py (05d)</span></div>
+      <div class="src">
+        <div class="grp g1">
+          <div class="l"><span class="c"># Server (Port 8001): Expose Suggeritore as an A2A microservice</span></div>
+          <div class="l">a2a_app = <span class="p">to_a2a</span>(agent=suggeritore_soste_agent, port=8001)</div>
+        </div>
+        <div class="l"> </div>
+        <div class="grp g2">
+          <div class="l"><span class="c"># Client (Port 8000): Consume remotely via Agent Card</span></div>
+          <div class="l">remote_suggeritore = <span class="p">RemoteA2aAgent</span>(</div>
+          <div class="l">    name=<span class="s">"suggeritore_soste"</span>,</div>
+          <div class="l">    <span class="p">agent_card</span>=<span class="s">"http://localhost:8001/.well-known/agent-card.json"</span>,</div>
+          <div class="l">)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card node n-cli"><b>Cameriere</b><span>A2A client · <code>:8000</code></span></div>
+    <div class="wire"></div>
+    <div class="wlabel">JSON-RPC</div>
+    <div class="acard">agent-card.json</div>
+    <div class="card node n-srv"><b>Suggeritore</b><span>A2A server · <code>:8001</code></span></div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

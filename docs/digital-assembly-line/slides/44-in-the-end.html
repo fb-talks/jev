@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>44 · And in the end…</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 44 of the original deck (docs/digital-assembly-line/speaker-notes.md, "44 · And in the end…").
+  Statement slide: "And in the end…" / "Let's put it all together". Under it, the pieces seen in the talk
+  (sub-agents, AgentTools, session state, MCP, A2A, adk eval) fly in from scattered places and line up on one belt.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 9s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+  .eyebrow { position: absolute; left: 80px; top: 64px; font-size: 22px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
+  .title { position: absolute; left: 0; right: 0; top: 250px; margin: 0; text-align: center; font-family: var(--hand); font-size: 150px; font-weight: 400; line-height: 1.1; color: var(--pink); opacity: 0; animation-name: title; }
+  .sub { position: absolute; left: 0; right: 0; top: 460px; text-align: center; font-size: 44px; font-weight: 600; opacity: 0; animation-name: sub; }
+  .sub .underline-pink::after { width: 0; right: auto; animation-name: underline; }
+
+  .row { position: absolute; left: 0; right: 0; top: 700px; display: flex; justify-content: center; gap: 28px; }
+  .row .chip { font-size: 28px; padding: 14px 24px; opacity: 0; }
+  .row .chip--pink { color: var(--pink); }
+  .c1 { animation-name: c1; } .c2 { animation-name: c2; } .c3 { animation-name: c3; } .c4 { animation-name: c4; } .c5 { animation-name: c5; } .c6 { animation-name: c6; }
+  .belt { position: absolute; left: 260px; right: 260px; top: 800px; border-top: 4px dashed #cfd6e3; transform-origin: left; transform: scaleX(0); animation-name: belt; }
+
+  /* ---------- Timeline (9s loop) ----------
+     0–4%    scene in        4–14%  "And in the end…"       16–24%  "Let's put it all together", underline 24–32%
+     30–36%  belt draws
+     34–66%  the six pieces fly in and line up, one every ~6%
+     94%     final frame     96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes title { 0%, 4% { opacity: 0; transform: translateY(30px) } 14%, 100% { opacity: 1; transform: none } }
+  @keyframes sub { 0%, 16% { opacity: 0; transform: translateY(14px) } 24%, 100% { opacity: 1; transform: none } }
+  @keyframes underline { 0%, 24% { width: 0 } 32%, 100% { width: 100% } }
+  @keyframes belt { 0%, 30% { transform: scaleX(0) } 36%, 100% { transform: scaleX(1) } }
+  @keyframes c1 { 0%, 34% { opacity: 0; transform: translate(-300px, 200px) rotate(-14deg) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes c2 { 0%, 40% { opacity: 0; transform: translate(-120px, -200px) rotate(10deg) } 48%, 100% { opacity: 1; transform: none } }
+  @keyframes c3 { 0%, 46% { opacity: 0; transform: translate(-60px, 220px) rotate(-8deg) } 54%, 100% { opacity: 1; transform: none } }
+  @keyframes c4 { 0%, 52% { opacity: 0; transform: translate(80px, -220px) rotate(12deg) } 60%, 100% { opacity: 1; transform: none } }
+  @keyframes c5 { 0%, 58% { opacity: 0; transform: translate(160px, 200px) rotate(-10deg) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes c6 { 0%, 64% { opacity: 0; transform: translate(300px, -160px) rotate(14deg) } 72% { opacity: 1; transform: scale(1.08) } 75%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="eyebrow">Google · AI Community 2026</div>
+    <h1 class="title">And in the end…</h1>
+    <div class="sub"><span class="underline-pink">Let's put it all together</span></div>
+
+    <div class="belt"></div>
+    <div class="row">
+      <span class="chip c1">Sub-agents</span>
+      <span class="chip c2">AgentTools</span>
+      <span class="chip c3">Session state</span>
+      <span class="chip c4">MCP</span>
+      <span class="chip c5">A2A</span>
+      <span class="chip c6">adk eval</span>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

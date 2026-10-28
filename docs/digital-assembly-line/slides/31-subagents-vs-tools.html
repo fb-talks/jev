@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>31 · Sub-agents vs. tools</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Slide 31 of the original deck (docs/digital-assembly-line/speaker-notes.md, "31 · Sub-agents vs. tools").
+  How to decouple the existing architecture: the Gatekeeper code (screenshot) with tools=[...] and
+  sub_agents=[...] framed in pink, the definition of each under it, then the four questions that push
+  towards a distributed system: integration, maintenance, scalability, security.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 15s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Left: code (1360×814 shown at 880×527) + definitions ---------- */
+  .shot { position: absolute; left: 80px; top: 205px; width: 880px; height: 527px; border-radius: 18px; overflow: hidden; background: #1f1f1f; box-shadow: 0 24px 48px -28px rgba(0,0,0,.6); opacity: 0; animation-name: shot; }
+  .shot img { display: block; width: 880px; height: 527px; }
+  .box { position: absolute; left: 34px; height: 26px; border: 3px solid var(--pink); border-radius: 6px; opacity: 0; }
+  .bx-t { top: 451px; width: 262px; animation-name: bx-t; }
+  .bx-s { top: 475px; width: 462px; animation-name: bx-s; }
+
+  .def { position: absolute; top: 760px; width: 430px; height: 200px; padding: 22px 26px; opacity: 0; }
+  .def b { display: flex; align-items: center; gap: 12px; font-family: var(--hand); font-size: 34px; font-weight: 400; }
+  .def p { margin: 10px 0 0; font-size: 22px; line-height: 1.38; }
+  .def code { font-family: var(--mono); font-size: 20px; color: var(--pink); }
+  .d-t { left: 80px; animation-name: d-t; }
+  .d-s { left: 530px; animation-name: d-s; }
+
+  /* ---------- Right: the four questions ---------- */
+  .qs { position: absolute; left: 1020px; top: 205px; width: 820px; display: flex; flex-direction: column; gap: 22px; }
+  .qs .lead { font-family: var(--hand); font-size: 36px; line-height: 1.2; opacity: 0; animation-name: lead; }
+  .q { padding: 20px 28px; opacity: 0; }
+  .q b { display: block; font-size: 28px; color: var(--pink); }
+  .q p { margin: 6px 0 0; font-size: 24px; line-height: 1.38; }
+  .q1 { animation-name: q1; } .q2 { animation-name: q2; } .q3 { animation-name: q3; } .q4 { animation-name: q4; }
+
+  /* ---------- Timeline (15s loop) ----------
+     0–4%    scene in              4–10%  code screenshot
+     12–16%  tools=[…] framed      14–20% "Tools" card
+     22–26%  sub_agents=[…] framed 24–30% "Sub-agents" card
+     34–38%  "But what if…"
+     38–42%  integration · 48–52% maintenance · 58–62% scalability · 68–72% security
+     94%     final frame           96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes shot { 0%, 4% { opacity: 0; transform: translateY(20px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes bx-t { 0%, 12% { opacity: 0; transform: scale(1.1) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes bx-s { 0%, 22% { opacity: 0; transform: scale(1.1) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes d-t { 0%, 14% { opacity: 0; transform: translateY(16px) } 20%, 100% { opacity: 1; transform: none } }
+  @keyframes d-s { 0%, 24% { opacity: 0; transform: translateY(16px) } 30%, 100% { opacity: 1; transform: none } }
+  @keyframes lead { 0%, 34% { opacity: 0 } 38%, 100% { opacity: 1 } }
+  @keyframes q1 { 0%, 38% { opacity: 0; transform: translateX(24px) } 42%, 100% { opacity: 1; transform: none } }
+  @keyframes q2 { 0%, 48% { opacity: 0; transform: translateX(24px) } 52%, 100% { opacity: 1; transform: none } }
+  @keyframes q3 { 0%, 58% { opacity: 0; transform: translateX(24px) } 62%, 100% { opacity: 1; transform: none } }
+  @keyframes q4 { 0%, 68% { opacity: 0; transform: translateX(24px) } 72%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>How to decouple the existing architecture into a Distributed Multi-Agent System?</small>Sub-agents vs. tools</div>
+
+    <div class="shot">
+      <img src="_shared/img/subagents-code.png" alt="Gatekeeper root agent with tools=[verify_user_id_tool] and sub_agents=[registratore_agent, cameriere_agent]">
+      <div class="box bx-t"></div>
+      <div class="box bx-s"></div>
+    </div>
+    <div class="card def d-t"><b>🛠️ Tools</b><p>rigid functions written in pure code (e.g. GPS calculation or saving a user to a database).</p></div>
+    <div class="card def d-s"><b>🤖 Sub-agents</b><p>secondary AI agents managed by a primary agent to execute specific tasks.</p></div>
+
+    <div class="qs">
+      <div class="lead">But what if…</div>
+      <div class="card q q1"><b>Integration</b><p>What if we need to interact with components written in a different language?</p></div>
+      <div class="card q q2"><b>Maintenance</b><p>What if certain components of our system need frequent updates and maintenance?</p></div>
+      <div class="card q q3"><b>Scalability</b><p>What if the different components should scale at different rates?</p></div>
+      <div class="card q q4"><b>Security</b><p>What if one of our components is compromised?</p></div>
+    </div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>
