@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { FlowDiagram } from "../_components/flow";
 
-export default function Demo1() {
+// The interactive part of the demo; the code panel comes from the server, already highlighted.
+export default function Demo1({ code }: { code: React.ReactNode }) {
   const [text, setText] = useState("Who taught you to code? Useless post.");
   const [before, setBefore] = useState<BeforeStep | null>(null);
   const [gemini, setGemini] = useState<GeminiStep | null>(null);
@@ -52,44 +54,73 @@ export default function Demo1() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 py-10">
-      <h1 className="text-2xl font-semibold">Demo 1 · Gemini rewrites, Jev confirms</h1>
-      <p className="-mt-2 text-zinc-600 dark:text-zinc-400">A rude comment goes in. Jev measures how offensive it is, Gemini rewrites it politely, and Jev measures it again: the drop in probability proves the rewrite worked.</p>
-
-      <textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        rows={3}
-        className="rounded-xl border border-zinc-300 bg-transparent p-3 dark:border-zinc-700"
-      />
-
-      <button onClick={rewrite} disabled={loading} className="self-start rounded-full bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">
-        {loading ? "Rewriting…" : "Rewrite politely"}
-      </button>
-
-      {before && (
-        <Card title="1 · Jev measures the original" subtitle={`${before.ms} ms`} question={before.question}>
-          <p>{text}</p>
-          <Bar label="Offensive" value={before.offensive} />
-        </Card>
-      )}
-      {gemini && (
-        <Card title="2 · Gemini rewrites it" subtitle={`${gemini.ms} ms`}>
-          <blockquote className="border-l-4 border-indigo-500 pl-3 italic">{gemini.rewritten}</blockquote>
-        </Card>
-      )}
-      {after && before && (
-        <Card title="3 · Jev measures the rewrite" subtitle={`${after.ms} ms`} question={before.question}>
-          <Bar label="Offensive" value={after.offensive} highlight />
-        </Card>
-      )}
-      {waitingFor && <p className="animate-pulse text-sm text-zinc-500">{waitingFor}</p>}
-      {before && gemini && after && (
-        <p className="text-sm text-zinc-500">
-          Jev, twice: {before.ms + after.ms} ms · Gemini: {gemini.ms} ms
+    // talk layout, one column: what it does, how it works (diagram, then code), the live demo
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10">
+      <header>
+        <h1 className="text-2xl font-semibold">Demo 1 · Gemini rewrites, Jev confirms</h1>
+        <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+          A rude comment goes in. Jev measures how offensive it is, Gemini rewrites it politely, and Jev measures it again: the drop in probability
+          proves the rewrite worked.
         </p>
-      )}
-      {error && <p className="text-rose-600">{error}</p>}
+      </header>
+
+      <section className="flex flex-col gap-4">
+
+        <FlowDiagram
+          lanes={[
+            {
+              columns: [
+                [{ label: "Comment" }],
+                [{ label: "Jev measures", note: "P(offensive) before", kind: "jev" }],
+                [{ label: "Gemini rewrites", note: "polite, same meaning", kind: "gemini" }],
+                [{ label: "Jev measures again", note: "P(offensive) after", kind: "jev" }],
+                [{ label: "Before vs after", note: "did the rewrite work?", kind: "ok" }],
+              ],
+            },
+          ]}
+          caption="Jev measures the same question twice, on the original and on Gemini's rewrite: the drop in probability is the proof that the rewrite worked."
+          wide={false}
+        />
+
+        {code}
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={3}
+          className="rounded-xl border border-zinc-300 bg-transparent p-3 dark:border-zinc-700"
+        />
+
+        <button onClick={rewrite} disabled={loading} className="self-start rounded-full bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">
+          {loading ? "Rewriting…" : "Rewrite politely"}
+        </button>
+
+        {before && (
+          <Card title="1 · Jev measures the original" subtitle={`${before.ms} ms`} question={before.question}>
+            <p>{text}</p>
+            <Bar label="Offensive" value={before.offensive} />
+          </Card>
+        )}
+        {gemini && (
+          <Card title="2 · Gemini rewrites it" subtitle={`${gemini.ms} ms`}>
+            <blockquote className="border-l-4 border-indigo-500 pl-3 italic">{gemini.rewritten}</blockquote>
+          </Card>
+        )}
+        {after && before && (
+          <Card title="3 · Jev measures the rewrite" subtitle={`${after.ms} ms`} question={before.question}>
+            <Bar label="Offensive" value={after.offensive} highlight />
+          </Card>
+        )}
+        {waitingFor && <p className="animate-pulse text-sm text-zinc-500">{waitingFor}</p>}
+        {before && gemini && after && (
+          <p className="text-sm text-zinc-500">
+            Jev, twice: {before.ms + after.ms} ms · Gemini: {gemini.ms} ms
+          </p>
+        )}
+        {error && <p className="text-rose-600">{error}</p>}
+      </section>
     </main>
   );
 }

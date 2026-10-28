@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { FlowDiagram } from "../_components/flow";
 
-export default function Demo6() {
+// The interactive part of the demo; the code panel comes from the server, already highlighted.
+export default function Demo6({ code }: { code: React.ReactNode }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
@@ -85,6 +87,29 @@ export default function Demo6() {
           Both models answer the same three questions; our policy turns the answers into a decision. Who agrees more with the human, and how fast?
         </p>
       </header>
+
+      <FlowDiagram
+        wide={false}
+        lanes={[
+          {
+            columns: [
+              [{ label: "CSV row", note: "comment + expected" }],
+              [
+                { label: "Jev answers", note: "3 questions · probabilities", kind: "jev" },
+                { label: "Gemini answers", note: "3 questions · labels", kind: "gemini" },
+              ],
+              [
+                { label: "policy", note: "→ decision", kind: "code" },
+                { label: "policy", note: "→ decision", kind: "code" },
+              ],
+              [{ label: "vs expected", note: "accuracy · time", kind: "ok" }],
+            ],
+          },
+        ]}
+        caption="The same policy turns each model's answers into publish, review or reject; the human's expected decision tells who is right more often."
+      />
+
+      {code}
 
       <div className="flex flex-wrap items-center gap-3">
         <label className="cursor-pointer rounded-full border border-zinc-300 px-4 py-2 text-sm hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900">

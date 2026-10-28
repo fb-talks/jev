@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { FlowDiagram } from "../_components/flow";
 
-export default function Demo3() {
+// The interactive part of the demo; the code panel comes from the server, already highlighted.
+export default function Demo3({ code }: { code: React.ReactNode }) {
   const [text, setText] = useState("I followed the tutorial but the build fails. Any idea?");
   const [gemini, setGemini] = useState<GeminiStep | null>(null);
   const [jev, setJev] = useState<JevStep | null>(null);
@@ -49,9 +51,31 @@ export default function Demo3() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4 py-10">
       <h1 className="text-2xl font-semibold">Demo 3 · Gemini proposes, Jev picks</h1>
       <p className="-mt-2 text-zinc-600 dark:text-zinc-400">Gemini writes three different replies to a blog comment. Jev scores each one, and our code keeps the best: instead of fixing one draft, you choose among several.</p>
+
+      <FlowDiagram
+        wide={false}
+        lanes={[
+          {
+            columns: [
+              [{ label: "Blog comment" }],
+              [{ label: "Gemini proposes", note: "3 replies, structured", kind: "gemini" }],
+              [
+                { label: "Jev scores", note: "curt", kind: "jev" },
+                { label: "Jev scores", note: "friendly", kind: "jev" },
+                { label: "Jev scores", note: "detailed", kind: "jev" },
+              ],
+              [{ label: "highest\nscore?", kind: "code" }],
+              [{ label: "Best reply", note: "picked by our code", kind: "ok" }],
+            ],
+          },
+        ]}
+        caption="Gemini returns three replies as structured data; Jev scores them in parallel, and our code keeps the one with the highest score."
+      />
+
+      {code}
 
       <textarea
         value={text}

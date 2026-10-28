@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { DemoNav } from "../_components/demo-nav";
 
-// Every demo in this section gets a fixed back button to the home page.
+// Every demo in this section gets a fixed back button to the home page, and arrows to the previous and next demo.
 export default function Layout({ children }: LayoutProps<"/1-jev">) {
   return (
     <>
@@ -12,6 +13,7 @@ export default function Layout({ children }: LayoutProps<"/1-jev">) {
       >
         ←
       </Link>
+      <DemoNav />
       {children}
     </>
   );

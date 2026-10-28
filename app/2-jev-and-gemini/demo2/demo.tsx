@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FlowDiagram } from "../_components/flow";
 
 // A few ready-made styles, so the demo can show every outcome with one click.
 const styles = [
@@ -11,7 +12,8 @@ const styles = [
   "generic boilerplate that ignores the problem",
 ];
 
-export default function Demo2() {
+// The interactive part of the demo; the code panel comes from the server, already highlighted.
+export default function Demo2({ code }: { code: React.ReactNode }) {
   const [message, setMessage] = useState("I was charged twice for my subscription this month and nobody has answered my emails.");
   const [style, setStyle] = useState(styles[1]);
   const [gemini, setGemini] = useState<GeminiStep | null>(null);
@@ -59,9 +61,26 @@ export default function Demo2() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-4xl flex-col gap-4 px-4 py-10">
       <h1 className="text-2xl font-semibold">Demo 2 · Gemini replies, Jev evaluates</h1>
       <p className="-mt-2 text-zinc-600 dark:text-zinc-400">Gemini drafts a support reply in the style you choose. Jev checks whether it addresses the customer&apos;s problem and how it treats the customer: the check you run before a reply goes out.</p>
+
+      <FlowDiagram
+        wide={false}
+        lanes={[
+          {
+            columns: [
+              [{ label: "Customer message" }],
+              [{ label: "Gemini writes", note: "a reply in the chosen style", kind: "gemini" }],
+              [{ label: "Jev evaluates", note: "relevance + tone", kind: "jev" }],
+              [{ label: "Verdict", note: "can the reply go out?", kind: "ok" }],
+            ],
+          },
+        ]}
+        caption="Gemini is the writer, Jev the controller: it sees both the customer's message and the reply, because relevance only makes sense against the request."
+      />
+
+      {code}
 
       <label className="flex flex-col gap-1 text-sm font-medium">
         Customer&apos;s message

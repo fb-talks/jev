@@ -1,8 +1,10 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import { FlowDiagram } from "../_components/flow";
 
-export default function Demo5() {
+// The interactive part of the demo; the code panel comes from the server, already highlighted.
+export default function Demo5({ code }: { code: React.ReactNode }) {
   const [input, setInput] = useState(defaultUrls.join("\n"));
   const [rows, setRows] = useState<Row[]>([]);
   const [running, setRunning] = useState(false);
@@ -60,6 +62,26 @@ export default function Demo5() {
           We scrape each home page once, then Jev and Gemini classify the same text. Who is faster, and do they agree?
         </p>
       </header>
+
+      <FlowDiagram
+        wide={false}
+        lanes={[
+          {
+            columns: [
+              [{ label: "Website URL", note: "20 home pages" }],
+              [{ label: "Scrape once", note: "title · description · text", kind: "step" }],
+              [
+                { label: "Jev classifies", note: "type · sector · commercial", kind: "jev" },
+                { label: "Gemini classifies", note: "the same 3 questions", kind: "gemini" },
+              ],
+              [{ label: "Compare", note: "time · agreement", kind: "ok" }],
+            ],
+          },
+        ]}
+        caption="Both models read exactly the same text and answer the same three questions, at the same time: the only difference is the model."
+      />
+
+      {code}
 
       <textarea
         value={input}
