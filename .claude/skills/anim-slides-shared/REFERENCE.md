@@ -24,6 +24,7 @@ self-contained HTML page with a CSS-only animation, used as the screen for one s
 | `<deck>/_shared/anim.js` | Scaling, play-once + replay, keyboard, **slide order** (`slides` array). **Live copy** for that deck. |
 | `assets/anim.css`, `assets/anim.js` | Starter runtime, copied into `<deck>/_shared/` when creating a new deck. |
 | `template.html` | Starting point for a new slide (copy into the deck folder). |
+| `scripts/serve.mjs` | Local server for the decks (`npm run slides` → http://localhost:3210/, serves `docs/`): no caching, URLs keep `.html` (clean-URL servers like `npx serve` break the navigation). |
 | `scripts/snap.mjs` | Screenshots slides at chosen points of their timeline (verification). |
 | `scripts/export.mjs` | Exports slides as MP4 (frame by frame, 0 → 94%, then holds the last frame) and PNG stills, controls hidden. Output in `<deck>/_export/` (git-ignored). |
 
@@ -38,9 +39,17 @@ When changing the runtime in a deck, ask whether the starter in `assets/` should
 - Bottom-left badge: file prefix + position in `slides` (e.g. `05e · 12 / 15`); clicking it opens a full-height
   slide list (titles from the video script headings). Next to it a **Notes** button (or `N`) opens the speaker
   notes panel at the bottom. Keep that corner free too.
+- `P` (or the `↗` button next to Notes) opens the notes in their own window (`page.html?notes`, e.g. on a second
+  monitor). The two windows stay in sync over a `BroadcastChannel` (one per deck): the notes window follows the
+  slide on screen, and arrows / Space / R pressed in it drive the slides window.
 - Speaker notes are not stored in the slides: `const SCRIPT` in `anim.js` points to the video script, and each
   slide shows the script section that holds its 🎬 link (fetched at runtime, so over http, not `file://`).
   To change the notes, edit the script. `.github/pages/build.mjs` publishes the script next to the deck.
+- Dev mode: served by `npm run slides` (`scripts/serve.mjs`, which adds `X-Slides-Dev` to its responses), the notes
+  panel has an **Edit** button: one textarea per block of the slide's section (split at blank lines and where `>`
+  quotes start/end; quotes are edited without `>`), `⌘S` saves the section back into the script via `POST /__notes`.
+  The 🎬 line and `---` are not editable. The save is refused (409) if the section changed in the file meanwhile.
+  Published decks (no such header) stay read-only.
 - `page.html#t=0.5` freezes the slide at 50% of its timeline (used by `snap.mjs`).
 - Navigation follows the `slides` array in `anim.js`, not the file system: **every slide must be listed there**.
 

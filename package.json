@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "slides": "node .claude/skills/anim-slides-shared/scripts/serve.mjs docs",
     "slides:export": "node .claude/skills/anim-slides-shared/scripts/export.mjs"
   },
   "dependencies": {

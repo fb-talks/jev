@@ -149,5 +149,79 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .notes ul { margin: 0 0 10px; padding-left: 22px; }
 .notes-empty { color: #6b7280; }
 
+/* Dev mode (npm run slides): Edit turns the notes into one textarea per block of the script section */
+.notes-btn {
+  padding: 6px 12px; border-radius: 8px; cursor: pointer; background: #fff; border: 1px solid #e3e7ef; color: #6b7280;
+  font: 500 13px/1 var(--mono);
+}
+.notes-btn:hover { color: var(--pink); border-color: var(--pink); }
+.notes-edit { float: right; margin-left: 12px; }
+.notes-btn.save { background: var(--pink); border-color: var(--pink); color: #fff; }
+.notes-form label { display: block; margin: 0 0 14px; font: 500 12px var(--mono); color: #6b7280; text-transform: uppercase; letter-spacing: .4px; }
+.notes-form textarea {
+  display: block; width: 100%; box-sizing: border-box; margin-top: 4px; padding: 10px 12px; resize: vertical;
+  border: 1px solid #e3e7ef; border-radius: 8px; font: 16px/1.5 var(--sans); color: var(--ink); text-transform: none; letter-spacing: 0;
+}
+.notes-form textarea.quote { border-left: 3px solid var(--pink); font-size: 18px; }
+.notes-form textarea:focus { outline: none; border-color: var(--pink); }
+.notes-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.notes-status { color: #6b7280; font-size: 14px; }
+
+/* page.html?notes (P): the notes window, only the notes at full height; the slide number stays as a reference */
+.presenter .frame, .presenter .replay, .presenter .slide-menu, .presenter .notes-toggle, .presenter .notes-window { display: none; }
+.presenter .notes { display: block; top: 0; height: auto; border-top: 0; box-shadow: none; font-size: 22px; }
+.presenter .notes-body { padding-bottom: 80px; }
+.presenter .notes h2 { font-size: 34px; }
+.presenter .notes blockquote { font-size: 26px; }
+.presenter .slide-id { pointer-events: none; }
+
 /* H toggles .bare on <html>: no on-screen controls, e.g. while recording */
 .bare .replay, .bare .dock, .bare .notes, .bare .slide-menu { display: none; }
+
+/* ---------- Drawing toolbar (draw.js, D) ---------- */
+/* Layer over the slide, outside .frame (not paused with it): 1920×1080, placed and scaled like .frame by draw.js */
+.draw-layer {
+  position: fixed; left: 0; top: 0; z-index: 45; width: 1920px; height: 1080px; transform-origin: 0 0;
+  overflow: hidden; pointer-events: none; touch-action: none;
+}
+.drawing .draw-layer { pointer-events: auto; cursor: crosshair; }
+.draw-layer svg { position: absolute; inset: 0; }
+.draw-stroke { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.draw-guide { fill: none; stroke-width: 2; stroke-dasharray: 6 12; stroke-linecap: round; opacity: .3; }
+/* Spotlight: everything outside the box dims and blurs */
+.draw-spot { position: absolute; inset: 0; animation: draw-fade .35s ease-out both; }
+.draw-spot-dim { position: absolute; inset: 0; background: rgba(15,18,30,.55); backdrop-filter: blur(6px) saturate(.6); }
+.draw-spot-ring { position: absolute; box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 24px 60px -12px rgba(0,0,0,.6); }
+@keyframes draw-fade { from { opacity: 0; } }
+
+/* Toolbar, right edge; the launcher button takes its place when it is closed */
+.draw-bar, .draw-launcher { position: fixed; right: 20px; top: 50%; z-index: 55; transform: translateY(-50%); }
+.draw-bar {
+  display: none; flex-direction: column; align-items: center; gap: 2px; max-height: calc(100vh - 24px); overflow-y: auto; padding: 8px;
+  border-radius: 16px; background: rgba(255,255,255,.95); border: 1px solid #e3e7ef; box-shadow: 0 16px 40px -20px rgba(0,0,0,.45);
+}
+.draw-open .draw-bar { display: flex; }
+.draw-open .draw-launcher { display: none; }
+.draw-bar button, .draw-launcher {
+  flex: none; width: 40px; height: 40px; padding: 0; display: grid; place-items: center;
+  border: 0; border-radius: 10px; background: none; color: #6b7280; cursor: pointer;
+}
+.draw-bar button:hover { background: var(--stage); color: var(--ink); }
+.draw-bar button.on { background: var(--pink-bg); color: var(--draw-color, var(--pink)); }
+.draw-bar svg, .draw-launcher svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.draw-bar hr { flex: none; width: 24px; margin: 4px 0; border: 0; border-top: 1px solid #e3e7ef; }
+.draw-bar .draw-color { width: 34px; height: 34px; border-radius: 50%; }
+.draw-color::after { content: ""; width: 18px; height: 18px; border-radius: 50%; background: var(--c); }
+.draw-bar .draw-color.on { background: none; box-shadow: inset 0 0 0 2.5px var(--c); }
+.draw-launcher { background: rgba(255,255,255,.85); border: 1px solid #e3e7ef; opacity: .6; }
+.draw-launcher:hover { opacity: 1; color: var(--pink); border-color: var(--pink); }
+/* H (recording): no toolbar, but D, 1–5, Z, C and the last tool still work */
+.bare .draw-bar, .bare .draw-launcher { display: none; }
+@media (max-width: 900px), (max-height: 500px) {
+  .draw-bar, .draw-launcher { right: 8px; }
+  .draw-bar { padding: 4px; }
+  .draw-bar button, .draw-launcher { width: 30px; height: 30px; }
+  .draw-bar .draw-color { width: 26px; height: 26px; }
+  .draw-color::after { width: 14px; height: 14px; }
+  .draw-bar svg, .draw-launcher svg { width: 18px; height: 18px; }
+}
