@@ -44,3 +44,9 @@ next-env.d.ts
 # exported slide videos and stills (npm run slides:export)
 _export/
 /_site
+
+# PromptOps context snapshot
+.promptops/
+
+# PromptOps session assets
+.promptops-assets/

@@ -19,6 +19,7 @@ const questions = {
     relevant: "Comment, opinion or question about the post's content",
     spam: "Advertising, promotional links or unsolicited messages",
     off_topic: "Has nothing to do with the post",
+    adult: "Sexually explicit or adult content",
   }),
   // score: a level on an ordered scale, from 0 to 3
   toxicity: score("How offensive is the tone of the comment?", [
@@ -36,7 +37,7 @@ const questions = {
     code: `const { answers } = await jev.systemOne({ state: text, questions });
 
 answers.category.choice;        // "relevant"
-answers.category.probabilities; // { relevant: 0.94, spam: 0.01, off_topic: 0.05 }
+answers.category.probabilities; // { relevant: 0.94, spam: 0.01, off_topic: 0.04, adult: 0.01 }
 answers.toxicity.score;         // 0.3 (from 0 to 3)
 answers.asks_author.noul;       // 0.91`,
   },

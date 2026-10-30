@@ -7,7 +7,7 @@ const questions = {
     relevant: "Comment, opinion or question about the post's content",
     spam: "Advertising, promotional links or unsolicited messages",
     off_topic: "Has nothing to do with the post",
-    sex: "Sex and erotic content"
+    adult: "Sexually explicit or adult content",
   }),
   toxicity: score("How offensive is the tone of the comment?", [
     "Polite or neutral",
