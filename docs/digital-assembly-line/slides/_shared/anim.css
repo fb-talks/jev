@@ -215,7 +215,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .draw-bar .draw-color.on { background: none; box-shadow: inset 0 0 0 2.5px var(--c); }
 .draw-launcher { background: rgba(255,255,255,.85); border: 1px solid #e3e7ef; opacity: .6; }
 .draw-launcher:hover { opacity: 1; color: var(--pink); border-color: var(--pink); }
-/* H (recording): no toolbar, but D, 1–5, Z, C and the last tool still work */
+/* H (recording): no toolbar, but D, 1–5, Z, Esc and the last tool still work */
 .bare .draw-bar, .bare .draw-launcher { display: none; }
 @media (max-width: 900px), (max-height: 500px) {
   .draw-bar, .draw-launcher { right: 8px; }

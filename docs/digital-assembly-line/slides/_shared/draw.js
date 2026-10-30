@@ -1,7 +1,7 @@
 // Drawing toolbar over the slide, for presenting live. Loaded by anim.js (not in the notes window).
 //   D = open / close the toolbar (open state, tool and color are remembered across slides)
 //   Tools: pen · ellipse (dashed guide, then drawn like a pen) · spotlight (the rest dims and blurs) · arrow
-//   1–5 = color · Z (or ⌘/Ctrl+Z) = undo · Esc (or C) = clear the slide · the pointer tool lets clicks reach the slide
+//   1–5 = color · Z (or ⌘/Ctrl+Z) = undo · Esc = clear the slide · the pointer tool lets clicks reach the slide
 // Drawings live in a layer outside .frame, so they are not paused or replayed with the slide; they last
 // until the page changes. The layer is 1920×1080 like the slide and follows its position and scale.
 (() => {
@@ -254,7 +254,7 @@
     if (k === "z" && !e.shiftKey) { if (e.metaKey || e.ctrlKey) e.preventDefault(); return undo(); }
     if (e.metaKey || e.ctrlKey) return;
     if (k === "d") setOpen(!state.open);
-    else if (k === "c" || k === "escape") clear();
+    else if (k === "escape") clear();
     else if (state.open && /^[1-5]$/.test(e.key)) { state.color = +e.key - 1; render(); }
   });
 
