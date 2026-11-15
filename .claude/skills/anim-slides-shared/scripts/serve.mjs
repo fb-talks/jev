@@ -51,10 +51,28 @@ const saveNotes = (req, res) => {
   });
 };
 
+// Decks are the folders of root with a slides/ folder; a deck's first slide is its first .html by name
+const decks = () => fs.readdirSync(root).filter((d) => fs.existsSync(path.join(root, d, "slides"))).sort();
+const firstSlide = (dir) => {
+  const slides = path.join(dir, "slides");
+  const html = fs.existsSync(slides) ? fs.readdirSync(slides).filter((f) => f.endsWith(".html")).sort() : [];
+  return html.length ? path.join(slides, html[0]) : null;
+};
+const deckList = () =>
+  `<!doctype html><meta charset="utf-8"><title>Slides</title><h1>Slides</h1><ul>${decks()
+    .map((d) => `<li><a href="/${d}/">${d}</a></li>`)
+    .join("")}</ul>`;
+
 http.createServer((req, res) => {
   if (req.url === "/__notes") return req.method === "POST" ? saveNotes(req, res) : res.writeHead(405, headers).end();
   let file = path.join(root, decodeURIComponent(new URL(req.url, "http://x").pathname));
   if (!inside(file)) return res.writeHead(403, headers).end();
+  if (fs.existsSync(file) && fs.statSync(file).isDirectory() && !fs.existsSync(path.join(file, "index.html"))) {
+    // A deck folder (or its slides/ folder) jumps to the first slide; the root lists the decks
+    if (path.resolve(file) === root) return res.writeHead(200, { ...headers, "Content-Type": "text/html; charset=utf-8" }).end(deckList());
+    const first = firstSlide(path.basename(file) === "slides" ? path.dirname(file) : file);
+    if (first) return res.writeHead(302, { ...headers, Location: "/" + path.relative(root, first).split(path.sep).join("/") }).end();
+  }
   if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, "index.html");
   fs.readFile(file, (err, data) => {
     if (err) return res.writeHead(404, headers).end("Not found");
@@ -63,4 +81,7 @@ http.createServer((req, res) => {
       "Content-Type": `${types[path.extname(file).toLowerCase()] ?? "application/octet-stream"}; charset=utf-8`,
     }).end(data);
   });
-}).listen(port, "localhost", () => console.log(`Slides: http://localhost:${port}/ (serving ${path.relative(process.cwd(), root) || "."}, no cache, notes editable)`));
+}).listen(port, "localhost", () => {
+  console.log(`Slides: http://localhost:${port}/ (serving ${path.relative(process.cwd(), root) || "."}, no cache, notes editable)`);
+  for (const d of decks()) console.log(`  ${d}: http://localhost:${port}/${d}/`);
+});

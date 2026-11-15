@@ -51,6 +51,10 @@ When changing the runtime in a deck, ask whether the starter in `assets/` should
   The 🎬 line and `---` are not editable. The save is refused (409) if the section changed in the file meanwhile.
   Published decks (no such header) stay read-only.
 - `page.html#t=0.5` freezes the slide at 50% of its timeline (used by `snap.mjs`).
+- Click-through steps (video-talk deck only for now): `<div class="frame" data-stops="0.26,0.5">` makes the slide wait
+  at those fractions of the loop, with a pulsing › bottom-right. Click the slide, → / PageDown or Space to go on;
+  → while a step plays jumps to its stop. Pick stops at the start of each beat (from the Timeline comment).
+  Stops only apply while playing, so `#t=`, `snap.mjs` and `export.mjs` are unaffected.
 - Navigation follows the `slides` array in `anim.js`, not the file system: **every slide must be listed there**.
 
 ## Page contract
@@ -65,6 +69,10 @@ When changing the runtime in a deck, ask whether the starter in `assets/` should
 <div class="frame"> … </div>                           <!-- everything animated lives inside .frame -->
 <script src="_shared/anim.js"></script>               <!-- last thing in <body> -->
 ```
+
+Reserved class names: the runtime adds `.notes` (speaker notes panel), `.replay`, `.stop-hint`, `.dock`, `.slide-menu`,
+`.slide-id` and `.notes-*` / `.draw-*` outside `.frame`. Don't use them for slide elements: a page rule like `.notes { … }`
+also restyles the runtime's element (e.g. the notes panel shows up under the slide).
 
 `anim.css` gives every element inside `.frame` `animation-duration: var(--loop)` and an infinite iteration
 count: an element only needs `animation-name`. **All keyframe percentages are relative to the whole loop**,

@@ -343,17 +343,19 @@ Vale lo stesso per le conoscenze: Jev sa le stesse cose generiche di un modello 
 
 🎬 [`slides/07c-non-solo-jev.html`](./slides/07c-non-solo-jev.html)
 
-Jev non è più l'unico decision model. **Liquid AI** ha pubblicato due modelli dello stesso tipo:
+Jev non è più l'unico decision model. **Liquid AI** ha pubblicato due modelli dello stesso tipo, e a novembre è arrivato anche **Google**:
 
 - **d1** (annunciato il 29 settembre 2026): non genera testo e restituisce probabilità sulle opzioni date (`output_tokens` sempre 0). Al lancio era solo via API, con un livello gratuito (`d1:free`) e senza un listino pubblicato;
 - **d1-ultra** (15 ottobre 2026, disponibile lo stesso giorno su Vercel AI Gateway come `liquid/d1-ultra`): il modello più grande, legge testo e immagini. Costa **0,042 $ per milione di token in input** (come Jev) e l'output è gratis.
+- **Gemini Decision 1** (`gemini-decision-1`, annunciato l'11 novembre 2026 sul blog di Google, "Gemini Decisions API: Fast, calibrated multimodal decisions"): disponibile nella Gemini API e in Google AI Studio, con un livello gratuito per prototipare; su Google Cloud "coming soon". Gli stessi tre tipi di domanda, con gli stessi nomi (`noul`, `choice` da 2 a 255 opzioni, `score`), fino a **1.000 domande** per richiesta su un input condiviso fino a 256K token di **testo, immagini, audio, video e PDF**. Restituisce probabilità e una confidenza da 0 a 1. Costa **0,10 $ per milione di token in input**, output 0 $; l'input condiviso si paga **una volta per richiesta**, ogni domanda aggiunge solo i suoi token. Latenza dichiarata 150–250 ms. Si usa con il suo SDK (`google-genai`, `client.decisions.create`), non con quello di TypeSafe. Fonti: [blog di Google](https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/), [listino](https://ai.google.dev/gemini-api/docs/pricing). Il listino non è stato letto per intero: il prezzo riportato qui è quello del blog.
 
-**La stessa API di Jev.** Gli stessi tre tipi (`noul`, `choice`, `score`) e un endpoint chiamato `/decisions/v1/systemone`. Si usa l'SDK di TypeSafe cambiando chiave, `baseURL` (`https://api.liquid.ai`) e nome del modello.
+**La stessa API di Jev (Liquid).** Gli stessi tre tipi (`noul`, `choice`, `score`) e un endpoint chiamato `/decisions/v1/systemone`. Si usa l'SDK di TypeSafe cambiando chiave, `baseURL` (`https://api.liquid.ai`) e nome del modello.
 
 **Differenze e cautele:**
 
 - d1-ultra fa pagare **ogni immagine per ogni domanda**, mentre Jev fa pagare lo state una volta per richiesta: con tante domande sulla stessa foto costa molto di più;
 - il "d1 batte Jev" viene dai test di Liquid: sul Decision Index 0.2.1, rifatto da loro, d1 prende 58,9 contro 57,9 di Jev 1.13. In un benchmark di terzi (typed-decisions, dati sintetici) i due sono vicini: accuratezza 0,742 contro 0,727, e Jev ha un Brier score leggermente migliore;
+- anche Google dice che Gemini Decision 1 "leads across the suite" con l'errore di calibrazione più basso, ma senza nominare nel testo i modelli con cui si confronta: anche questo è un benchmark del produttore;
 - d1-ultra è primo nell'Artificial Analysis Decision Index v1.0 (13 ottobre 2026), ma il vantaggio viene soprattutto dal fatto che si astiene più spesso, non da più risposte giuste. Secondo Artificial Analysis tutti i decision model testati sono troppo sicuri di sé;
 - le fonti non sono d'accordo su alcuni dettagli (finestra di contesto, date esatte, pesi aperti di varianti più piccole): prima di citarli, ricontrollare la documentazione di Liquid.
 

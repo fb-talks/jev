@@ -25,12 +25,10 @@ Legenda:
 
 ### 01d · Hook (0:00 – 0:30)
 
-🖥️ **SCHERMO**: `/1-jev/demo1`. Scrivo "Who taught you to code? Useless post." e clicco **Analyze**. Compare "Offensive: 80%" circa (valore reale: 79–81%).
-
 🎙️ **VOCE**:
-> Questo non è un LLM per darvi una risposta testuale o che vi scrive un paragrafo per dirvi che il commento è offensivo.
+> Quello che vediamo in azione non è un LLM per darvi una risposta testuale o che vi scrive un paragrafo per dirvi che il commento è offensivo.
 > È un modello che vi risponde con un numero: offensivo, all'ottanta per cento. In pochi millisecondi anziché secondi o minuti.
-> Si chiama **Jev**, e oggi vediamo cos'è, come si usa e, soprattutto, come fa a "sapere" che una frase è un insulto.
+> Tra i più noti troviamo **Jev** e **Gemini Decision Mode**, e oggi vediamo cosa sono, come si usano e, soprattutto, come fammp a "sapere" che una frase è un insulto.
 
 ✂️ Titolo a schermo: **"Un LLM scrive. Jev sceglie."**
 
@@ -118,7 +116,7 @@ Legenda:
 > Con un **classificatore classico**: raccogliete un dataset etichettato, lo addestrate, ed è veloce ed economico. Ma le etichette sono fisse: se aggiungete una categoria, si riaddestra.
 > Oppure con un **LLM e un prompt**: flessibile, ma vi risponde con del testo da interpretare e validare, ed è lento e caro.
 > Jev sta in mezzo: **non dovete addestrarlo**. Gli date le categorie a ogni richiesta, come in un prompt, e vi risponde con un valore tipizzato e le probabilità, come un classificatore.
-> Questa categoria di modelli si chiama **decision model**. "System One" è il nome che gli dà TypeSafe.
+> Questa categoria di modelli si chiama **decision model**. "System One" è il nome che gli dà TypeSafe e Google lo chiama invece Gemini Decision API.
 > Attenzione: "non dovete addestrarlo" non vuol dire che non sia addestrato. Il linguaggio lo conosce già, e come fa lo vediamo più avanti. Quello che non serve è addestrarlo sui **vostri** dati.
 
 ---
@@ -130,7 +128,8 @@ Legenda:
 🖥️ **SCHERMO**: due colonne di icone che compaiono una alla volta.
 
 🎙️ **VOCE**:
-> Dove lo usereste? Pensate a tutte le micro-decisioni ad alto volume.
+> Analizziamo un po' di casi d'uso in cui si potrebbero sfruttare questi di modelli.
+> Pensate a tutte le micro-decisioni ad alto volume.
 >
 > In un **CMS**: moderazione dei commenti, classificazione degli articoli per sezione o livello del lettore, una checklist pre-pubblicazione con tante domande sì/no in parallelo, una per ogni regola editoriale.
 >
@@ -154,6 +153,12 @@ Legenda:
 > Scrivo "voglio comprare": Jev legge la descrizione e risponde con la chiave `sale`. Non può rispondere "compra" o "acquisto": sceglie tra le nostre chiavi, oppure "la frase non lo dice". Una risposta fuori elenco verrebbe scartata.
 > "Buy" nel modulo è solo l'etichetta per il visitatore. Alla ricerca arriva `sale`, lo stesso valore che la lista immobili si aspetta già.
 > Le regole trovano i candidati, Jev sceglie una delle nostre chiavi, e la ricerca è quella di sempre.
+
+### 05d · Variante: uno step alla volta
+
+🎬 **ANIMAZIONE**: [`slides/05d-immobiliare-click.html`](./slides/05d-immobiliare-click.html). La stessa slide della 05c, ma dopo il primo step si ferma e aspetta un click (o → / Spazio) prima di ogni passo: domande, istruzioni, Jev sceglie, filtri, frase finale. Da confrontare con la 05c.
+
+🎙️ **VOCE**: la stessa della 05c, detta un passo alla volta.
 
 ---
 
@@ -349,6 +354,14 @@ else                          codaManuale();  // o escalation a un LLM più gran
 > Premessa onesta: TypeSafe non ha pubblicato architettura né paper tecnico. Quella che vi racconto è la ricostruzione più probabile, coerente con come funzionano i modelli di questo tipo. Cinque passi.
 > I primi quattro non riguardano Jev in sé, ma il **modello linguistico di base** su cui Jev è costruito: è lì che nasce la conoscenza. Solo il quinto è l'addestramento specifico di Jev.
 
+### 06a0 · Passo 1 — Il modello di base legge tutto
+
+🎬 **ANIMAZIONE**: [`slides/06a0-modello-base.html`](./slides/06a0-modello-base.html). Forum, libri e chat entrano in un flusso continuo nel "base model"; a destra il suo unico compito, "Guess the next word", su "Once upon a ___" (time 0.91, day, hill); sotto, "Nobody gives it" labels, rules, definitions, barrati. Chiude: "To guess well, it must learn in which situations words appear". Il flusso continua a scorrere anche quando la slide si ferma. Dura 14 s.
+
+🎙️ **VOCE**:
+> Prima di Jev c'è un modello di base, come quello di un LLM. Questo modello legge un'enorme quantità di testo: forum, libri, chat. Con un solo compito: indovinare la parola successiva.
+> Nessuno gli dà etichette, regole o definizioni. Ma per indovinare bene deve imparare **in che situazioni compaiono le parole**.
+
 ### 06a · Passo 1 — Indovinare la parola dopo
 
 🎬 **ANIMAZIONE**: [`slides/06a-parola-dopo.html`](./slides/06a-parola-dopo.html)
@@ -362,8 +375,7 @@ else                          codaManuale();  // o escalation a un LLM più gran
 ```
 
 🎙️ **VOCE**:
-> Prima di Jev c'è un modello di base, come quello di un LLM. Questo modello legge un'enorme quantità di testo: forum, libri, chat. Con un solo compito: indovinare la parola successiva.
-> Nessuno gli scrive mai "brutto uguale offensivo". Ma per indovinare bene deve imparare **in che situazioni compaiono le parole**. E "sei brutto" compare quasi sempre vicino a litigi, persone ferite, scuse.
+> Nessuno gli scrive mai "brutto uguale offensivo". Eppure "sei brutto" compare quasi sempre vicino a litigi, persone ferite, scuse.
 > Jev parte da un modello che ha già fatto questo lavoro, quindi **eredita** tutto quello che ha imparato. Ecco perché sa che "sei brutto" è un'offesa senza che nessuno gliel'abbia insegnato.
 
 ### 06b · Passo 2 — Le parole diventano coordinate
@@ -484,14 +496,14 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 ### 07c · Non solo Jev
 
-🎬 **ANIMAZIONE**: [`slides/07c-non-solo-jev.html`](./slides/07c-non-solo-jev.html). Jev e Liquid AI d1 / d1-ultra ai lati, al centro "Same API" (noul, choice, score e l'SDK di TypeSafe con il `baseURL` di Liquid), poi due avvertenze: immagini pagate per domanda e benchmark dei produttori. Chiude "A new category: decision models". Dura 14 s.
+🎬 **ANIMAZIONE**: [`slides/07c-non-solo-jev.html`](./slides/07c-non-solo-jev.html). Tre schede affiancate: Jev, Liquid AI d1 / d1-ultra e Google Gemini Decision 1 ("NEW"). Sotto, una riga: gli stessi tre tipi di domanda (noul, choice, score). Poi due avvertenze: le immagini di d1-ultra pagate per domanda e i benchmark dei produttori. Chiude "A new category: decision models". Dura 14 s.
 
 🎙️ **VOCE**:
-> Jev non è più l'unico. A fine settembre **Liquid AI** ha pubblicato **d1**, e a metà ottobre **d1-ultra**, che legge anche le immagini.
-> Sono decision model come Jev, e usano **la stessa API**: stessi tre tipi di domanda, e funziona perfino l'SDK di TypeSafe, cambiando il `baseURL`.
-> d1-ultra costa come Jev: 4 centesimi per milione di token in input, output gratis. Con una differenza: le immagini si pagano **per ogni domanda**, non una volta per richiesta.
-> E i benchmark in cui "d1 batte Jev" li ha fatti Liquid. Nei test indipendenti sono vicini, e tutti un po' troppo sicuri di sé.
-> Il punto è un altro: sta nascendo una **categoria**, e l'API di Jev sta diventando uno standard.
+> Jev non è più l'unico. A fine settembre **Liquid AI** ha pubblicato **d1**, e a metà ottobre **d1-ultra**, che legge anche le immagini. E l'11 novembre è arrivato anche **Google**, con **Gemini Decision 1** e la sua **Decisions API**: testo, immagini, audio, video e PDF.
+> Tutti e tre usano **gli stessi tre tipi di domanda**: noul, choice e score. Con Liquid funziona perfino l'SDK di TypeSafe, cambiando il `baseURL`; Google ha il suo SDK.
+> I prezzi: Jev e d1-ultra costano 4 centesimi per milione di token in input, Gemini 10 centesimi. Output gratis per tutti. Una differenza: d1-ultra fa pagare le immagini **per ogni domanda**, Jev e Gemini l'input una volta per richiesta.
+> E i benchmark in cui "siamo i primi" li fanno i produttori: lo dicono sia Liquid sia Google.
+> Il punto è un altro: sta nascendo una **categoria**, e i tipi di domanda di Jev stanno diventando uno standard.
 
 ### Vercel AI Gateway (nessuna slide)
 

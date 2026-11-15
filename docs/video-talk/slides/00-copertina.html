@@ -8,7 +8,7 @@
 <!--
   Cover of the talk, before the title slide (docs/video-talk/01-intro-jev-video-script.md, "00 · Copertina").
   Left: the talk title on two lines, the authors and a Start button that opens the next slide in the deck (data-next, set by anim.js).
-  Right: the essence of the talk, top to bottom: a paragraph written for people goes into Jev
+  Right (loops forever, data-forever): the essence of the talk, top to bottom: a paragraph written for people goes into Jev
   and comes out as one decision for the code, a probability per option.
   The probabilities are illustrative, not measured.
   Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
@@ -37,7 +37,9 @@
   .start:hover { filter: brightness(1.08); }
   .start svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 
-  /* ---------- Right: paragraph → Jev → decision ---------- */
+  /* ---------- Right: paragraph → Jev → decision ----------
+     Inside .flow[data-forever]: it keeps looping after the rest of the slide stops at 94% (anim.js) */
+  .flow { position: absolute; inset: 0; pointer-events: none; animation-name: flow; } /* full-frame layer: let clicks reach Start */
   .label { position: absolute; font-size: 20px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: #8a93a6; }
 
   .para { position: absolute; left: 1080px; top: 150px; width: 700px; height: 230px; padding: 66px 40px 0; opacity: 0; animation-name: para; }
@@ -82,7 +84,8 @@
      30–34%  wire into Jev        32–42% the dot travels into Jev   40–46% Jev appears, then pulses
      46–50%  wire out             48–56% the dot travels to the decision card
      54–58%  decision card        58–76% the bars fill, the numbers count up (0.92 / 0.06 / 0.02)
-     94%     final frame (playback stops here)        96–100% fade out */
+     94%     final frame (playback stops here)        96–100% fade out
+     Right diagram (.flow, data-forever) does not stop: it fades out at 95–99% and starts again, forever */
   @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
   @keyframes eyebrow { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
   @keyframes line1 { 0%, 6% { opacity: 0; transform: translateY(24px) } 12%, 100% { opacity: 1; transform: none } }
@@ -90,6 +93,7 @@
   @keyframes authors { 0%, 20% { opacity: 0; transform: translateY(14px) } 26%, 100% { opacity: 1; transform: none } }
   @keyframes start { 0%, 26% { opacity: 0; transform: scale(.9) } 30% { opacity: 1; transform: scale(1.04) } 32%, 100% { opacity: 1; transform: none } }
 
+  @keyframes flow { 0%, 95% { opacity: 1 } 99%, 100% { opacity: 0 } }
   @keyframes para { 0%, 8% { opacity: 0; transform: translateY(20px) } 12%, 100% { opacity: 1; transform: none } }
   @keyframes w1 { 0%, 12% { transform: scaleX(0) } 16%, 100% { transform: scaleX(1) } }
   @keyframes w2 { 0%, 16% { transform: scaleX(0) } 20%, 100% { transform: scaleX(1) } }
@@ -117,6 +121,7 @@
     <div class="authors">Mario Rossi <i>&amp;</i> Maria Verde</div>
     <a class="start" href="01d-hook.html" data-next>Start <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
 
+    <div class="flow" data-forever>
     <div class="card para"><span class="label">Text, for people</span><i></i><i></i><i></i><i></i></div>
     <div class="wire wire--in"></div>
     <div class="dot dot--in"></div>
@@ -128,6 +133,7 @@
       <div class="row row--win"><span>offensive</span><div class="bar"><i></i></div><b></b></div>
       <div class="row"><span>neutral</span><div class="bar"><i></i></div><b></b></div>
       <div class="row"><span>praise</span><div class="bar"><i></i></div><b></b></div>
+    </div>
     </div>
   </div>
 </div>

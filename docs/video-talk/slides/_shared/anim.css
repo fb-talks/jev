@@ -95,6 +95,16 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .replay:hover { background: var(--pink-bg); }
 .replay svg { width: 34px; height: 34px; margin-left: 4px; fill: var(--pink); }
 
+/* Shown by anim.js while the slide waits at a data-stops point: click, → or Space to go on */
+.stop-hint {
+  position: fixed; right: 40px; bottom: calc(40px + var(--notes-h, 0px)); z-index: 50; width: 56px; height: 56px; border-radius: 50%;
+  display: grid; place-items: center; background: #fff; border: 2.5px solid var(--pink); pointer-events: none;
+  opacity: 0; transition: opacity .3s;
+}
+.stop-hint.show { opacity: 1; animation: stop-hint 1.4s ease-in-out infinite; }
+.stop-hint svg { width: 28px; height: 28px; fill: none; stroke: var(--pink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+@keyframes stop-hint { 50% { transform: translateX(6px) } }
+
 /* Bottom left, outside .frame like the replay button: slide number (opens the slide menu) and notes toggle */
 .dock {
   position: fixed; left: 24px; bottom: calc(20px + var(--notes-h, 0px)); z-index: 50; display: flex; gap: 6px;
@@ -159,7 +169,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .notes-status { color: #6b7280; font-size: 14px; }
 
 /* page.html?notes (P): the notes window, only the notes at full height; the slide number stays as a reference */
-.presenter .frame, .presenter .replay, .presenter .slide-menu, .presenter .notes-toggle, .presenter .notes-window { display: none; }
+.presenter .frame, .presenter .replay, .presenter .stop-hint, .presenter .slide-menu, .presenter .notes-toggle, .presenter .notes-window { display: none; }
 .presenter .notes { display: block; top: 0; height: auto; border-top: 0; box-shadow: none; font-size: 22px; }
 .presenter .notes-body { padding-bottom: 80px; }
 .presenter .notes h2 { font-size: 34px; }
@@ -167,21 +177,20 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .presenter .slide-id { pointer-events: none; }
 
 /* H toggles .bare on <html>: no on-screen controls, e.g. while recording */
-.bare .replay, .bare .dock, .bare .notes, .bare .slide-menu { display: none; }
+.bare .replay, .bare .stop-hint, .bare .dock, .bare .notes, .bare .slide-menu { display: none; }
 
 /* ---------- Drawing toolbar (draw.js, D) ---------- */
-/* Layer over the slide, outside .frame (not paused with it): 1920×1080, placed and scaled like .frame by draw.js */
-.draw-layer {
-  position: fixed; left: 0; top: 0; z-index: 45; width: 1920px; height: 1080px; transform-origin: 0 0;
-  overflow: hidden; pointer-events: none; touch-action: none;
-}
+/* Layer over the whole window, outside .frame (not paused with it), so drawings can go past the slide edges.
+   The stage inside is 1920×1080, placed and scaled like .frame by draw.js; shapes overflow it freely. */
+.draw-layer { position: fixed; inset: 0; z-index: 45; overflow: hidden; pointer-events: none; touch-action: none; }
 .drawing .draw-layer { pointer-events: auto; cursor: crosshair; }
-.draw-layer svg { position: absolute; inset: 0; }
+.draw-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+.draw-layer svg { position: absolute; inset: 0; overflow: visible; }
 .draw-stroke { fill: none; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
 .draw-guide { fill: none; stroke-width: 2; stroke-dasharray: 6 12; stroke-linecap: round; opacity: .3; }
 /* Spotlight: everything outside the box dims and blurs */
 .draw-spot { position: absolute; inset: 0; animation: draw-fade .35s ease-out both; }
-.draw-spot-dim { position: absolute; inset: 0; background: rgba(15,18,30,.55); backdrop-filter: blur(6px) saturate(.6); }
+.draw-spot-dim { position: absolute; background: rgba(15,18,30,.55); backdrop-filter: blur(6px) saturate(.6); }
 .draw-spot-ring { position: absolute; box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 24px 60px -12px rgba(0,0,0,.6); }
 @keyframes draw-fade { from { opacity: 0; } }
 
@@ -206,7 +215,18 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .draw-bar .draw-color.on { background: none; box-shadow: inset 0 0 0 2.5px var(--c); }
 .draw-launcher { background: rgba(255,255,255,.85); border: 1px solid #e3e7ef; opacity: .6; }
 .draw-launcher:hover { opacity: 1; color: var(--pink); border-color: var(--pink); }
-/* H (recording): no toolbar, but D, 1–5, Z, Esc and the last tool still work */
+/* Grip at the top of the toolbar: drag to move it (draw.js) */
+.draw-bar .draw-grip { height: 24px; cursor: grab; touch-action: none; color: #9ca3af; }
+.draw-bar .draw-grip:active { cursor: grabbing; }
+.draw-bar .draw-grip svg { width: 18px; height: 18px; transform: rotate(90deg); }
+/* Tooltip for the toolbar buttons: name and shortcut, left of the button */
+.draw-tip {
+  position: fixed; z-index: 56; transform: translateY(-50%); padding: 6px 10px; border-radius: 8px;
+  background: var(--ink); color: #fff; font: 600 13px/1.2 system-ui, sans-serif; white-space: nowrap;
+  pointer-events: none; opacity: 0; transition: opacity .12s;
+}
+.draw-tip.on { opacity: 1; transition-delay: .15s; }
+/* H (recording): no toolbar, but D, B/E/S/A, 1–5, Z, T, Esc, Delete and the last tool still work */
 .bare .draw-bar, .bare .draw-launcher { display: none; }
 @media (max-width: 900px), (max-height: 500px) {
   .draw-bar, .draw-launcher { right: 8px; }

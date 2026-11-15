@@ -23,9 +23,10 @@
   .times { position: absolute; left: 80px; top: 200px; width: 860px; height: 702px; padding: 28px 36px; }
   .big { margin-top: 14px; font-family: var(--hand); font-size: 96px; line-height: 1; color: var(--pink); opacity: 0; animation-name: big; }
   .big small { margin-left: 16px; font-size: 34px; color: var(--ink); opacity: .7; }
-  .runs { margin-top: 36px; display: flex; flex-direction: column; gap: 20px; }
+  .runs { margin-top: 30px; display: flex; flex-direction: column; gap: 20px; }
   .run { display: flex; align-items: center; gap: 18px; opacity: 0; }
-  .run span { width: 200px; font-size: 22px; }
+  .run span { width: 240px; font-size: 22px; }
+  .legend { display: flex; justify-content: space-between; margin-bottom: -8px; font-size: 17px; font-weight: 600; letter-spacing: .3px; color: #8a93a6; opacity: 0; }
   .run .bar { flex: 1; }
   .run .bar > i { width: 0; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
   .run b { width: 110px; text-align: right; font-family: var(--mono); font-size: 26px; font-weight: 500; }
@@ -80,14 +81,15 @@
     <div class="kicker"><small>09 · Bonus: images · 6 / 6</small>How long, and what to know</div>
 
     <div class="card times">
-      <div class="label">One photo, three questions, one call</div>
+      <div class="label">5 calls · each one photo, three questions</div>
       <div class="big">0.5–0.8 s<small>usually</small></div>
       <div class="runs">
+        <div class="legend r1"><span>photo · what we looked for</span><span>one call</span></div>
         <div class="run r1"><span>dog · nose</span><div class="bar"><i></i></div><b>446 ms</b></div>
-        <div class="run r2"><span>dog · main subject</span><div class="bar"><i></i></div><b>484 ms</b></div>
+        <div class="run r2"><span>dog · (empty prompt)</span><div class="bar"><i></i></div><b>484 ms</b></div>
         <div class="run r3"><span>dog · eye</span><div class="bar"><i></i></div><b>728 ms</b></div>
-        <div class="run r4"><span>pug · main subject</span><div class="bar"><i></i></div><b>844 ms</b></div>
-        <div class="run r5 slow"><span>cars · once</span><div class="bar"><i></i></div><b>2380 ms</b></div>
+        <div class="run r4"><span>pug · (empty prompt)</span><div class="bar"><i></i></div><b>844 ms</b></div>
+        <div class="run r5 slow"><span>cars · one slow run</span><div class="bar"><i></i></div><b>2380 ms</b></div>
       </div>
       <div class="note">Measured in our demo, through Vercel AI Gateway, October 2026.<br>Network included: try it again before you rely on it.</div>
     </div>

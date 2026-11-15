@@ -1,7 +1,9 @@
 // Shared runtime for the docs/video-talk/slides animations.
-//   Plays once, then shows a play button (bottom right) to watch it again
+//   Plays once, then shows a play button (bottom right) to watch it again; elements inside [data-forever] keep looping
 //   Space = pause / resume (replay once ended) · R = restart · page.html#t=0.3 = freeze at 30%
 //   ← / → (or PageUp / PageDown) = previous / next slide
+//   <div class="frame" data-stops="0.26,0.5"> = the slide waits at 26% and 50% of its loop: click the slide,
+//   → / PageDown or Space to go on (→ while a step is playing jumps to the end of that step)
 //   H = hide / show the on-screen controls (slide number, play button), remembered across slides
 //   N = open / close the speaker notes (bottom panel) · click the slide number = jump to any slide
 //   P = open the speaker notes in their own window (e.g. a second monitor), kept in sync with the slides
@@ -20,6 +22,7 @@ const slides = [
   "02a-tre-modi.html",
   "05-casi-uso.html",
   "05c-immobiliare-chiavi.html",
+  "05d-immobiliare-click.html",
   "03a-state-domande.html",
   "03b-tipi-domanda.html",
   "03c-noul-base.html",
@@ -29,6 +32,7 @@ const slides = [
   "03g-score.html",
   "04-tre-fasce.html",
   "06-come-sa.html",
+  "06a0-modello-base.html",
   "06a-parola-dopo.html",
   "06b-coordinate.html",
   "06c-attention.html",
@@ -95,7 +99,31 @@ const loop = parseFloat(getComputedStyle(frame).getPropertyValue("--loop")) * 10
 const END = 0.94;
 let ended = false;
 
-const seek = (time) => animations().forEach((a) => { a.currentTime = time; a.pause(); });
+const seek = (time, list = animations()) => list.forEach((a) => { a.currentTime = time; a.pause(); });
+// Animations inside [data-forever] (e.g. the cover's diagram) keep looping when the slide stops at END
+const once = () => animations().filter((a) => !a.effect?.target?.closest("[data-forever]"));
+// Stops: points of the loop where the slide waits for a click (data-stops on .frame, fractions of --loop)
+const stops = (frame.dataset.stops || "").split(",").map(Number).filter((x) => x > 0 && x < END).sort((a, b) => a - b);
+let nextStop = 0;
+let held = false;
+const holdAt = (time) => {
+  held = true;
+  nextStop++;
+  seek(time, once());
+  replay.classList.remove("show");
+  hint.classList.add("show");
+};
+const proceed = () => {
+  if (held) {
+    held = false;
+    hint.classList.remove("show");
+    once().forEach((a) => a.play());
+    return true;
+  }
+  // A step is still playing: finish it and wait at its stop
+  if (!ended && nextStop < stops.length) { holdAt(stops[nextStop] * loop); return true; }
+  return false;
+};
 const togglePause = () => {
   const running = animations().some((a) => a.playState === "running");
   animations().forEach((a) => (running ? a.pause() : a.play()));
@@ -109,10 +137,21 @@ document.body.append(replay);
 
 const restart = () => {
   ended = false;
+  held = false;
+  nextStop = 0;
+  hint?.classList.remove("show");
   replay.classList.remove("show");
   animations().forEach((a) => { a.currentTime = 0; a.play(); });
 };
 replay.addEventListener("click", restart);
+
+// Shown while the slide waits at a stop
+const hint = document.createElement("div");
+hint.className = "stop-hint";
+hint.setAttribute("aria-hidden", "true");
+hint.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
+document.body.append(hint);
+if (stops.length) frame.addEventListener("click", (e) => { if (!e.target.closest("a, button")) proceed(); });
 
 // Links marked data-next (e.g. the cover's Start button) open the next slide in the deck
 const nextSlide = slides[slides.indexOf(file) + 1];
@@ -388,10 +427,13 @@ try { if (localStorage.getItem(NOTES) === "1") setNotes(true); } catch {}
 try { setBare(localStorage.getItem(BARE) === "1"); } catch {}
 
 const watch = () => {
-  const now = Math.max(0, ...animations().map((a) => a.currentTime ?? 0));
-  if (!ended && now >= END * loop) {
+  const now = Math.max(0, ...once().map((a) => a.currentTime ?? 0));
+  // Only while playing: #t=… and the exporter seek paused animations and must not be stopped
+  const playing = once().some((a) => a.playState === "running");
+  if (!ended && !held && playing && nextStop < stops.length && now >= stops[nextStop] * loop) holdAt(stops[nextStop] * loop);
+  else if (!ended && now >= END * loop) {
     ended = true;
-    seek(END * loop);
+    seek(END * loop, once());
     replay.classList.add("show");
   }
   requestAnimationFrame(watch);
@@ -408,8 +450,8 @@ if (channel) channel.onmessage = ({ data }) => {
     return;
   }
   if (data.hello) send({ slide: file });
-  if (data.go) go(data.go);
-  if (data.key === "space") ended ? restart() : togglePause();
+  if (data.go) data.go === 1 && proceed() || go(data.go);
+  if (data.key === "space") ended ? restart() : held ? proceed() : togglePause();
   if (data.key === "restart") restart();
 };
 send(presenter ? { hello: true } : { slide: file });
@@ -426,7 +468,7 @@ addEventListener("keydown", (e) => {
   }
   if (e.code === "Space") {
     e.preventDefault();
-    ended ? restart() : togglePause();
+    ended ? restart() : held ? proceed() : togglePause();
   } else if (e.key === "Escape") {
     openMenu(false);
   } else if (e.key === "n" || e.key === "N") {
@@ -439,7 +481,7 @@ addEventListener("keydown", (e) => {
     setBare(!document.documentElement.classList.contains("bare"));
   } else if (e.key === "ArrowRight" || e.key === "PageDown") {
     e.preventDefault();
-    go(1);
+    if (!proceed()) go(1);
   } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
     e.preventDefault();
     go(-1);

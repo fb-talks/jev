@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>06a0 · Before Jev: a base model</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "Step 1" of section 6 of the video script (docs/video-talk/01-intro-jev-video-script.md), before 06a:
+  before Jev there is a base model, like an LLM's. It reads an enormous amount of text (forums, books, chats)
+  with one task: guess the next word. Nobody gives it labels or rules; to guess well it must learn in which
+  situations words appear. 06a then shows that on "ugly".
+  The text stream keeps flowing after the slide stops (data-forever). The guess probabilities are illustrative.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 14s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Sources ---------- */
+  .src { position: absolute; left: 80px; width: 320px; height: 116px; display: flex; align-items: center; gap: 20px; padding: 0 24px; opacity: 0; }
+  .src .ico { font-size: 46px; }
+  .src b { display: block; font-size: 30px; }
+  .src small { display: block; font-size: 19px; color: #6b7385; }
+  .src1 { top: 215px; animation-name: src1; }
+  .src2 { top: 357px; animation-name: src2; }
+  .src3 { top: 499px; animation-name: src3; }
+
+  /* ---------- The stream of text: keeps flowing once the slide stops ---------- */
+  .stream { position: absolute; left: 410px; top: 215px; width: 300px; height: 400px; overflow: hidden; opacity: 0; animation-name: stream;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 80%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 80%, transparent); }
+  .stream i { position: absolute; left: 0; width: 70px; height: 32px; padding: 8px 10px; border-radius: 8px; background: #fff; border: 1.5px solid #d5dbe6; box-shadow: 0 2px 0 rgba(0,0,0,.05);
+    background-image: linear-gradient(#c5cddc, #c5cddc), linear-gradient(#c5cddc, #c5cddc); background-size: 48px 4px, 30px 4px; background-position: 10px 9px, 10px 19px; background-repeat: no-repeat;
+    animation: flow 2.4s linear infinite; animation-delay: var(--d); }
+  .stream i:nth-child(3n+1) { top: 40px; } .stream i:nth-child(3n+2) { top: 182px; } .stream i:nth-child(3n) { top: 324px; }
+
+  /* ---------- The base model ---------- */
+  .model { position: absolute; left: 720px; top: 255px; width: 290px; height: 320px; display: grid; place-content: center; text-align: center; gap: 10px;
+    border: 3px solid var(--pink); background: var(--pink-bg); opacity: 0; animation-name: model; }
+  .model b { font-family: var(--hand); font-size: 44px; line-height: 1.05; }
+  .model small { font-size: 20px; font-weight: 600; color: #6b7385; }
+  .model .dots { display: flex; justify-content: center; gap: 10px; margin-top: 8px; }
+  .model .dots span { width: 14px; height: 14px; border-radius: 50%; background: var(--pink); opacity: .3; animation: think 1.2s ease-in-out infinite; }
+  .model .dots span:nth-child(2) { animation-delay: .2s; } .model .dots span:nth-child(3) { animation-delay: .4s; }
+
+  .arr { position: absolute; left: 1030px; top: 413px; width: 80px; height: 4px; border-radius: 2px; background: var(--ink); transform-origin: left; transform: scaleX(0); animation-name: arr; }
+  .arr::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
+
+  /* ---------- One task ---------- */
+  .task { position: absolute; left: 1130px; top: 215px; width: 710px; height: 400px; padding: 30px 40px; opacity: 0; animation-name: task; }
+  .task h4 { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #6b7385; }
+  .task h3 { margin: 4px 0 26px; font-family: var(--hand); font-size: 50px; font-weight: 400; line-height: 1.1; }
+  .sentence { display: flex; align-items: baseline; gap: 14px; font-size: 40px; }
+  .sentence .typed { clip-path: inset(0 100% 0 0); animation-name: type; animation-timing-function: steps(11, end); }
+  .slot { position: relative; display: inline-block; width: 150px; height: 50px; border-bottom: 3px dashed #c7cfdd; opacity: 0; animation-name: slot; }
+  .slot b { position: absolute; inset: 0; text-align: center; color: var(--pink); opacity: 0; animation-name: win; }
+  .guesses { margin-top: 26px; display: grid; gap: 12px; }
+  .g { display: grid; grid-template-columns: 90px 1fr 70px; align-items: center; gap: 16px; font-family: var(--mono); font-size: 24px; opacity: 0; }
+  .g .bar { height: 18px; }
+  .g .bar > i { width: 0; background: var(--muted); }
+  .g em { font-style: normal; text-align: right; color: #6b7385; }
+  .g.top { font-weight: 600; } .g.top .bar > i { background: var(--pink); } .g.top em { color: var(--pink); }
+  .g1 { animation-name: g1; } .g1 .bar > i { animation-name: w1; }
+  .g2 { animation-name: g2; } .g2 .bar > i { animation-name: w2; }
+  .g3 { animation-name: g3; } .g3 .bar > i { animation-name: w3; }
+
+  /* ---------- No labels, no rules ---------- */
+  .none { position: absolute; left: 0; right: 0; top: 680px; display: flex; justify-content: center; align-items: center; gap: 22px; font-size: 26px; font-weight: 600; color: #6b7385; }
+  .none > span { opacity: 0; animation-name: nonel; }
+  .x { position: relative; padding: 10px 20px; font-family: var(--mono); font-size: 24px; font-weight: 500; color: var(--ink); opacity: 0; }
+  .x::after { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; height: 4px; border-radius: 2px; background: var(--red); transform-origin: left; transform: scaleX(0); }
+  .x1 { animation-name: x1; } .x1::after { animation-name: s1; }
+  .x2 { animation-name: x2; } .x2::after { animation-name: s2; }
+  .x3 { animation-name: x3; } .x3::after { animation-name: s3; }
+
+  /* ---------- Caption ---------- */
+  .caption { position: absolute; left: 0; right: 0; top: 800px; text-align: center; font-family: var(--hand); font-size: 58px; opacity: 0; animation-name: caption; }
+  .caption .u { position: relative; }
+  .caption .u::after { content: ""; position: absolute; left: 0; bottom: -10px; height: 8px; width: 0; border-radius: 4px; background: var(--pink); animation-name: uline; }
+
+  /* ---------- Timeline (14s loop) ----------
+     0–4%    scene in             4–12%  forums, books, chats appear, one every 3%
+     12–16%  the base model       14–18% the text stream starts flowing into it (then loops forever)
+     22–26%  arrow + "One task: guess the next word"
+     28–36%  "Once upon a" is typed, the empty slot appears
+     38–48%  three guesses grow: time 0.91, day 0.06, hill 0.01        50–53% "time" fills the slot
+     56–58%  "Nobody gives it"    58–68% labels, rules, definitions appear and get struck through
+     72–76%  caption              78–84% underline
+     94%     final frame (playback stops here; the stream keeps flowing)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes src1 { 0%, 4% { opacity: 0; transform: translateX(-20px) } 7%, 100% { opacity: 1; transform: none } }
+  @keyframes src2 { 0%, 7% { opacity: 0; transform: translateX(-20px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes src3 { 0%, 10% { opacity: 0; transform: translateX(-20px) } 13%, 100% { opacity: 1; transform: none } }
+  @keyframes model { 0%, 12% { opacity: 0; transform: scale(.85) } 15% { opacity: 1; transform: scale(1.03) } 16%, 100% { opacity: 1; transform: none } }
+  @keyframes stream { 0%, 14% { opacity: 0 } 18%, 100% { opacity: 1 } }
+  @keyframes flow { from { transform: translateX(-100px) } to { transform: translateX(310px) } }
+  @keyframes think { 50% { opacity: 1; transform: scale(1.25) } }
+  @keyframes arr { 0%, 22% { transform: scaleX(0) } 24%, 100% { transform: scaleX(1) } }
+  @keyframes task { 0%, 22% { opacity: 0; transform: translateY(16px) } 26%, 100% { opacity: 1; transform: none } }
+  @keyframes type { 0%, 28% { clip-path: inset(0 100% 0 0) } 34%, 100% { clip-path: inset(0 0 0 0) } }
+  @keyframes slot { 0%, 34% { opacity: 0 } 36%, 100% { opacity: 1 } }
+  @keyframes g1 { 0%, 38% { opacity: 0 } 40%, 100% { opacity: 1 } }
+  @keyframes g2 { 0%, 40% { opacity: 0 } 42%, 100% { opacity: 1 } }
+  @keyframes g3 { 0%, 42% { opacity: 0 } 44%, 100% { opacity: 1 } }
+  @keyframes w1 { 0%, 40% { width: 0 } 48%, 100% { width: 91% } }
+  @keyframes w2 { 0%, 42% { width: 0 } 48%, 100% { width: 6% } }
+  @keyframes w3 { 0%, 44% { width: 0 } 48%, 100% { width: 1.5% } }
+  @keyframes win { 0%, 50% { opacity: 0; transform: translateY(-14px) } 52% { opacity: 1; transform: translateY(3px) } 53%, 100% { opacity: 1; transform: none } }
+  @keyframes nonel { 0%, 56% { opacity: 0 } 58%, 100% { opacity: 1 } }
+  @keyframes x1 { 0%, 58% { opacity: 0; transform: scale(.7) } 60%, 100% { opacity: 1; transform: none } }
+  @keyframes x2 { 0%, 61% { opacity: 0; transform: scale(.7) } 63%, 100% { opacity: 1; transform: none } }
+  @keyframes x3 { 0%, 64% { opacity: 0; transform: scale(.7) } 66%, 100% { opacity: 1; transform: none } }
+  @keyframes s1 { 0%, 60% { transform: scaleX(0) } 62%, 100% { transform: scaleX(1) } }
+  @keyframes s2 { 0%, 63% { transform: scaleX(0) } 65%, 100% { transform: scaleX(1) } }
+  @keyframes s3 { 0%, 66% { transform: scaleX(0) } 68%, 100% { transform: scaleX(1) } }
+  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(14px) } 76%, 100% { opacity: 1; transform: none } }
+  @keyframes uline { 0%, 78% { width: 0 } 84%, 100% { width: 100% } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>Step 1 · the base model, before Jev</small>It reads everything</div>
+
+    <div class="card src src1"><span class="ico">💬</span><div><b>Forums</b><small>threads, replies, fights</small></div></div>
+    <div class="card src src2"><span class="ico">📚</span><div><b>Books</b><small>novels, essays, manuals</small></div></div>
+    <div class="card src src3"><span class="ico">💭</span><div><b>Chats</b><small>messages, comments</small></div></div>
+
+    <div class="stream"><div data-forever>
+      <i style="--d: 0.0s"></i>
+      <i style="--d: -0.2s"></i>
+      <i style="--d: -0.4s"></i>
+      <i style="--d: -0.6s"></i>
+      <i style="--d: -0.8s"></i>
+      <i style="--d: -1.0s"></i>
+      <i style="--d: -1.2s"></i>
+      <i style="--d: -1.4s"></i>
+      <i style="--d: -1.6s"></i>
+      <i style="--d: -1.8s"></i>
+      <i style="--d: -2.0s"></i>
+      <i style="--d: -2.2s"></i>
+    </div></div>
+
+    <div class="card model">
+      <b>Base model</b>
+      <small>like an LLM's</small>
+      <div class="dots" data-forever><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="arr"></div>
+
+    <div class="card task">
+      <h4>One task</h4>
+      <h3>Guess the next word</h3>
+      <div class="sentence"><span class="typed">Once upon a</span><span class="slot"><b>time</b></span></div>
+      <div class="guesses">
+        <div class="g g1 top"><span>time</span><span class="bar"><i></i></span><em>0.91</em></div>
+        <div class="g g2"><span>day</span><span class="bar"><i></i></span><em>0.06</em></div>
+        <div class="g g3"><span>hill</span><span class="bar"><i></i></span><em>0.01</em></div>
+      </div>
+    </div>
+
+    <div class="none">
+      <span>Nobody gives it</span>
+      <span class="chip x x1">labels</span>
+      <span class="chip x x2">rules</span>
+      <span class="chip x x3">definitions</span>
+    </div>
+
+    <div class="caption">To guess well, it must learn <span class="u">in which situations words appear</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>
