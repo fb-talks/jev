@@ -27,6 +27,13 @@ export const groups = [
       { href: "/3-jev-images/demo1", title: "Demo 1 · Where is it, and what is it?", text: "A box around the main subject of a photo, with its label and probability." },
     ],
   },
+  {
+    title: "Compare",
+    demos: [
+      { href: "/compare/demo1", title: "Demo 1 · Is this comment offensive?", text: "Jev, Gemini Decision, Flash and Flash Lite on the same yes/no probability, one at a time or all together: time, tokens and estimated cost." },
+      { href: "/compare/demo2", title: "Demo 2 · CSV evaluation, four models", text: "The CSV of comments, the same three questions and policy for every model: accuracy, total time, tokens and estimated cost side by side." },
+    ],
+  },
 ];
 
 // all the demos in a row, with the title of their section

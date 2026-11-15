@@ -33,7 +33,13 @@ export function jevClient(keys: ApiKeys, defaultHeaders?: Record<string, string>
 
 // Gemini only exists on Vercel AI Gateway. The key is always explicit: a bare "provider/model"
 // string would fall back to the OIDC token on Vercel.
-export function geminiModel(keys: ApiKeys) {
+export function geminiModel(keys: ApiKeys, id = "google/gemini-3.8-flash") {
   if (!keys.gateway) throw new Error("No API key for Gemini: add a Vercel AI Gateway key in the 🔑 panel.");
-  return createGateway({ apiKey: keys.gateway })("google/gemini-3.8-flash");
+  return createGateway({ apiKey: keys.gateway })(id);
+}
+
+// Decision models on Vercel AI Gateway (e.g. Gemini Decision): typed questions, probabilities, no output tokens.
+export function decisionModel(keys: ApiKeys, id: string) {
+  if (!keys.gateway) throw new Error("No API key for the decision model: add a Vercel AI Gateway key in the 🔑 panel.");
+  return createGateway({ apiKey: keys.gateway }).decision(id);
 }
