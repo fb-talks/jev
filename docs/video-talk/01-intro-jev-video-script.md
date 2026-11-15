@@ -138,6 +138,23 @@ Legenda:
 >
 > In tutti questi casi non vi serve una frase. Vi serve **un tipo e una confidenza**.
 
+### 05c · Ricerca immobiliare: dalla frase ai filtri
+
+🎬 **ANIMAZIONE**: [`slides/05c-immobiliare-chiavi.html`](./slides/05c-immobiliare-chiavi.html). Diagramma, niente codice, in quattro passi da sinistra a destra: la textarea con la richiesta ("I want to buy…") e i candidati evidenziati dalle regole → cinque domande chiuse, ognuna con "not stated", due con la loro istruzione; le opzioni di "Buy or rent?" mostrano la chiave (`sale`, `rent`) con la descrizione sotto, e una legenda spiega chi legge cosa → Jev sceglie (una chiamata) → il modulo dei filtri compilato, che mostra "Buy" al visitatore ma passa `sale` alla ricerca. Le probabilità e il numero di annunci sono illustrativi. Dura 20 s.
+
+🎙️ **VOCE**:
+> Un esempio concreto: un sito immobiliare, dove il visitatore scrive quello che cerca in una frase.
+> Il testo lo legge prima il nostro codice, nel browser: regole semplici tirano fuori i possibili valori. Città e zone, importi, superfici, le stanze nominate. Così a Jev non chiediamo di inventare niente: i candidati li prepariamo noi.
+> A Jev facciamo solo **domande a risposta chiusa**: vuole comprare o affittare? Tra 200.000 e 90, qual è il prezzo massimo? Vuole un balcone? Ogni domanda ha anche la risposta "la frase non lo dice", così Jev non è costretto a forzare un valore. E sulle cose che la frase non tocca non facciamo domande: una sola chiamata, veloce ed economica.
+> Le regole di interpretazione sono scritte come **istruzioni**, non come codice: "il solo prezzo non dice se è vendita o affitto", "una zona non è una città". Se Jev sbaglia, si corregge quella frase. Per aggiungere un filtro, basta aggiungerlo all'elenco.
+> Le risposte sicure e valide diventano i filtri della ricerca normale: il visitatore li vede e li può correggere, e gli annunci arrivano dalla stessa ricerca della lista immobili. E la frase va dal browser a Jev con la chiave del visitatore: il nostro server riceve solo i filtri.
+>
+> E se il database si aspetta un valore preciso? Non c'è niente da forzare: quel valore non lo scrive Jev, lo decidiamo noi in anticipo.
+> Ogni opzione ha due parti: la **chiave**, il valore che usa la ricerca, per esempio `sale`, e la **descrizione**, "la persona vuole comprare", che legge solo Jev.
+> Scrivo "voglio comprare": Jev legge la descrizione e risponde con la chiave `sale`. Non può rispondere "compra" o "acquisto": sceglie tra le nostre chiavi, oppure "la frase non lo dice". Una risposta fuori elenco verrebbe scartata.
+> "Buy" nel modulo è solo l'etichetta per il visitatore. Alla ricerca arriva `sale`, lo stesso valore che la lista immobili si aspetta già.
+> Le regole trovano i candidati, Jev sceglie una delle nostre chiavi, e la ricerca è quella di sempre.
+
 ---
 
 ## 4. Come si usa: state + domande (3:30 – 5:15)

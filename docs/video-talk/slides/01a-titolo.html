@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="_shared/anim.css">
 <!--
   Title slide of the talk, before the hook (docs/video-talk/01-intro-jev-video-script.md, "Apertura").
-  "Jev" is written, a probability bar fills to 92% under it, the four question types drop in around it,
+  "Jev" is written, "& Gemini Decision API" appears under it, a probability bar fills to 92% under it, the four question types drop in around it,
   then the tagline. 0.92 is the urgent ticket of 03e, used here only as a symbol.
   Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
 -->
@@ -27,8 +27,12 @@
   .name text { font-family: var(--hand); font-size: 300px; fill: var(--ink); fill-opacity: 0; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round;
     stroke-dasharray: 1600; stroke-dashoffset: 1600; animation-name: pen, ink; animation-timing-function: ease-in-out, ease-out; }
 
+  /* ---------- What it runs on ---------- */
+  .with { position: absolute; left: 0; right: 0; top: 525px; text-align: center; font-family: var(--hand); font-size: 56px; opacity: 0; animation-name: with; }
+  .with span { color: var(--pink); }
+
   /* ---------- One answer, as a number ---------- */
-  .answer { position: absolute; left: 610px; top: 610px; width: 700px; display: flex; align-items: center; gap: 28px; opacity: 0; animation-name: answer; }
+  .answer { position: absolute; left: 610px; top: 635px; width: 700px; display: flex; align-items: center; gap: 28px; opacity: 0; animation-name: answer; }
   .answer .bar { flex: 1; height: 30px; }
   .answer .bar > i { width: 0; animation-name: fill; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
   .answer b { width: 150px; text-align: right; font-family: var(--mono); font-size: 56px; font-weight: 500; color: var(--pink); --n: 0; counter-reset: n var(--n); animation-name: count; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
@@ -48,7 +52,7 @@
 
   /* ---------- Timeline (9s loop) ----------
      0–4%    scene in        4–20%  "Jev" is written: outline drawn while it is uncovered left to right
-     14–24%  the ink fills the letters
+     14–24%  the ink fills the letters      20–24%  "& Gemini Decision API" under the name
      22–26%  the bar appears           26–44%  it fills to 92%, the number counts up
      40–58%  noul, choice, score, box drop in around the name, one every 6%
      64–70%  tagline        72–78%  subtitle
@@ -57,6 +61,7 @@
   @keyframes wipe { 0%, 4% { -webkit-mask-position: 100% 0; mask-position: 100% 0 } 20%, 100% { -webkit-mask-position: 0 0; mask-position: 0 0 } }
   @keyframes pen { 0%, 4% { stroke-dashoffset: 1600 } 22%, 100% { stroke-dashoffset: 0 } }
   @keyframes ink { 0%, 14% { fill-opacity: 0; stroke-width: 5 } 24%, 100% { fill-opacity: 1; stroke-width: 0 } }
+  @keyframes with { 0%, 20% { opacity: 0; transform: translateY(14px) } 24%, 100% { opacity: 1; transform: none } }
   @keyframes answer { 0%, 22% { opacity: 0; transform: translateY(14px) } 26%, 100% { opacity: 1; transform: none } }
   @keyframes fill { 0%, 26% { width: 0 } 44%, 100% { width: 92% } }
   @keyframes count { 0%, 26% { --n: 0 } 44%, 100% { --n: 92 } }
@@ -72,6 +77,8 @@
 <div class="frame">
   <div class="stage">
     <svg class="name" viewBox="0 0 900 380"><text x="450" y="300" text-anchor="middle">Jev</text></svg>
+
+    <div class="with"><span>&amp;</span> Gemini Decision API</div>
 
     <div class="answer"><div class="bar"><i></i></div><b></b></div>
 

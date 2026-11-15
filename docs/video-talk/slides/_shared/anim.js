@@ -19,6 +19,7 @@ const slides = [
   "02-cos-e.html",
   "02a-tre-modi.html",
   "05-casi-uso.html",
+  "05c-immobiliare-chiavi.html",
   "03a-state-domande.html",
   "03b-tipi-domanda.html",
   "03c-noul-base.html",
