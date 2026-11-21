@@ -21,17 +21,27 @@ Legenda:
 🎬 **ANIMAZIONE**: [`slides/00-copertina.html`](./slides/00-copertina.html). A sinistra il titolo su due righe, "From Texts / to Decisions", gli autori (Zelda Ailine Luconi & Fabio Biondi) e il pulsante **Start**, che passa alla slide successiva. A destra l'essenza del talk: un paragrafo "per le persone" entra in Jev ed esce come una decisione "per il codice", una probabilità per opzione (offensive 0.92). Dura 10 s. Le probabilità sono illustrative.
 
 🎙️ **VOCE**:
+> Slide da mostrare prima di iniziare il talk
+> Niente da dire... si inizia con la pro slide
+
+### 01a · Titolo
+
+🎬 **ANIMAZIONE**: [`slides/01a-titolo.html`](./slides/01a-titolo.html). "Jev" scritto a mano, sotto una barra che si riempie fino a 0.92, intorno arrivano i quattro tipi di domanda (noul, choice, score, box), poi "It doesn't write. It decides." Dura 9 s.
+
+🎙️ **VOCE**:
 > Negli ultimi anni ci siamo abituati a modelli che **scrivono**: fai una domanda e ti rispondono con un paragrafo.
 > Ma nel nostro codice, molto spesso, un paragrafo non ci serve. Ci serve una **decisione**: questo commento è offensivo? Questo ticket va al supporto o alle vendite? In questa email c'è un ordine?
-> Per questo motivo stanno iniziando a prendere piede una "nuova2 famiglia di modelli, i **decision model**. 
+> Per questo motivo stanno iniziando a prendere piede una "nuova famiglia di modelli, i **decision model**. 
 > Oggi partiamo da **Jev**, e vediamo anche la novità di queste settimane: **Gemini Decision 1** di Google.
 
 ### 01d · Hook (0:00 – 0:30)
 
 🎙️ **VOCE**:
-> Quello che vediamo in azione non è un LLM per darvi una risposta testuale o che vi scrive un paragrafo per dirvi che il commento è offensivo.
+> Partiamo da un commento sotto un post: "Who taught you to code? Useless post.", cioè "Chi ti ha insegnato a programmare? Post inutile."
+> A sinistra c'è quello che facciamo di solito: lo diamo a un LLM e gli chiediamo se è offensivo. Lui ci scrive un paragrafo, educato e pieno di "dipende dal contesto", e la risposta vera è lì in mezzo. Ci tocca leggerla, o farne il parsing, e aspettare che finisca di scrivere.
+> Quello che vediamo in azione a destra, invece, non è un LLM che vi scrive un paragrafo per dirvi che il commento è offensivo.
 > È un modello che vi risponde con un numero: offensivo, all'ottanta per cento. In pochi millisecondi anziché secondi o minuti.
-> Tra i più noti troviamo **Jev** e **Gemini Decision Mode**, e oggi vediamo cosa sono, come si usano e, soprattutto, come fammp a "sapere" che una frase è un insulto.
+> Tra i più noti troviamo **Jev** e **Gemini Decision Mode**, e oggi vediamo cosa sono, come si usano e, soprattutto, come fanno a "sapere" che una frase è un insulto.
 
 ✂️ Titolo a schermo: **"Un LLM scrive. Jev sceglie."**
 
@@ -40,13 +50,6 @@ Legenda:
 ✂️ Con l'apertura, Jev è già presentato in 01c: "Si chiama Jev" si può accorciare in "Ecco Jev in azione".
 
 🎬 **ANIMAZIONE**: [`slides/01d-hook.html`](./slides/01d-hook.html). Lo stesso commento analizzato da un LLM (che scrive un paragrafo) e da Jev (che risponde 80% in un istante), poi il titolo. Dura 12 s, poi si ferma sul titolo.
-
-### 01a · Titolo
-
-🎬 **ANIMAZIONE**: [`slides/01a-titolo.html`](./slides/01a-titolo.html). "Jev" scritto a mano, sotto una barra che si riempie fino a 0.92, intorno arrivano i quattro tipi di domanda (noul, choice, score, box), poi "It doesn't write. It decides." Dura 9 s.
-
-🎙️ **VOCE**:
-> _(titolo: nessun parlato, oppure il saluto iniziale)_
 
 ### 01b · Speaker
 
@@ -71,6 +74,7 @@ Legenda:
 > LLM contro Jev, in uno schema.
 > Sopra, un LLM: gli date i vostri dati e vi risponde con un paragrafo. Perfetto se a leggerlo è una persona.
 > Ma se a usarlo è il vostro **codice**, quel paragrafo è un problema: dovete chiedergli un formato preciso, fare il parsing, e sperare che sia sempre giusto.
+
 > Sotto, Jev: stessi dati, ma niente testo. Risponde con un numero, zero novantadue, e il codice lo usa subito: per un `if`, per ordinare, per smistare.
 > Un LLM scrive per le persone. **Jev risponde al vostro codice.**
 

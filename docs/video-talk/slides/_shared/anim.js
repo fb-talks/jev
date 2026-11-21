@@ -13,8 +13,8 @@ const frame = document.querySelector(".frame");
 // Slide order: add new pages here
 const slides = [
   "00-copertina.html",
-  "01d-hook.html",
   "01a-titolo.html",
+  "01d-hook.html",
   "01b-speaker.html",
   "01c-jev.html",
   "01e-classificatori.html",
@@ -374,6 +374,13 @@ const editNotes = () => {
   for (const { sep, text: c } of chunks(text)) {
     if (isQuote(c)) area("quote", c.split("\n").map((l) => l.replace(/^>\s?/, "")).join("\n"), sep);
     else blocks.push({ kind: "fixed", value: c, sep });
+  }
+  // No spoken part yet: one empty textarea, saved right under the "🎙️ VOCE" label (or at the end without one)
+  if (!blocks.some((b) => b.kind === "quote")) {
+    const at = blocks.findIndex((b) => b.kind === "fixed" && b.value.startsWith("🎙️"));
+    const ta = area("quote", "", at === -1 ? "\n\n" : "\n");
+    if (at !== -1) blocks.splice(at + 1, 0, blocks.pop());
+    requestAnimationFrame(() => ta.focus());
   }
   actions.querySelector(".add-quote").addEventListener("click", () => area("quote", "").focus());
   actions.querySelector(".cancel").addEventListener("click", () => loadNotes().then(showNotes));
