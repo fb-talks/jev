@@ -39,6 +39,11 @@
   .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
   .b0 { animation-name: b0; } .b1 { animation-name: b1; } .b2 { animation-name: b2; } .b3 { animation-name: b3; }
 
+  /* Possible loop (not in the demo code): dashed, softer than the real links */
+  .again { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; pointer-events: none; opacity: 0; animation-name: again; }
+  .again path { fill: none; stroke: var(--pink); stroke-width: 4; stroke-dasharray: 12 10; stroke-linecap: round; opacity: .7; }
+  .again-label { position: absolute; left: 222px; top: 563px; height: 36px; line-height: 36px; font-family: var(--hand); font-size: 26px; color: var(--pink); white-space: nowrap; opacity: 0; animation-name: again; }
+
   .caption .num { font-family: var(--sans); font-weight: 700; font-size: 46px; }
   .caption { position: absolute; left: 0; right: 0; top: 880px; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
 
@@ -48,6 +53,7 @@
      14–18%  node "Jev measures" + code block 1 · 20–23% 0.78
      26–30%  node "Gemini rewrites" + code block 2 (blue)
      38–42%  node "Jev measures again" + code block 3 · 44–47% 0.11
+     48–51%  dashed loop arrow "Jev measures again" → "Gemini rewrites" (a possibility, not in the code)
      52–56%  node "Before vs after"
      each block stays lit, the one in focus has a coloured border until the next step
      72–78%  caption
@@ -70,6 +76,7 @@
   @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 24% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 28%, 100% { opacity: 1; border-color: transparent; background: none } }
   @keyframes b2 { 0%, 26% { opacity: .3; border-color: transparent; background: none } 30%, 36% { opacity: 1; border-color: var(--blue); background: rgba(13,153,255,.1) } 40%, 100% { opacity: 1; border-color: transparent; background: none } }
   @keyframes b3 { 0%, 38% { opacity: .3; border-color: transparent; background: none } 42%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes again { 0%, 48% { opacity: 0 } 51%, 100% { opacity: 1 } }
   @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
 </style>
 </head>
@@ -90,6 +97,12 @@
       <div class="node ok n5"><div><b>Before vs after</b><span>did the rewrite work?</span></div></div>
     </div>
 
+    <svg class="again" viewBox="0 0 1920 1080" aria-hidden="true">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" style="fill:var(--pink);stroke:none;stroke-dasharray:none"/></marker></defs>
+      <path d="M 133 645 C 55 645, 55 517, 126 517" marker-end="url(#ah)"/>
+    </svg>
+    <div class="again-label">still high? rewrite again</div>
+
     <div class="code-card">
       <div class="blk b0">
         <h5>THE QUESTION FOR JEV</h5>
@@ -107,7 +120,7 @@ before.answers.offensive.noul; <span class="c">// </span><span class="n">0.78</s
 <pre><span class="k">const</span> { text: rewritten } = <span class="k">await</span> generateText({
   model: <span class="s">"google/gemini-3.8-flash"</span>, <span class="c">// same AI Gateway</span>
   instructions: <span class="s">"Rewrite the comment in a polite tone…"</span>,
-  prompt: text,
+  prompt,
 });</pre>
       </div>
       <div class="blk b3">

@@ -279,9 +279,11 @@ let editing = false;
 
 const showNotes = () => {
   editing = false;
-  notesBody.innerHTML = section
-    ? `<h2>${inline(section.title)}</h2>${render(section.body)}`
-    : `<p class="notes-empty">No section in the script links to ${esc(file)}.</p>`;
+  // Only the spoken parts (> quotes) of the section: no title, text, code or tables
+  const spoken = section ? chunks(section.body).map((c) => c.text).filter(isQuote).join("\n\n") : "";
+  notesBody.innerHTML = !section
+    ? `<p class="notes-empty">No section in the script links to ${esc(file)}.</p>`
+    : spoken ? render(spoken) : '<p class="notes-empty">No spoken part for this slide.</p>';
   if (!dev || !section) return;
   const edit = document.createElement("button");
   edit.className = "notes-btn notes-edit";
@@ -332,10 +334,9 @@ const chunks = (text) => {
   flush("");
   return out;
 };
-// Spoken parts (> quotes) are edited without the "> ", added back on save. The 🎬 line (it ties the section
-// to the slide) and --- separators are kept as they are, not editable.
+// Only the spoken parts (> quotes) are editable, without the "> " (added back on save). Everything else
+// (text, code, the 🎬 line that ties the section to the slide, --- separators) is kept as it is, not shown.
 const isQuote = (c) => c.split("\n").every((l) => l.startsWith(">"));
-const fixed = (c) => c.startsWith("🎬") || c === "---";
 
 const editNotes = () => {
   editing = true;
@@ -350,7 +351,7 @@ const editNotes = () => {
   const blocks = [];
   const area = (kind, value, sep = "\n\n") => {
     const label = document.createElement("label");
-    label.textContent = kind === "quote" ? "Spoken" : value.startsWith("```") ? "Code" : "Text";
+    label.textContent = "Spoken";
     const ta = document.createElement("textarea");
     ta.className = kind;
     ta.rows = 1;
@@ -367,16 +368,14 @@ const editNotes = () => {
   const actions = document.createElement("div");
   actions.className = "notes-actions";
   actions.innerHTML = '<button type="submit" class="notes-btn save">Save</button><button type="button" class="notes-btn cancel">Cancel</button>'
-    + '<button type="button" class="notes-btn add-quote">+ Spoken</button><button type="button" class="notes-btn add-text">+ Text</button>'
+    + '<button type="button" class="notes-btn add-quote">+ Spoken</button>'
     + '<span class="notes-status">⌘S save · Esc cancel</span>';
   form.append(actions);
   for (const { sep, text: c } of chunks(text)) {
-    if (fixed(c)) blocks.push({ kind: "fixed", value: c, sep });
-    else if (isQuote(c)) area("quote", c.split("\n").map((l) => l.replace(/^>\s?/, "")).join("\n"), sep);
-    else area("text", c, sep);
+    if (isQuote(c)) area("quote", c.split("\n").map((l) => l.replace(/^>\s?/, "")).join("\n"), sep);
+    else blocks.push({ kind: "fixed", value: c, sep });
   }
   actions.querySelector(".add-quote").addEventListener("click", () => area("quote", "").focus());
-  actions.querySelector(".add-text").addEventListener("click", () => area("text", "").focus());
   actions.querySelector(".cancel").addEventListener("click", () => loadNotes().then(showNotes));
   const status = actions.querySelector(".notes-status");
 
@@ -410,7 +409,7 @@ const editNotes = () => {
     else if (e.key === "Escape") loadNotes().then(showNotes);
   });
 
-  notesBody.innerHTML = `<h2>${inline(section.title)}</h2>`;
+  notesBody.innerHTML = "";
   notesBody.append(form);
   form.querySelector("textarea")?.focus();
 };

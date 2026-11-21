@@ -18,10 +18,13 @@ Legenda:
 
 ### 00 · Copertina
 
-🎬 **ANIMAZIONE**: [`slides/00-copertina.html`](./slides/00-copertina.html). A sinistra il titolo su due righe, "From paragraphs / to decisions", gli autori (Mario Rossi & Maria Verde) e il pulsante **Start**, che passa alla slide successiva. A destra l'essenza del talk: un paragrafo "per le persone" entra in Jev ed esce come una decisione "per il codice", una probabilità per opzione (offensive 0.92). Dura 10 s. Le probabilità sono illustrative.
+🎬 **ANIMAZIONE**: [`slides/00-copertina.html`](./slides/00-copertina.html). A sinistra il titolo su due righe, "From Texts / to Decisions", gli autori (Zelda Ailine Luconi & Fabio Biondi) e il pulsante **Start**, che passa alla slide successiva. A destra l'essenza del talk: un paragrafo "per le persone" entra in Jev ed esce come una decisione "per il codice", una probabilità per opzione (offensive 0.92). Dura 10 s. Le probabilità sono illustrative.
 
 🎙️ **VOCE**:
-> _(copertina: resta a schermo mentre il pubblico si siede; nessun parlato)_
+> Negli ultimi anni ci siamo abituati a modelli che **scrivono**: fai una domanda e ti rispondono con un paragrafo.
+> Ma nel nostro codice, molto spesso, un paragrafo non ci serve. Ci serve una **decisione**: questo commento è offensivo? Questo ticket va al supporto o alle vendite? In questa email c'è un ordine?
+> Per questo motivo stanno iniziando a prendere piede una "nuova2 famiglia di modelli, i **decision model**. 
+> Oggi partiamo da **Jev**, e vediamo anche la novità di queste settimane: **Gemini Decision 1** di Google.
 
 ### 01d · Hook (0:00 – 0:30)
 
@@ -615,12 +618,13 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 
 ### 10a · Gemini riscrive, Jev conferma
 
-🎬 **ANIMAZIONE**: [`slides/10a-riscrive.html`](./slides/10a-riscrive.html). A sinistra il flusso dall'alto in basso: commento → Jev misura (0.78) → Gemini riscrive → Jev misura di nuovo (0.11) → prima e dopo. A destra il codice di `/2-jev-and-gemini/demo1`, un blocco per passo. Dura 18 s.
+🎬 **ANIMAZIONE**: [`slides/10a-riscrive.html`](./slides/10a-riscrive.html). A sinistra il flusso dall'alto in basso: commento → Jev misura (0.78) → Gemini riscrive → Jev misura di nuovo (0.11) → prima e dopo. Una freccia tratteggiata torna da "Jev misura di nuovo" a "Gemini riscrive" ("still high? rewrite again"): è il loop possibile, non è nel codice della demo. A destra il codice di `/2-jev-and-gemini/demo1`, un blocco per passo. Dura 18 s.
 
 🎙️ **VOCE**:
 > Primo esempio: un commento maleducato. Jev misura quanto è offensivo: settantotto per cento.
 > Gemini lo riscrive in tono educato, mantenendo il senso della critica.
 > E Jev rifà **la stessa domanda** sul testo nuovo: undici per cento.
+> E se il numero restasse alto? Lo rimandiamo a Gemini, e il loop si chiude da solo. Nella demo basta un giro.
 > Gemini scrive, Jev dimostra con un numero che la riscrittura ha funzionato. E il codice è tutto qui: una domanda, due chiamate a Jev e una a Gemini, con la stessa chiave del gateway.
 
 ### 10b · Gemini risponde, Jev valuta
@@ -631,7 +635,7 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 > Secondo esempio: un cliente scrive al supporto, e Gemini prepara la risposta.
 > Prima che parta, Jev la controlla con due domande: la risposta affronta davvero il problema? Una **choice**. E come tratta il cliente? Uno **score** su quattro livelli.
 > Jev vede tutti e due i testi, il messaggio e la risposta: la pertinenza ha senso solo rispetto alla richiesta.
-> Qui la risposta è generica e scortese: "generic", tono 2.74 su 3. Non si manda.
+> Qui la risposta è generica e scortese: "generic", e tono 2.74: su una scala da 0, educato, a 3, tossico, è quasi tossico. Non si manda.
 
 ### 10c · Gemini propone, Jev sceglie
 

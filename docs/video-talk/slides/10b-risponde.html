@@ -78,7 +78,7 @@
       <div class="link l2"></div>
       <div class="node jev n3"><b>Jev evaluates</b><span>relevance + tone</span></div>
       <div class="link l3"></div>
-      <div class="node ok n4"><b>✋ Verdict: hold it</b><span>generic · tone 2.74 / 3</span></div>
+      <div class="node ok n4"><b>✋ Verdict: hold it</b><span>generic · tone 2.74, near toxic</span></div>
     </div>
 
     <div class="code q">
@@ -105,7 +105,8 @@
         <h5>1 · GEMINI WRITES THE REPLY</h5>
 <pre><span class="k">const</span> { text: reply } = <span class="k">await</span> generateText({
   model: <span class="s">"google/gemini-3.8-flash"</span>,
-  prompt: <span class="s">`${message}\nStyle: ${style}`</span>,
+  instructions: style,   <span class="c">// how to reply</span>
+  prompt: message,       <span class="c">// what to reply to</span>
 });</pre>
       </div>
       <div class="blk bj">
@@ -115,7 +116,7 @@
 <span class="k">const</span> { answers } = <span class="k">await</span> jev.systemOne({ state, questions });
 
 answers.relevance.choice; <span class="c">// </span><span class="n">"generic"</span>
-answers.tone.score;       <span class="c">// </span><span class="n">2.74</span><span class="c"> (out of 3)</span></pre>
+answers.tone.score;       <span class="c">// </span><span class="n">2.74</span><span class="c"> (0 polite → 3 toxic)</span></pre>
       </div>
     </div>
 
