@@ -13,8 +13,10 @@
 //   N = open / close the speaker notes (bottom or right panel: the two buttons in the dock) · click the slide number = jump to any slide
 //   Slides with stops show one square per step, bottom right: pink = on screen, grey = still to come
 //   P = open the speaker notes in their own window (e.g. a second monitor), kept in sync with the slides
+//   F = full screen (also the button bottom right)
 //   D = drawing toolbar over the slide: pen, ellipse, spotlight, arrow (see draw.js)
-//   O (or the gear in the drawing toolbar) = options: Export PDF, every slide at its last frame, with or without notes
+//   O (or the toolbar's gear → Export, or ⋮ in the notes → Export) = Export: this slide (copy image, PNG) or all
+//   of them (PDF, PNGs), at their last frame, with or without notes, into _export/ or a folder you choose
 //   page.html?still = the last frame only, no controls, no notes, no keys (the pages of the PDF export)
 const frame = document.querySelector(".frame");
 
@@ -27,11 +29,25 @@ let leaveEdit = null;
 // notes as read while presenting, saving the changes first
 let saveEdit = null;
 let previewEdit = null;
+// Slide status, from `const slideStatus = { "05c-….html": "draft" }` in the deck's _shared/anim.js (set from ⋮ in
+// the notes or on each slide of the slide list): "draft" = shown with a DRAFT badge; "hidden" = out of the talk
+// (← / →, the numbering, the deck bar, Export of all slides) but still in the slide list, dimmed
+const STATUS = typeof slideStatus === "object" && slideStatus ? { ...slideStatus } : {};
+const statusOf = (f) => (STATUS[f] === "draft" || STATUS[f] === "hidden" ? STATUS[f] : "");
+const talk = () => slides.filter((f) => statusOf(f) !== "hidden");
+// Position in the talk (1, 2, …), 0 for a hidden slide
+const num = (f) => talk().indexOf(f) + 1;
+const goTo = (next) => (leaveEdit ? leaveEdit() : Promise.resolve(true)).then((ok) => ok && (location.href = next));
+// step slides forward or back, skipping the hidden ones
 const go = (step) => {
-  const i = slides.indexOf(file);
-  const next = slides[i + step];
-  if (i === -1 || !next) return;
-  (leaveEdit ? leaveEdit() : Promise.resolve(true)).then((ok) => ok && (location.href = next));
+  let j = slides.indexOf(file);
+  if (j === -1) return;
+  for (let n = Math.abs(step); n > 0;) {
+    j += Math.sign(step);
+    if (!slides[j]) return;
+    if (statusOf(slides[j]) !== "hidden") n--;
+  }
+  goTo(slides[j]);
 };
 
 // page.html?notes is the notes window opened with P: only the notes, full height. It follows the slides
@@ -122,8 +138,11 @@ const restart = () => {
 frame.addEventListener("click", (e) => { if (stops.length && !e.target.closest("a, button")) proceed(); });
 
 // Links marked data-next (e.g. the cover's Start button) open the next slide in the deck
-const nextSlide = slides[slides.indexOf(file) + 1];
-if (nextSlide) document.querySelectorAll("[data-next]").forEach((a) => (a.href = nextSlide));
+const linkNext = () => {
+  const nextSlide = slides.slice(slides.indexOf(file) + 1).find((f) => statusOf(f) !== "hidden");
+  if (nextSlide) document.querySelectorAll("[data-next]").forEach((a) => (a.href = nextSlide));
+};
+linkNext();
 
 // Slide number, bottom left: "05e · 12 / 15" (the file prefix, then the position in the deck).
 // Clicking it opens the slide list, as tall as the window.
@@ -134,7 +153,19 @@ const badge = document.createElement("button");
 badge.className = "slide-id";
 badge.setAttribute("aria-label", "Go to slide");
 const index = slides.indexOf(file);
-badge.textContent = prefix(file) + (index === -1 ? "" : ` · ${index + 1} / ${slides.length}`);
+const showBadge = () => {
+  badge.textContent = prefix(file) + (index === -1 ? "" : num(file) ? ` · ${num(file)} / ${talk().length}` : " · hidden");
+};
+showBadge();
+// DRAFT / HIDDEN, top left of the slide area (not in the exports)
+const flag = Object.assign(document.createElement("div"), { className: "slide-flag" });
+const showFlag = () => {
+  const s = statusOf(file);
+  flag.textContent = s.toUpperCase();
+  flag.className = `slide-flag${s ? ` is-${s}` : ""}`;
+  flag.title = s === "hidden" ? "Hidden: left out of the talk (← / → skip it)" : s === "draft" ? "Draft" : "";
+};
+showFlag();
 const notesToggle = document.createElement("button");
 notesToggle.className = "notes-toggle";
 // An icon (a page with lines); hidden while the notes are open, the panel has its own ✕
@@ -146,41 +177,84 @@ notesWindow.className = "notes-window";
 notesWindow.textContent = "↗";
 notesWindow.title = "Notes in a new window (P)";
 notesWindow.setAttribute("aria-label", "Open the notes in a new window");
-// Where the notes panel sits: at the bottom or on the right (the ⋮ dropdown at the top right of the panel)
-const placeButton = (right) => {
-  const b = document.createElement("button");
-  b.className = `notes-place-item${right ? " to-right" : " to-bottom"}`;
-  b.setAttribute("role", "menuitem");
-  b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/>${right ? '<path d="M14 4v16"/>' : '<path d="M3 14h18"/>'}</svg>`
-    + `<span>${right ? "Notes on the right" : "Notes at the bottom"}</span>`;
-  b.addEventListener("click", () => {
-    b.blur();
-    placeMenu.hidden = true;
-    notesRight = right;
-    try { right ? localStorage.setItem(SIDE, "right") : localStorage.removeItem(SIDE); } catch {}
-    setNotes(true);
-  });
-  return b;
+// Where the notes panel sits: one button before ✕ switches it between the bottom and the right; its icon shows
+// where the panel goes on click
+const sideToggle = Object.assign(document.createElement("button"), { className: "notes-place notes-side" });
+const showSide = () => {
+  const label = notesRight ? "Notes at the bottom" : "Notes on the right";
+  sideToggle.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/>${notesRight ? '<path d="M3 14h18"/>' : '<path d="M14 4v16"/>'}</svg>`;
+  sideToggle.title = label;
+  sideToggle.setAttribute("aria-label", label);
 };
+sideToggle.addEventListener("click", () => {
+  sideToggle.blur();
+  notesRight = !notesRight;
+  try { notesRight ? localStorage.setItem(SIDE, "right") : localStorage.removeItem(SIDE); } catch {}
+  showSide();
+  setNotes(true);
+});
 dock.append(badge);
 // Bottom right: Notes and ↗ (the notes in their own window)
 const dockRight = Object.assign(document.createElement("div"), { className: "dock dock-right" });
 // In the notes window only: put the notes back into the slides window (and close this one)
 const notesBack = Object.assign(document.createElement("button"), { className: "notes-back", textContent: "⇲ Back to the slides window" });
 notesBack.title = "Close this window and open the notes in the slides window";
-dockRight.append(notesToggle, notesWindow, notesBack);
+// Full screen (F): the window, on and off
+const fullscreen = Object.assign(document.createElement("button"), { className: "fullscreen", title: "Full screen (F)" });
+fullscreen.setAttribute("aria-label", "Full screen");
+const FS_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>';
+const FS_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M20 9h-5V4M15 20v-5h5M4 15h5v5"/></svg>';
+const toggleFullscreen = () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {});
+const showFullscreen = () => { fullscreen.innerHTML = document.fullscreenElement ? FS_OFF : FS_ON; };
+showFullscreen();
+document.addEventListener("fullscreenchange", showFullscreen);
+fullscreen.addEventListener("click", () => { fullscreen.blur(); toggleFullscreen(); });
+dockRight.append(notesToggle, notesWindow, fullscreen, notesBack);
 
 const menu = document.createElement("nav");
 menu.className = "slide-menu";
 const slideTitle = (f) => f.replace(/^[^-]+-/, "").replace(/\.html$/, "").replaceAll("-", " ");
 const current = (f) => (f === file ? ' class="current" aria-current="page"' : "");
+const DOTS = '<span class="row-dots" role="button" tabindex="-1" title="Status: draft, hidden" aria-label="Slide status">'
+  + '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></span>';
 // Two views, switched from the sticky buttons on top (remembered): a list, or cards three to a row with a
 // preview of each slide (its last frame, ?still, loaded as it scrolls into view)
 menu.innerHTML = '<div class="menu-head"><button data-view="list">List</button><button data-view="cards">Cards</button></div>'
   + '<div class="menu-list">' + slides
-  // Position in the deck (what the presenter says and the badge counts), then the file prefix
-  .map((f, i) => `<a href="${f}"${current(f)}><b class="slide-n">${i + 1}</b><code>${prefix(f)}</code><span>${slideTitle(f)}</span></a>`)
+  // Position in the talk (what the presenter says and the badge counts), then the file prefix; ⋮ sets the status
+  .map((f) => `<a href="${f}"${current(f)}><b class="slide-n"></b><code>${prefix(f)}</code><span class="slide-title">${slideTitle(f)}</span><em class="slide-tag"></em>${DOTS}</a>`)
   .join("") + '</div><div class="menu-cards"></div>';
+// The status popup of the slide list (⋮ on a row or a card): one for the whole menu
+const statusPop = Object.assign(document.createElement("div"), { className: "notes-place-menu status-pop", hidden: true });
+statusPop.setAttribute("role", "menu");
+menu.append(statusPop);
+// Numbers, tags and dimming of every row and card, from the status
+const markMenu = () => menu.querySelectorAll(".menu-list a, .menu-cards a").forEach((a) => {
+  const f = a.getAttribute("href");
+  const s = statusOf(f);
+  a.classList.toggle("is-draft", s === "draft");
+  a.classList.toggle("is-hidden", s === "hidden");
+  a.querySelector(".slide-n").textContent = num(f) || "–";
+  const tag = a.querySelector(".slide-tag");
+  if (tag) tag.textContent = s;
+});
+markMenu();
+menu.addEventListener("click", (e) => {
+  const dots = e.target.closest(".row-dots");
+  if (!dots) { if (!statusPop.contains(e.target)) statusPop.hidden = true; return; }
+  e.preventDefault();
+  e.stopPropagation();
+  const f = dots.closest("a").getAttribute("href");
+  if (!statusPop.hidden && statusPop.dataset.file === f) { statusPop.hidden = true; return; }
+  statusPop.dataset.file = f;
+  statusPop.replaceChildren(...statusItems(f, () => { statusPop.hidden = true; }));
+  statusPop.hidden = false;
+  const r = dots.getBoundingClientRect();
+  const m = menu.getBoundingClientRect();
+  statusPop.style.top = `${Math.min(r.bottom + 4 - m.top + menu.scrollTop, menu.scrollTop + menu.clientHeight - statusPop.offsetHeight - 8)}px`;
+  statusPop.style.left = `${Math.max(8, r.right - m.left - statusPop.offsetWidth)}px`;
+});
+menu.addEventListener("scroll", () => { statusPop.hidden = true; });
 const VIEW = "anim-menu-view";
 let menuView = "list";
 try { menuView = localStorage.getItem(VIEW) === "cards" ? "cards" : "list"; } catch {}
@@ -196,10 +270,11 @@ const setView = (view) => {
   menu.classList.toggle("cards", view === "cards");
   menu.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
   if (view === "cards" && !cards.children.length) {
-    const titles = [...menu.querySelectorAll(".menu-list a span")].map((s) => s.innerHTML);
+    const titles = [...menu.querySelectorAll(".menu-list a .slide-title")].map((s) => s.innerHTML);
     cards.innerHTML = slides.map((f, i) => `<a href="${f}"${current(f)}><div class="card-shot">`
-      + `<iframe src="${f}?still" loading="lazy" tabindex="-1" aria-hidden="true"></iframe><b class="slide-n">${i + 1}</b></div>`
-      + `<span>${titles[i]}</span></a>`).join("");
+      + `<iframe src="${f}?still" loading="lazy" tabindex="-1" aria-hidden="true"></iframe><b class="slide-n"></b><em class="slide-tag"></em>${DOTS}</div>`
+      + `<span class="slide-title">${titles[i]}</span></a>`).join("");
+    markMenu();
   }
   if (menu.classList.contains("open")) menu.querySelector(`.menu-${view} .current`)?.scrollIntoView({ block: "center" });
 };
@@ -227,44 +302,49 @@ document.body.append(deckBar);
   const fill = deckBar.querySelector(".deck-fill");
   const thumb = deckBar.querySelector(".deck-thumb");
   const tip = deckBar.querySelector(".deck-tip");
-  const last = Math.max(1, slides.length - 1);
-  const pos = (i) => `${(i / last) * 100}%`;
+  // Only the slides of the talk (no hidden ones): i is a position in talk(). A hidden slide on screen sits
+  // halfway between the talk slides around it.
+  const last = () => Math.max(1, talk().length - 1);
+  const pos = (i) => `${(Math.max(0, i) / last()) * 100}%`;
+  const here = () => (num(file) ? num(file) - 1 : talk().filter((f) => slides.indexOf(f) < index).length - 0.5);
   // Preview of the slide under the pointer: its last frame (?still), loaded a moment after the pointer stops
   // on it, only while the tooltip is shown
   const frameEl = tip.querySelector("iframe");
-  let shotTimer = 0, shotOf = -1;
+  let shotTimer = 0, shotOf = "";
   const preview = (i) => {
     clearTimeout(shotTimer);
-    if (!deckBar.classList.contains("hover") || i === shotOf || !slides[i]) return;
+    const f = talk()[i];
+    if (!deckBar.classList.contains("hover") || f === shotOf || !f) return;
     shotTimer = setTimeout(() => {
-      shotOf = i;
+      shotOf = f;
       tip.classList.add("loading");
       frameEl.onload = () => tip.classList.remove("loading");
-      frameEl.src = `${slides[i]}?still`;
+      frameEl.src = `${f}?still`;
     }, 60);
   };
   const pick = (x) => {
     const r = track.getBoundingClientRect();
-    return Math.round(Math.min(1, Math.max(0, (x - r.left) / r.width)) * last);
+    return Math.round(Math.min(1, Math.max(0, (x - r.left) / r.width)) * last());
   };
   // Thumb and tooltip on slide i (the fill follows only while dragging); the tooltip kept inside the bar
   const show = (i) => {
     thumb.style.left = pos(i);
-    if (dragging || i === index) fill.style.width = pos(i);
+    if (dragging) fill.style.width = pos(i);
     tip.querySelector("b").textContent = i + 1;
-    tip.querySelector("span").textContent = menu.querySelectorAll(".menu-list a span")[i]?.textContent || "";
+    tip.querySelector("span").textContent = menu.querySelectorAll(".menu-list a .slide-title")[slides.indexOf(talk()[i])]?.textContent || "";
     preview(i);
     const r = track.getBoundingClientRect();
     const half = tip.offsetWidth / 2;
-    const x = r.left + (i / last) * r.width;
+    const x = r.left + (i / last()) * r.width;
     tip.style.left = `${Math.min(innerWidth - notesWidth - half - 8, Math.max(half + 8, x))}px`;
   };
   let dragging = false;
   // Back on this slide: fill and thumb only. The tooltip stays where it is while it fades out (moving it to this
   // slide, and loading its preview, made it jump across the bar)
-  const rest = () => { clearTimeout(shotTimer); fill.style.width = thumb.style.left = pos(Math.max(0, index)); };
+  const rest = () => { clearTimeout(shotTimer); fill.style.width = thumb.style.left = pos(here()); };
   rest();
   addEventListener("anim-layout", rest);
+  addEventListener("anim-status", rest);
   addEventListener("resize", rest);
   // The tooltip is part of the bar: it can be grabbed and dragged too. Leaving closes it after a moment,
   // so the pointer can move from the line up to the tooltip
@@ -288,7 +368,7 @@ document.body.append(deckBar);
     dragging = false;
     deckBar.classList.remove("dragging");
     const i = pick(e.clientX);
-    if (index !== -1 && i !== index) go(i - index);
+    if (index !== -1 && talk()[i] && talk()[i] !== file) goTo(talk()[i]);
     else { deckBar.classList.remove("hover"); rest(); }
   });
   deckBar.addEventListener("click", (e) => e.stopPropagation());
@@ -304,10 +384,10 @@ const headClose = Object.assign(document.createElement("button"), { className: "
 headClose.setAttribute("aria-label", "Close the notes");
 headClose.addEventListener("click", () => { headClose.blur(); setNotes(false); });
 const headTimeline = Object.assign(document.createElement("div"), { className: "notes-head-tl" });
-// ⋮ opens a dropdown with the two places of the panel
+// ⋮ opens a dropdown: Slide details, Export, Status
 const placeWrap = Object.assign(document.createElement("div"), { className: "notes-more" });
-const placeToggle = Object.assign(document.createElement("button"), { className: "notes-place notes-dots", title: "Notes panel position" });
-placeToggle.setAttribute("aria-label", "Notes panel position");
+const placeToggle = Object.assign(document.createElement("button"), { className: "notes-place notes-dots", title: "More" });
+placeToggle.setAttribute("aria-label", "More");
 placeToggle.setAttribute("aria-haspopup", "true");
 placeToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
 const placeMenu = Object.assign(document.createElement("div"), { className: "notes-place-menu", hidden: true });
@@ -316,6 +396,8 @@ placeToggle.addEventListener("click", () => {
   placeToggle.blur();
   detailsItem.hidden = !(dev && document.querySelector(".kicker"));
   details.hidden = true;
+  statusGroup.hidden = !dev;
+  if (dev) statusGroup.replaceChildren(...statusItems(file, () => { placeMenu.hidden = true; }));
   placeMenu.hidden = !placeMenu.hidden;
 });
 addEventListener("pointerdown", (e) => { if (!placeWrap.contains(e.target)) placeMenu.hidden = details.hidden = true; });
@@ -383,15 +465,90 @@ details.addEventListener("submit", (e) => {
 placeWrap.append(placeToggle, placeMenu, details);
 const headPreview = Object.assign(document.createElement("button"), { className: "notes-btn notes-head-preview", textContent: "Preview", title: "Back to the notes as you read them while presenting (saves first)" });
 headPreview.addEventListener("click", () => { headPreview.blur(); previewEdit?.(); });
-notes.querySelector(".notes-head").append(headTimeline, headPreview, headSave, placeWrap, headClose);
-placeMenu.append(placeButton(false), placeButton(true), detailsItem);
-document.body.append(menu, dock, dockRight, notes);
+notes.querySelector(".notes-head").append(headTimeline, headPreview, headSave, placeWrap, sideToggle, headClose);
+// ⋮ → Export: the same panel as O and the toolbar's gear
+const exportItem = Object.assign(document.createElement("button"), { className: "notes-place-item" });
+exportItem.setAttribute("role", "menuitem");
+exportItem.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>Export</span>';
+exportItem.addEventListener("click", () => { exportItem.blur(); placeMenu.hidden = true; showOptions(true); });
+placeMenu.append(detailsItem, exportItem);
+// ⋮ → Status (with npm run slides): Normal, Draft or Hidden for this slide, the same as ⋮ in the slide list
+const statusGroup = Object.assign(document.createElement("div"), { className: "status-group", hidden: true });
+placeMenu.append(statusGroup);
+
+// Status items: Normal, Draft, Hidden, with a check on the current one. Saved into slideStatus in the deck's
+// _shared/anim.js (POST /__notes), applied here right away and sent to the deck's other windows.
+const STATUS_ITEMS = [
+  ["", "Normal", "In the talk", '<path d="M5 12l5 5 9-10"/>'],
+  ["draft", "Draft", "In the talk, with a DRAFT badge", '<path d="M4 20l4-1 11-11-3-3L5 16z"/>'],
+  ["hidden", "Hidden", "Out of the talk, only in this list", '<path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0 1 12 6c5 0 9 6 9 6a16 16 0 0 1-3 3.4M6.6 6.6A16 16 0 0 0 3 12s4 6 9 6a9 9 0 0 0 4.4-1.1"/>'],
+];
+const statusItems = (f, done) => {
+  const head = Object.assign(document.createElement("div"), { className: "status-head", textContent: `Status · ${prefix(f)}` });
+  const note = Object.assign(document.createElement("div"), { className: "notes-status status-msg" });
+  const items = STATUS_ITEMS.map(([value, label, hint, icon]) => {
+    const b = document.createElement("button");
+    b.className = `notes-place-item status-item${statusOf(f) === value ? " on" : ""}`;
+    b.setAttribute("role", "menuitemradio");
+    b.setAttribute("aria-checked", String(statusOf(f) === value));
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${icon}</svg><span>${label}<small>${hint}</small></span>`;
+    b.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      b.blur();
+      if (statusOf(f) === value) return done();
+      note.textContent = "Saving…";
+      saveStatus(f, value).then(done, (err) => {
+        note.textContent = err === 409 ? "The deck's anim.js changed: reload and try again."
+          : "Not saved: is npm run slides running (restarted)?";
+      });
+    });
+    return b;
+  });
+  return [head, ...items, note];
+};
+const DECK_JS = new URL("_shared/anim.js", location.href).pathname;
+const STATUS_NOTE = `// Slides kept out of the talk without deleting them (set from ⋮ in the notes or in the slide list):
+// "draft" = shown with a DRAFT badge; "hidden" = skipped by ← / →, the numbering and the export, only in the slide list`;
+const saveStatus = async (f, value) => {
+  const src = await fetch(DECK_JS, { cache: "no-store" }).then((r) => (r.ok ? r.text() : Promise.reject(r.status)));
+  const next = { ...STATUS };
+  if (value) next[f] = value;
+  else delete next[f];
+  const rows = slides.filter((x) => next[x]).map((x) => `  "${x}": "${next[x]}",`);
+  const block = `const slideStatus = {${rows.length ? `\n${rows.join("\n")}\n` : ""}};`;
+  const old = src.match(/const slideStatus = \{[\s\S]*?\};/);
+  const list = src.match(/const slides = \[[\s\S]*?\];/);
+  if (!old && !list) throw "slides";
+  const r = await fetch("/__notes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(old
+      ? { path: DECK_JS, original: old[0], updated: block }
+      : { path: DECK_JS, original: list[0], updated: `${list[0]}\n\n${STATUS_NOTE}\n${block}` }),
+  });
+  if (!r.ok) throw r.status;
+  applyStatus(next);
+  send({ status: next });
+};
+// The status in force everywhere on this page: badge, flag, slide list, deck bar, data-next links
+const applyStatus = (next) => {
+  Object.keys(STATUS).forEach((k) => delete STATUS[k]);
+  Object.assign(STATUS, next);
+  showBadge();
+  showFlag();
+  markMenu();
+  linkNext();
+  dispatchEvent(new Event("anim-status"));
+};
+document.body.append(menu, dock, dockRight, notes, flag);
 
 // N opens the notes; the choice is remembered across slides, like their place (bottom or right, the dock buttons)
 const NOTES = "anim-notes";
 const SIDE = "anim-notes-side";
 let notesRight = false;
 try { notesRight = localStorage.getItem(SIDE) === "right"; } catch {}
+showSide();
 const setNotes = (on) => {
   if (presenter) return;
   const root = document.documentElement;
@@ -504,6 +661,7 @@ const showNotes = () => {
 const loadNotes = () => fetch(SCRIPT, { cache: "no-store" })
   .then((r) => {
     dev = r.headers.has("X-Slides-Dev");
+    menu.classList.toggle("dev", dev);
     return r.ok ? r.text() : Promise.reject(r.status);
   })
   .then((md) => {
@@ -520,7 +678,7 @@ const loadNotes = () => fetch(SCRIPT, { cache: "no-store" })
       const title = all[a.getAttribute("href")]?.title
         .replace(/^\S+ · |^\d+\. /, "")
         .replace(/\s*\(\d+:\d+ – \d+:\d+\)$/, "");
-      if (title) a.querySelector("span").innerHTML = inline(title);
+      if (title) a.querySelector(".slide-title").innerHTML = inline(title);
     });
   })
   .catch(() => {
@@ -564,9 +722,17 @@ const isQuote = (c) => c.split("\n").every((l) => l.startsWith(">"));
 const STOP = /^⏸\s*(\d+(?:\.\d+)?)\s*s$/;
 const loopS = loop / 1000;
 const maxS = Math.floor(END * loopS * 10) / 10;
+// Stops end half a second before the final frame: a stop later than that would be a step with nothing left to show
+const lastStop = Math.max(0, Math.round((maxS - 0.5) * 10) / 10);
 const secs = (t) => (Math.round(t * 10) / 10).toFixed(1);
 // The step a spoken part belongs to: how many stops come at or before its start (0 = the first step)
-const stepOf = (time) => stops.filter((x) => x * loopS <= time + 0.01).length;
+// Steps: one per point where a spoken part starts. A part is on from the moment → takes the slide past its stop
+// up to the next stop, the wait there included: it is what you say while the slide builds and then waits. When no
+// part starts at 0, the slide opens with a transition (it plays up to the first stop and waits with nothing to
+// say): no step of its own.
+// stepOf: the step (0, 1…) of a part starting at that time.
+let leadStep = true;
+const stepOf = (time) => stops.filter((x) => x * loopS <= time + 0.01).length - (leadStep ? 0 : 1);
 // A stop can have nothing to say: its part is a lone ">" (kept so the stop is saved)
 const blank = (text) => !text.replace(/^>\s?/gm, "").trim();
 const spoken = (body) => {
@@ -578,11 +744,19 @@ const spoken = (body) => {
     if (isQuote(c)) out.push({ text: c, time: time ?? 0 });
     time = null;
   }
+  // No stop on the last frame: it would be a step with nothing left to show (the editor keeps them before it too)
+  out.forEach((b) => { b.time = Math.min(b.time, lastStop); });
   return out;
 };
 const applyStops = () => {
-  if (section && /^⏸/m.test(section.body)) setStops(spoken(section.body).map((b) => b.time / loopS));
-  else setStops(htmlStops);
+  if (section && /^⏸/m.test(section.body)) {
+    const parts = spoken(section.body);
+    setStops(parts.map((b) => b.time / loopS));
+    leadStep = parts.some((b) => b.time === 0);
+  } else {
+    setStops(htmlStops);
+    leadStep = true;
+  }
 };
 // Scrubbing from the notes editor: the slide waits at that point, → plays on from there
 const scrub = (t) => {
@@ -590,6 +764,16 @@ const scrub = (t) => {
   ended = false;
   held = true;
   nextStop = stops.filter((x) => x * loop <= t * 1000 + 1).length;
+};
+// ← on a slide with stops: undoes the last →. The slide goes back to the stop where the current step started and
+// waits there (the step before is on again; → plays the step once more). In the first step (or the opening
+// transition) there is nothing to undo: it returns false and ← changes slide.
+const back = () => {
+  if (!stops.length) return false;
+  const passed = stops.map((x) => x * loop).filter((x) => x < now() - 1);
+  if (!passed.length) return false;
+  scrub(passed.at(-1) / 1000);
+  return true;
 };
 
 // focus: false when edit mode carries over from the previous slide, so ← / → still move between slides
@@ -628,6 +812,9 @@ const editNotes = ({ focus = true } = {}) => {
   const setSlider = (t) => { slider.value = t; nowLabel.textContent = `${secs(t)} s`; };
   setSlider(clampT(now() / 1000));
   slider.addEventListener("input", () => { setSlider(Number(slider.value)); scrub(Number(slider.value)); });
+  let sliding = false;
+  slider.addEventListener("pointerdown", () => { sliding = true; });
+  addEventListener("pointerup", () => { sliding = false; });
   // Play / pause; the slider follows the slide while it plays (a stop still holds it, → or play goes on)
   const play = timeline.querySelector(".tl-play");
   const running = () => once().some((a) => a.playState === "running");
@@ -644,11 +831,16 @@ const editNotes = ({ focus = true } = {}) => {
   const follow = () => {
     if (!form.isConnected) return;
     const on = running();
-    if (on) setSlider(clampT(now() / 1000));
+    // The slider follows the slide, also when it jumps while paused (← to the previous stop, the presenter
+    // window); not while you drag it
+    const pos = clampT(now() / 1000);
+    if (!sliding && Number(slider.value) !== pos) setSlider(pos);
     if (on !== shown) { play.innerHTML = on ? PAUSE : PLAY; play.classList.toggle("on", on); shown = on; }
     // The spoken part(s) for the point the slide is at: the latest start at or before it
-    const t = now() / 1000 + 0.05;
-    const at = Math.max(...quotes().map((q) => q.time).filter((x) => x <= t), 0);
+    // Same rule as the steps: a part is on once → takes the slide past its stop, up to the next wait included
+    const t = now() / 1000;
+    const live = quotes().map((q) => q.time).filter((x) => x === 0 || x < t - 0.001);
+    const at = live.length ? Math.max(...live) : -1;
     quotes().forEach((q) => q.label.classList.toggle("current", q.time === at));
     requestAnimationFrame(follow);
   };
@@ -658,7 +850,7 @@ const editNotes = ({ focus = true } = {}) => {
   const blocks = [];
   const quotes = () => blocks.filter((b) => b.kind === "quote");
   const setTime = (b, t) => {
-    b.time = clampT(t);
+    b.time = Math.min(lastStop, clampT(t));
     b.input.value = secs(b.time);
     b.mark.style.left = `${(b.time / maxS) * 100}%`;
   };
@@ -679,7 +871,7 @@ const editNotes = ({ focus = true } = {}) => {
     label.innerHTML = '<span class="tl-head"><b class="tl-num"></b> Spoken · from <input type="number" min="0" step="0.1"> s'
       + '<button type="button" class="tl-del" title="Delete this spoken part" aria-label="Delete this spoken part">'
       + '<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5"/></svg></button></span>';
-    label.querySelector("input").max = maxS;
+    label.querySelector("input").max = lastStop;
     const ta = document.createElement("textarea");
     ta.className = "quote";
     ta.rows = 1;
@@ -704,7 +896,7 @@ const editNotes = ({ focus = true } = {}) => {
       // The slide jumps to the end of this part's step (the next stop, or the last frame): what is on screen
       // while it is said
       const next = quotes().map((q) => q.time).filter((t) => t > b.time).sort((x, y) => x - y)[0];
-      const t = next !== undefined ? Math.max(b.time, next - 0.1) : maxS;
+      const t = next !== undefined ? next : maxS;
       setSlider(t);
       scrub(t);
     });
@@ -853,17 +1045,19 @@ if (!still) {
 // Step indicator, bottom right (slides with stops only): one square per step, pink for the steps already
 // on screen, grey for those still to come
 const steps = document.createElement("div");
-steps.className = "steps";
+steps.className = "anim-steps";
 steps.setAttribute("aria-hidden", "true");
 document.body.append(steps);
 let stepsShown = "";
 const showSteps = (t) => {
-  // A step counts once the slide has gone past its stop (waiting at a stop is still the step before)
-  const done = stops.filter((x) => x * loop < t - 1).length + 1;
-  const key = stops.length ? `${done}/${stops.length + 1}` : "";
+  // A step starts when → takes the slide past its stop: waiting at a stop is still the step before (in an opening
+  // transition, before the first stop is passed: none yet)
+  const total = stops.length + (leadStep ? 1 : 0);
+  const done = stops.filter((x) => x * loop < t - 1).length + (leadStep ? 1 : 0);
+  const key = stops.length ? `${done}/${total}` : "";
   if (key === stepsShown) return;
   stepsShown = key;
-  steps.innerHTML = stops.length ? Array.from({ length: stops.length + 1 }, (_, i) => `<i class="${i < done ? "done" : ""}"></i>`).join("") : "";
+  steps.innerHTML = stops.length ? Array.from({ length: total }, (_, i) => `<i class="${i < done ? "done" : ""}"></i>`).join("") : "";
   // In the notes, the spoken parts of the step on screen stand out (slides with stops only)
   notesBody.querySelectorAll(".notes-part").forEach((p) => p.classList.toggle("current", stops.length > 0 && +p.dataset.step === done - 1));
 };
@@ -907,6 +1101,7 @@ const follow = (data) => {
 const mine = (data) => !data.tab || data.tab === tabId;
 if (channel) channel.onmessage = ({ data }) => {
   if (data.notes) loadNotes();
+  if (data.status) applyStatus(data.status);
   if (presenter) {
     if (data.slide && data.tab) follow(data);
     return;
@@ -914,7 +1109,7 @@ if (channel) channel.onmessage = ({ data }) => {
   if (data.hello) announce();
   if (!mine(data)) return;
   if (data.dock) setNotes(true);
-  if (data.go) data.go === 1 && proceed() || go(data.go);
+  if (data.go) (data.go === 1 ? proceed() : back()) || go(data.go);
   if (data.key === "space") ended ? restart() : held ? proceed() : togglePause();
   if (data.key === "restart") restart();
 };
@@ -946,6 +1141,8 @@ addEventListener("keydown", (e) => {
     openMenu(false);
   } else if (e.key === "n" || e.key === "N") {
     setNotes(!document.documentElement.classList.contains("notes-open"));
+  } else if ((e.key === "f" || e.key === "F") && !e.metaKey && !e.ctrlKey) {
+    toggleFullscreen();
   } else if (e.key === "p" || e.key === "P") {
     openNotesWindow();
   } else if (e.key === "r" || e.key === "R") {
@@ -959,68 +1156,81 @@ addEventListener("keydown", (e) => {
     if (!proceed()) go(1);
   } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
     e.preventDefault();
-    go(-1);
+    back() || go(-1);
   }
 });
 
-// ---------- Options (O, or the gear in the drawing toolbar): a modal in the middle of the window ----------
+// ---------- Export (O, the gear menu of the drawing toolbar, or ⋮ in the notes): a modal in the middle ----------
+// This slide: copy it as an image, or save it as PNG. All slides: one PDF, or one PNG each. With or without notes
+// (slide on the left, its spoken parts on the right). Saved in the deck's _export/ folder (by the dev server,
+// POST /__export in serve.mjs), or also into a folder of your choice (File System Access, Chrome).
 const options = document.createElement("div");
 options.className = "options";
 options.hidden = true;
+const canPick = "showDirectoryPicker" in window;
 options.innerHTML = `<div class="options-box" role="dialog" aria-modal="true" aria-labelledby="options-title">
   <button type="button" class="options-close" aria-label="Close">×</button>
-  <h2 id="options-title">Options</h2>
+  <h2 id="options-title">Export</h2>
+  <label class="options-check"><input type="checkbox" name="notes"> Include notes <span>(slide on the left, speaker notes on the right)</span></label>
+  ${canPick ? `<label class="options-dest">Save to <select name="dest"><option value="project">the deck's _export folder</option><option value="pick">a folder I choose…</option></select></label>` : ""}
   <section>
-    <h3>Export PDF</h3>
-    <p>All ${slides.length} slides, each at its last frame, in one PDF file.</p>
-    <label class="options-check"><input type="checkbox" name="notes"> Include notes <span>(slide on the left, speaker notes on the right)</span></label>
-    <div class="options-row"><button type="button" class="notes-btn save options-export">Export PDF</button><span class="options-status"></span></div>
+    <h3>This slide</h3>
+    <p class="options-this"></p>
+    <div class="options-row"><button type="button" class="notes-btn save" data-export="copy">Copy image</button><button type="button" class="notes-btn" data-export="png-one">Save PNG</button></div>
   </section>
+  <section>
+    <h3 class="options-all"></h3>
+    <p>Each at its last frame (hidden slides left out).</p>
+    <div class="options-row"><button type="button" class="notes-btn save" data-export="pdf">Export PDF</button><button type="button" class="notes-btn" data-export="png-all">Export PNGs</button></div>
+  </section>
+  <p class="options-status" aria-live="polite"></p>
 </div>`;
 document.body.append(options);
 const withNotes = options.querySelector("[name=notes]");
+const dest = options.querySelector("[name=dest]");
 const PDF_NOTES = "anim-pdf-notes";
-try { withNotes.checked = localStorage.getItem(PDF_NOTES) === "1"; } catch {}
+const DEST = "anim-export-dest";
+try {
+  withNotes.checked = localStorage.getItem(PDF_NOTES) === "1";
+  if (dest) dest.value = localStorage.getItem(DEST) === "pick" ? "pick" : "project";
+} catch {}
 withNotes.addEventListener("change", () => { try { withNotes.checked ? localStorage.setItem(PDF_NOTES, "1") : localStorage.removeItem(PDF_NOTES); } catch {} });
+dest?.addEventListener("change", () => { try { localStorage.setItem(DEST, dest.value); } catch {} });
+const exportStatus = options.querySelector(".options-status");
 const showOptions = (on) => {
   options.hidden = !on;
-  if (on) options.querySelector(".options-export").focus();
+  if (!on) return;
+  const n = slides.indexOf(file);
+  options.querySelector(".options-this").textContent = `${num(file) || prefix(file)} · ${menu.querySelectorAll(".menu-list a .slide-title")[n]?.textContent || prefix(file)}, at its last frame.`;
+  options.querySelector(".options-all").textContent = `All ${talk().length} slides`;
+  options.querySelector("[data-export=copy]").focus();
 };
 options.addEventListener("click", (e) => { if (e.target === options || e.target.closest(".options-close")) showOptions(false); });
 addEventListener("anim-options", () => showOptions(true));
 
-// Export PDF: a print page with one 1920×1080 page per slide (with notes: the slide on the left 65%, its
-// spoken parts on the right), sent to the dev server (POST /__pdf in serve.mjs) that puts a picture of each
-// slide's last frame in it, prints it with headless Chrome to <slides>/_export/<name>.pdf, then opened in a new tab.
-const exportPdf = async () => {
-  const notesToo = withNotes.checked;
-  const status = options.querySelector(".options-status");
-  const button = options.querySelector(".options-export");
-  if (!dev) { status.textContent = "Export PDF needs the dev server: npm run slides."; return; }
-  // The tab for the PDF opens now, inside the click (later the browser would block it), and loads it when ready
-  const tab = window.open("", "_blank");
-  tab?.document.write('<title>Exporting PDF…</title><p style="font: 18px sans-serif; padding: 24px">Exporting the PDF…</p>');
-  tab?.document.close();
-  button.disabled = true;
-  status.textContent = `Rendering ${slides.length} slides… (about ${Math.ceil(slides.length * 0.8)} s)`;
+// The print page: one 1920×1080 .page per slide (with notes: the slide on the left 65%, its spoken parts on the
+// right); the server puts a picture of each slide's last frame in it, then prints it (PDF) or shoots each page (PNG)
+const deckName = deck.split("/").filter(Boolean).at(-2) || "slides";
+const printPage = async (list, notesToo, name) => {
   let all = {};
   if (notesToo) {
     try { all = sections(await fetch(SCRIPT, { cache: "no-store" }).then((r) => (r.ok ? r.text() : Promise.reject(r.status)))); } catch {}
   }
   const css = getComputedStyle(document.documentElement);
   const v = (name, fallback) => css.getPropertyValue(name).trim() || fallback;
-  const notesHtml = (f, i) => {
+  const notesHtml = (f) => {
     const sec = all[f];
     const title = sec ? inline(sec.title.replace(/^\S+ · |^\d+\. /, "")) : esc(slideTitle(f));
     const parts = sec ? spoken(sec.body) : [];
     const body = parts.length
       ? parts.map((b, k) => (b.time > 0 && b.time !== parts[k - 1]?.time ? `<div class="stop">→ ${secs(b.time)} s</div>` : "") + (blank(b.text) ? "" : render(b.text))).join("")
       : '<p class="empty">No speaker notes.</p>';
-    return `<div class="side"><div class="meta">${esc(prefix(f))} · ${i + 1} / ${slides.length}</div><h2>${title}</h2><div class="text">${body}</div></div>`;
+    return `<div class="side"><div class="meta">${esc(prefix(f))} · ${num(f) ? `${num(f)} / ${talk().length}` : "hidden"}</div><h2>${title}</h2><div class="text">${body}</div></div>`;
   };
-  const pages = slides.map((f, i) => `<section class="page"><div class="shot"><img data-shot="${i}" alt=""></div>${notesToo ? notesHtml(f, i) : ""}</section>`).join("\n");
-  const name = `${deck.split("/").filter(Boolean).at(-2) || "slides"} - ${notesToo ? "slides + notes" : "slides"}`;
-  const html = `<!doctype html><html${notesToo ? ' class="with-notes"' : ""}><head><meta charset="utf-8"><title>${esc(name)}</title>
+  const pages = list.map((f, k) => {
+    return `<section class="page" data-name="${esc(prefix(f))}"><div class="shot"><img data-shot="${k}" alt=""></div>${notesToo ? notesHtml(f) : ""}</section>`;
+  }).join("\n");
+  return `<!doctype html><html${notesToo ? ' class="with-notes"' : ""}><head><meta charset="utf-8"><title>${esc(name)}</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Architects+Daughter&family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
   @page { size: 1920px 1080px; margin: 0; }
@@ -1052,27 +1262,96 @@ ${pages}
   });
 </script>
 </body></html>`;
-  try {
-    const r = await fetch("/__pdf", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ html, name, shots: slides.map((f) => new URL(f, location.href).href) }),
-    });
-    if (!r.ok) throw new Error(r.status === 404 || r.status === 405 ? "restart npm run slides to enable it" : (await r.text()) || r.status);
-    const { url, file } = await r.json();
-    const href = new URL(url, location.href).href;
-    if (tab && !tab.closed) tab.location.replace(href);
-    else window.open(href, "_blank");
-    // Also a link, in case the browser blocked the tab
-    status.innerHTML = `Saved in <a href="${esc(href)}" target="_blank" rel="noopener">${esc(file)}</a>`;
-  } catch (e) {
-    tab?.close();
-    status.textContent = `Not exported: ${e.message}`;
-  } finally {
-    button.disabled = false;
+};
+
+// Runs one export on the dev server; resolves to its files [{ url, file, name }]
+let exporting = false;
+const exportName = (list, notesToo) => `${deckName} - ${list.length === 1 ? prefix(list[0]) : "slides"}${notesToo ? " + notes" : ""}`;
+const runExport = async (format, list, notesToo) => {
+  const name = exportName(list, notesToo);
+  const html = await printPage(list, notesToo, name);
+  const r = await fetch("/__export", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ html, name, format, shots: list.map((f) => new URL(f, location.href).href) }),
+  });
+  if (!r.ok) throw new Error(r.status === 404 || r.status === 405 ? "restart npm run slides to enable it" : (await r.text()) || r.status);
+  return (await r.json()).files;
+};
+// Copies the files where you chose (asked for at the click, while the browser allows it): one file through
+// "Save as" (any folder, Desktop and Documents too), several into a folder (Chrome refuses system folders such as
+// Desktop, Documents or Downloads themselves: pick or create a folder inside them)
+const writeTo = async (target, files) => {
+  for (const f of files) {
+    const blob = await fetch(f.url, { cache: "no-store" }).then((r) => r.blob());
+    const handle = target.kind === "file" ? target : await target.getFileHandle(f.name, { create: true });
+    const w = await handle.createWritable();
+    await w.write(blob);
+    await w.close();
   }
 };
-options.querySelector(".options-export").addEventListener("click", exportPdf);
+const busy = (on) => {
+  exporting = on;
+  options.querySelectorAll("[data-export]").forEach((b) => (b.disabled = on));
+};
+options.querySelectorAll("[data-export]").forEach((button) => button.addEventListener("click", async () => {
+  if (exporting) return;
+  if (!dev) { exportStatus.textContent = "Export needs the dev server: npm run slides."; return; }
+  const kind = button.dataset.export;
+  const notesToo = withNotes.checked;
+  const list = kind === "copy" || kind === "png-one" ? [file] : talk();
+  const format = kind === "pdf" ? "pdf" : "png";
+  busy(true);
+  exportStatus.textContent = list.length > 1 ? `Rendering ${list.length} slides… (about ${Math.ceil(list.length * 0.8)} s)` : "Rendering the slide…";
+  try {
+    if (kind === "copy") {
+      // The clipboard write starts inside the click; the picture arrives when the server has made it
+      const files = runExport(format, list, notesToo);
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": files.then((f) => fetch(f[0].url, { cache: "no-store" }).then((r) => r.blob())) })]);
+      exportStatus.textContent = "Copied: paste it anywhere.";
+      return;
+    }
+    let dir = null;
+    if (dest?.value === "pick") {
+      const single = list.length === 1 || format === "pdf";
+      const ext = format === "pdf" ? "pdf" : "png";
+      exportStatus.textContent = "Choose where to save…";
+      try {
+        dir = single && "showSaveFilePicker" in window
+          ? await showSaveFilePicker({
+            id: "slides-export",
+            suggestedName: `${exportName(list, notesToo)}.${ext}`,
+            types: [{ description: ext.toUpperCase(), accept: { [ext === "pdf" ? "application/pdf" : "image/png"]: [`.${ext}`] } }],
+          })
+          : await showDirectoryPicker({ id: "slides-export", mode: "readwrite" });
+      } catch {
+        exportStatus.textContent = single ? "Not exported: no file chosen." : "Not exported: no folder chosen (system folders like Desktop or Documents can't be picked: choose or create a folder inside them).";
+        return;
+      }
+    }
+    if (dir) exportStatus.textContent = list.length > 1 ? `Rendering ${list.length} slides… (about ${Math.ceil(list.length * 0.8)} s)` : "Rendering the slide…";
+    // The PDF opens in a new tab: opened now, inside the click (later the browser would block it)
+    const tab = kind === "pdf" && !dir ? window.open("", "_blank") : null;
+    tab?.document.write('<title>Exporting PDF…</title><p style="font: 18px sans-serif; padding: 24px">Exporting the PDF…</p>');
+    tab?.document.close();
+    let files;
+    try { files = await runExport(format, list, notesToo); } catch (e) { tab?.close(); throw e; }
+    const first = new URL(files[0].url, location.href).href;
+    if (tab && !tab.closed) tab.location.replace(first);
+    if (dir) {
+      exportStatus.textContent = `Saving into ${dir.name}…`;
+      await writeTo(dir, files);
+    }
+    const where = dir ? (dir.kind === "file" ? esc(dir.name) : `the folder ${esc(dir.name)}`) : files.length > 1 ? esc(files[0].file.replace(/\/[^/]*$/, "/")) : "";
+    exportStatus.innerHTML = files.length > 1
+      ? `Saved ${files.length} PNGs in ${where}`
+      : `Saved${dir ? ` in ${where} and` : ""} in <a href="${esc(first)}" target="_blank" rel="noopener">${esc(files[0].file)}</a>`;
+  } catch (e) {
+    exportStatus.textContent = `Not exported: ${e.message}`;
+  } finally {
+    busy(false);
+  }
+}));
 
 // ?still: the last frame, paused (also after the fonts load, which may restart layout-driven animations)
 if (still) {

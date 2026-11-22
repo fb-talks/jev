@@ -2,8 +2,9 @@
 //   node serve.mjs [dir] [--port 3210]      (dir defaults to docs)
 // URLs keep their .html: anim.js finds the current slide from the file name, so no clean-URL redirects.
 // Dev mode: every response carries X-Slides-Dev, which makes the speaker notes editable in anim.js, and
-// POST /__notes saves an edited section back into the script .md (or the slide's kicker into its .html), and POST /__pdf renders the Export PDF of
-// the options (anim.js) with headless Chrome ($CHROME overrides the macOS default path). Listens on localhost only.
+// POST /__notes saves an edited section back into the script .md (or the slide's kicker into its .html, or the
+// slide status into the deck's _shared/anim.js), and POST /__export renders the exports of
+// the Export panel (anim.js: PDF, PNG) with headless Chrome ($CHROME overrides the macOS default path). Listens on localhost only.
 import http from "node:http";
 import fs from "node:fs";
 import os from "node:os";
@@ -40,7 +41,9 @@ const saveNotes = (req, res) => {
     try {
       const { path: p, original, updated } = JSON.parse(body);
       const file = path.join(root, decodeURIComponent(p));
-      if (!inside(file) || ![".md", ".html"].includes(path.extname(file)) || typeof original !== "string" || typeof updated !== "string" || !original) {
+      // .md (notes), .html (Slide details), a deck's _shared/anim.js (slideStatus: draft / hidden)
+      const deckJs = path.basename(file) === "anim.js" && path.basename(path.dirname(file)) === "_shared";
+      if (!inside(file) || !([".md", ".html"].includes(path.extname(file)) || deckJs) || typeof original !== "string" || typeof updated !== "string" || !original) {
         return res.writeHead(400, headers).end();
       }
       const md = fs.readFileSync(file, "utf8");
@@ -54,10 +57,14 @@ const saveNotes = (req, res) => {
   });
 };
 
-// { html, shots, name }: shots are slide URLs of this server (opened with ?still, their last frame). Each one is
-// screenshotted at 2× in headless Chrome, html (the print page built by anim.js, with <img data-shot="i">) gets
-// the pictures, and Chrome prints it to <slides folder>/_export/<name>.pdf; the reply is { url } of that file. Pictures, not iframes: Chrome fails to print a page
-// with dozens of slide iframes. One export at a time.
+// POST /__export { html, shots, name, format }: shots are slide URLs of this server (opened with ?still, their last
+// frame). Each one is screenshotted at 2× in headless Chrome, html (the print page built by anim.js, one 1920×1080
+// .page per slide with <img data-shot="i">) gets the pictures, then
+//   format "pdf" (default): Chrome prints it to <slides folder>/_export/<name>.pdf
+//   format "png": each page becomes a PNG (3840×2160) in <slides folder>/_export/<name>/ ("01 - 00.png"…), or
+//   <slides folder>/_export/<name>.png when there is one slide
+// The reply is { files: [{ url, file, name }] }. Pictures, not iframes: Chrome fails to print a page with dozens
+// of slide iframes. One export at a time. POST /__pdf is the same, kept for pages loaded before the rename.
 let rendering = false;
 const exportPdf = (req, res) => {
   const origin = req.headers.origin;
@@ -73,14 +80,16 @@ const exportPdf = (req, res) => {
   req.on("end", async () => {
     let browser, dir;
     try {
-      const { html, shots, name } = JSON.parse(body);
+      const { html, shots, name, format = "pdf" } = JSON.parse(body);
+      const png = format === "png";
       const base = `http://${req.headers.host}/`;
       if (typeof html !== "string" || !Array.isArray(shots) || !shots.length || shots.some((u) => typeof u !== "string" || !u.startsWith(base))) {
         return res.writeHead(400, headers).end();
       }
       // Next to the slides, in _export/ (ignored by git, like the videos and stills of export.mjs)
       const slidesDir = path.dirname(path.join(root, decodeURIComponent(new URL(shots[0]).pathname)));
-      const outFile = path.join(slidesDir, "_export", `${String(name || "slides").replace(/[^\w .+-]/g, "_")}.pdf`);
+      const safe = String(name || "slides").replace(/[^\w .+-]/g, "_");
+      const outFile = path.join(slidesDir, "_export", `${safe}.${png ? "png" : "pdf"}`);
       if (!inside(outFile)) return res.writeHead(400, headers).end();
       rendering = true;
       dir = fs.mkdtempSync(path.join(os.tmpdir(), "slides-pdf-"));
@@ -113,15 +122,36 @@ const exportPdf = (req, res) => {
         await send("Page.navigate", { url: u.href });
         await loaded();
         await evaluate("document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 250)))");
-        const shot = await send("Page.captureScreenshot", { format: "jpeg", quality: 90 });
-        fs.writeFileSync(path.join(dir, `shot-${n}.jpg`), Buffer.from(shot.result.data, "base64"));
-        if ((n + 1) % 10 === 0 || n + 1 === shots.length) console.log(`pdf export: ${n + 1} / ${shots.length} slides`);
+        // PNG keeps the pictures lossless; the PDF takes JPEG, much smaller
+        const shot = await send("Page.captureScreenshot", png ? { format: "png" } : { format: "jpeg", quality: 90 });
+        fs.writeFileSync(path.join(dir, `shot-${n}.${png ? "png" : "jpg"}`), Buffer.from(shot.result.data, "base64"));
+        if ((n + 1) % 10 === 0 || n + 1 === shots.length) console.log(`${format} export: ${n + 1} / ${shots.length} slides`);
       }
-      console.log("pdf export: printing");
-      fs.writeFileSync(path.join(dir, "print.html"), html.replace(/data-shot="(\d+)"/g, (_, n) => `src="shot-${n}.jpg"`));
+      fs.writeFileSync(path.join(dir, "print.html"), html.replace(/data-shot="(\d+)"/g, (_, n) => `src="shot-${n}.${png ? "png" : "jpg"}"`));
       await send("Page.navigate", { url: `file://${path.join(dir, "print.html")}` });
       await loaded();
       for (let n = 0; n < 100 && !(await evaluate("window.pdfReady === true")); n++) await sleep(100);
+      const toUrl = (f) => "/" + path.relative(root, f).split(path.sep).map(encodeURIComponent).join("/");
+      const reply = (files) => res.writeHead(200, { ...headers, "Content-Type": "application/json" })
+        .end(JSON.stringify({ files: files.map((f) => ({ url: toUrl(f), file: path.relative(process.cwd(), f), name: path.basename(f) })) }));
+      if (png) {
+        // One picture per page of the print page, each 1920×1080 at 2×
+        const names = await evaluate("JSON.stringify([...document.querySelectorAll('.page')].map((p) => p.dataset.name))");
+        const pages = JSON.parse(names || "[]");
+        const out = pages.length === 1 ? [outFile] : pages.map((n, i) => path.join(slidesDir, "_export", safe, `${String(i + 1).padStart(2, "0")} - ${String(n || i + 1).replace(/[^\w .+-]/g, "_")}.png`));
+        if (out.some((f) => !inside(f))) return res.writeHead(400, headers).end();
+        fs.mkdirSync(path.dirname(out[0]), { recursive: true });
+        if (pages.length > 1) for (const f of fs.readdirSync(path.dirname(out[0]))) if (f.endsWith(".png")) fs.rmSync(path.join(path.dirname(out[0]), f));
+        for (const [i, f] of out.entries()) {
+          const shot = await send("Page.captureScreenshot", { format: "png", captureBeyondViewport: true, clip: { x: 0, y: i * 1080, width: 1920, height: 1080, scale: 1 } });
+          if (!shot.result) throw new Error(shot.error?.message ?? "Screenshot failed");
+          fs.writeFileSync(f, Buffer.from(shot.result.data, "base64"));
+        }
+        ws.close();
+        console.log(`png exported: ${path.relative(process.cwd(), pages.length === 1 ? out[0] : path.dirname(out[0]))} (${out.length} slides)`);
+        return reply(out);
+      }
+      console.log("pdf export: printing");
       // As a stream, read in chunks: a PDF of dozens of slides is too big for a single DevTools message
       const pdf = await send("Page.printToPDF", { preferCSSPageSize: true, printBackground: true, transferMode: "ReturnAsStream" });
       if (!pdf.result) throw new Error(pdf.error?.message ?? "Printing failed");
@@ -137,10 +167,9 @@ const exportPdf = (req, res) => {
       fs.mkdirSync(path.dirname(outFile), { recursive: true });
       fs.writeFileSync(outFile, file);
       console.log(`pdf exported: ${path.relative(process.cwd(), outFile)} (${shots.length} slides, ${(file.length / 1e6).toFixed(1)} MB)`);
-      const url = "/" + path.relative(root, outFile).split(path.sep).map(encodeURIComponent).join("/");
-      res.writeHead(200, { ...headers, "Content-Type": "application/json" }).end(JSON.stringify({ url, file: path.relative(process.cwd(), outFile) }));
+      reply([outFile]);
     } catch (e) {
-      console.error(`pdf export failed: ${e.message}`);
+      console.error(`export failed: ${e.message}`);
       if (!res.headersSent) res.writeHead(500, headers).end(e.message);
     } finally {
       rendering = false;
@@ -164,7 +193,7 @@ const deckList = () =>
 
 http.createServer((req, res) => {
   if (req.url === "/__notes") return req.method === "POST" ? saveNotes(req, res) : res.writeHead(405, headers).end();
-  if (req.url === "/__pdf") return req.method === "POST" ? exportPdf(req, res) : res.writeHead(405, headers).end();
+  if (req.url === "/__export" || req.url === "/__pdf") return req.method === "POST" ? exportPdf(req, res) : res.writeHead(405, headers).end();
   let file = path.join(root, decodeURIComponent(new URL(req.url, "http://x").pathname));
   if (!inside(file)) return res.writeHead(403, headers).end();
   if (fs.existsSync(file) && fs.statSync(file).isDirectory() && !fs.existsSync(path.join(file, "index.html"))) {

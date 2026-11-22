@@ -22,7 +22,7 @@ self-contained HTML page with a CSS-only animation, used as the screen for one s
 | File | Role |
 |---|---|
 | `<deck>/NN-name.html` | One slide. `NN` orders the deck (`05a`, `05b`… for sub-steps). Follow the deck's existing naming and on-screen language. |
-| `docs/_engine/anim.js` | The runtime of every deck: scaling, play-once + replay, stops, keyboard, speaker notes and their editor, options (Export PDF). |
+| `docs/_engine/anim.js` | The runtime of every deck: scaling, play-once + replay, stops, keyboard, speaker notes and their editor, Export (this slide: copy image or PNG; all slides: PDF or PNGs; with or without notes; into `_export/` or a chosen folder, via `POST /__export` of serve.mjs). |
 | `docs/_engine/anim.css` | Design tokens, 1920×1080 `.frame`, building blocks, controls. Shared by every deck. |
 | `docs/_engine/draw.js` | Drawing toolbar (D), loaded by anim.js. |
 | `<deck>/_shared/anim.js` | The deck's settings only: **slide order** (`slides` array) and `SCRIPT` (its speaker notes), then it loads the engine. |
@@ -53,6 +53,8 @@ Runtime changes go in `docs/_engine/`, never in a deck's `_shared/`. `.github/pa
 - Dev mode: served by `npm run slides` (`scripts/serve.mjs`, which adds `X-Slides-Dev` to its responses), the notes
   panel has an **Edit** button: one textarea per block of the slide's section (split at blank lines and where `>`
   quotes start/end; quotes are edited without `>`), `⌘S` saves the section back into the script via `POST /__notes`. The ⋮ menu of the notes also has **Slide details**: the `.kicker` label (`<small>`) and title of the slide, saved into its `.html` (and its `<title>`) through the same endpoint.
+
+**Slide status** (⋮ in the notes → Status, or ⋮ on each row / card of the slide list, dev server only): Normal, Draft or Hidden, saved as `const slideStatus = { "05c-….html": "draft" }` in the deck's `_shared/anim.js` (next to `slides`; the server's `/__notes` may write that file). Draft = in the talk with a DRAFT badge top left (not in exports). Hidden = skipped by ← / → and the deck bar, not counted in the numbering, left out of Export all slides and of the Pages index, still in the slide list (dimmed, "hidden" tag). Use it instead of deleting a slide.
   The 🎬 line and `---` are not editable. The save is refused (409) if the section changed in the file meanwhile.
   Published decks (no such header) stay read-only.
 - `page.html#t=0.5` freezes the slide at 50% of its timeline (used by `snap.mjs`).

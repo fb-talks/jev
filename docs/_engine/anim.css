@@ -97,8 +97,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
   font: 500 14px/1 var(--mono); letter-spacing: .3px;
 }
 .dock button:hover { color: var(--pink); border-color: var(--pink); }
-.dock .notes-toggle { display: grid; place-items: center; padding: 4px 8px; }
-.dock .notes-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dock .notes-toggle, .dock .fullscreen { display: grid; place-items: center; padding: 4px 8px; }
+.dock .fullscreen svg, .dock .notes-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .notes-open:not(.bare) .dock .notes-toggle { display: none; }
 /* Top of the notes panel, stays put while the notes scroll: the buttons that place it at the bottom or on the right */
 .notes-head { position: sticky; top: 0; z-index: 4; display: flex; align-items: flex-end; justify-content: flex-end; gap: 6px; padding: 8px 12px 6px; background: #fff; }
@@ -110,6 +110,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
    sticky top */
 .notes-right .notes-head { flex-wrap: wrap; row-gap: 10px; }
 .notes-right .notes-head-tl { order: 1; flex-basis: 100%; }
+/* Preview and Save on the left of the first row, ⋮, the side and ✕ on the right */
+.notes-right .notes-more { margin-left: auto; }
 .notes-head-tl:empty { margin: 0; }
 .notes-place {
   display: grid; place-items: center; width: 34px; height: 30px; padding: 0; border-radius: 8px; cursor: pointer;
@@ -146,8 +148,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 }
 .notes-place-item:hover { background: var(--stage); }
 .notes-place-item svg { width: 18px; height: 18px; flex: none; fill: none; stroke: #6b7280; stroke-width: 2; }
-.notes-open:not(.notes-right) .notes-place-item.to-bottom, .notes-open.notes-right .notes-place-item.to-right { color: var(--pink); background: var(--pink-bg); }
-.notes-open:not(.notes-right) .notes-place-item.to-bottom svg, .notes-open.notes-right .notes-place-item.to-right svg { stroke: var(--pink); }
 .presenter .notes-head { display: none; }
 .notes-head-save { display: none; height: 30px; padding: 0 14px; }
 .notes-head-preview { display: none; height: 30px; padding: 0 12px; }
@@ -159,9 +159,9 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .notes-right .notes-body { padding: 4px 24px 32px; }
 
 /* Step indicator (slides with stops): one square per step, pink = on screen, grey = still to come */
-.steps { position: fixed; right: calc(28px + var(--notes-w, 0px)); bottom: calc(66px + var(--notes-h, 0px)); z-index: 50; display: flex; gap: 6px; pointer-events: none; }
-.steps i { width: 12px; height: 12px; border-radius: 3px; background: #cfd6e3; }
-.steps i.done { background: var(--pink); }
+.anim-steps { position: fixed; right: calc(28px + var(--notes-w, 0px)); bottom: calc(66px + var(--notes-h, 0px)); z-index: 50; display: flex; gap: 6px; pointer-events: none; }
+.anim-steps i { width: 12px; height: 12px; border-radius: 3px; background: #cfd6e3; }
+.anim-steps i.done { background: var(--pink); }
 
 /* Slide menu: as tall as the window, scrolls on its own */
 .slide-menu {
@@ -273,7 +273,7 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .notes-form label.active textarea { border-color: var(--pink); }
 
 /* page.html?notes (P): the notes window, only the notes at full height; the slide number stays as a reference */
-.presenter .frame, .presenter .slide-menu, .presenter .notes-toggle, .presenter .notes-window { display: none; }
+.presenter .frame, .presenter .slide-menu, .presenter .notes-toggle, .presenter .notes-window, .presenter .fullscreen { display: none; }
 .presenter .notes { display: block; top: 0; height: auto; border-top: 0; box-shadow: none; font-size: 22px; }
 .presenter .notes-body { padding-top: 20px; padding-bottom: 80px; }
 .presenter .notes h2 { font-size: 34px; }
@@ -310,7 +310,6 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .draw-bottom .draw-bar { flex-direction: row; max-height: none; max-width: calc(100vw - var(--notes-w, 0px) - 360px); overflow: auto hidden; }
 .draw-bottom .draw-bar hr { width: 0; height: 24px; margin: 0 4px; border-top: 0; border-left: 1px solid #e3e7ef; }
 .draw-bottom .draw-top { order: 99; width: auto; align-self: flex-start; margin: -4px -4px 0 2px; }
-.draw-bottom .draw-chevron svg { transform: rotate(90deg); }
 .draw-bottom .draw-palette { flex-direction: row; }
 .draw-bar {
   display: none; flex-direction: column; align-items: center; gap: 2px; max-height: calc(100vh - 24px); overflow-y: auto; padding: 8px;
@@ -373,14 +372,19 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .options-check input { accent-color: var(--pink); width: 16px; height: 16px; }
 .options-check span { font-weight: 400; color: #6b7280; font-size: 14px; }
 .options-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-.options-status { color: #6b7280; font-size: 14px; }
+.options-status { margin: 16px 0 0 !important; color: #6b7280; font-size: 14px; }
+.options-status:empty { display: none; }
+.options-box section + section { margin-top: 18px; }
+.options-dest { display: flex; align-items: center; gap: 8px; margin: 0 0 18px; font-weight: 600; }
+.options-dest select { padding: 5px 8px; border: 1px solid #e3e7ef; border-radius: 8px; font: 500 14px var(--sans); color: var(--ink); background: #fff; }
+.options-box .notes-btn:disabled { opacity: .5; cursor: progress; }
 .options-status a { color: var(--pink); font-weight: 600; word-break: break-all; }
 .options-close {
   position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%;
   background: transparent; color: #6b7280; font-size: 26px; line-height: 1; cursor: pointer;
 }
 .options-close:hover { background: #f3f5f9; color: var(--ink); }
-.still .steps, .bare .steps, .presenter .steps { display: none !important; }
+.still .anim-steps, .bare .anim-steps, .presenter .anim-steps { display: none !important; }
 
 /* Drawing toolbar: each button shows its shortcut, small, bottom right */
 .draw-bar button { position: relative; }
@@ -398,7 +402,7 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
   .dock { left: 8px; bottom: calc(8px + var(--notes-h, 0px)); gap: 4px; }
   .dock.dock-right { left: auto; right: 8px; }
   .dock button { padding: 4px 8px; font-size: 11px; background: rgba(255,255,255,.7); }
-  .steps { right: 10px; bottom: calc(40px + var(--notes-h, 0px)); }
+  .anim-steps { right: 10px; bottom: calc(40px + var(--notes-h, 0px)); }
 }
 
 /* Color button: the current color; it opens the palette beside the toolbar */
@@ -436,7 +440,6 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .draw-no-keys .draw-key, .draw-no-keys .draw-menu kbd { display: none; }
 .bare .draw-palette, .bare .draw-menu { display: none; }
 /* The arrow opening the "more" menu points to the side it opens on */
-.draw-chevron svg { transition: transform .2s; }
 
 /* Deck bar: a thin line at the top of the slide area (where the slide is, not over the notes); near it
    it thickens, a thumb and a tooltip with the slide number and title appear; drag to change slide */
@@ -468,3 +471,53 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .deck-bar.dragging, .deck-bar.dragging * { cursor: grabbing; }
 .deck-bar.dragging .deck-fill, .deck-bar.dragging .deck-thumb { transition: none; }
 .still .deck-bar, .bare .deck-bar, .presenter .deck-bar { display: none; }
+
+/* Slide status (slideStatus in the deck's anim.js): DRAFT / HIDDEN flag top left of the slide area; in the slide
+   list a tag, hidden rows dimmed (still readable), and ⋮ on each row / card to change it (dev server only) */
+.slide-flag { display: none; }
+.slide-flag.is-draft, .slide-flag.is-hidden {
+  display: block; position: fixed; left: 18px; top: 18px; z-index: 45; padding: 7px 14px 6px; border-radius: 8px;
+  font: 800 17px/1 var(--sans); letter-spacing: 2.5px; color: #fff; pointer-events: auto; cursor: default;
+  box-shadow: 0 6px 18px -6px rgba(0,0,0,.35);
+}
+.slide-flag.is-draft { background: #f59e0b; transform: rotate(-3deg); }
+.slide-flag.is-hidden { background: #64748b; }
+.still .slide-flag, .presenter .slide-flag { display: none !important; }
+
+.slide-menu .menu-list a { align-items: center; }
+.slide-menu .menu-list a > .slide-title { flex: 1; min-width: 0; }
+.slide-menu .slide-tag { display: none; font-style: normal; }
+.slide-menu a.is-draft .slide-tag, .slide-menu a.is-hidden .slide-tag {
+  display: inline-block; flex: none; padding: 2px 6px; border-radius: 5px; font: 700 10px/1.3 var(--sans); letter-spacing: 1px; text-transform: uppercase;
+}
+.slide-menu a.is-draft .slide-tag { background: #fef3c7; color: #b45309; }
+.slide-menu a.is-hidden .slide-tag { background: #e2e8f0; color: #475569; }
+.slide-menu a.is-hidden > .slide-title, .slide-menu a.is-hidden > code, .slide-menu a.is-hidden .slide-n { opacity: .5; }
+.slide-menu a.is-hidden > .slide-title { font-style: italic; }
+.slide-menu .menu-cards a.is-hidden .card-shot iframe { opacity: .4; filter: grayscale(1); }
+.slide-menu .menu-cards a.is-hidden .slide-title { opacity: .5; font-style: italic; }
+.slide-menu .menu-cards a.is-draft .card-shot { border-color: #f59e0b; }
+.slide-menu .menu-cards .slide-tag { position: absolute; left: 6px; bottom: 6px; }
+
+.row-dots {
+  display: none; flex: none; width: 26px; height: 26px; align-items: center; justify-content: center; border-radius: 6px;
+  cursor: pointer; opacity: 0; transition: opacity .12s;
+}
+.slide-menu.dev .row-dots { display: inline-flex; }
+.row-dots svg { width: 18px; height: 18px; fill: #6b7280; }
+.row-dots:hover { background: #e3e7ef; }
+.slide-menu a:hover .row-dots, .slide-menu a.is-draft .row-dots, .slide-menu a.is-hidden .row-dots, .row-dots:focus-visible { opacity: 1; }
+.menu-cards .row-dots { position: absolute; right: 6px; top: 6px; background: rgba(255,255,255,.92); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.menu-cards .row-dots:hover { background: #fff; }
+
+.status-pop { position: absolute; top: 0; left: 0; right: auto; z-index: 70; width: 250px; font-weight: 500; }
+.status-group { margin-top: 6px; padding-top: 6px; border-top: 1px solid #eef1f6; }
+.status-group[hidden], .status-pop[hidden] { display: none; }
+.status-head { padding: 6px 10px 4px; color: #8a93a6; font: 600 11px var(--mono); letter-spacing: .5px; text-transform: uppercase; }
+.status-item span { display: flex; flex-direction: column; }
+.status-item small { color: #8a93a6; font-size: 12px; font-weight: 400; }
+.status-item.on { color: var(--pink); background: var(--pink-bg); }
+.status-item.on svg { stroke: var(--pink); }
+.status-msg { padding: 0 10px; font-size: 12px; }
+.status-msg:empty { display: none; }
+.presenter .notes-side { display: none; }

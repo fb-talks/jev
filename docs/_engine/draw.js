@@ -3,10 +3,11 @@
 //   It sits top right, next to the notes panel or the window edge; the ‹ menu can put it at the bottom
 //   center instead (between the slide number and the notes button), laid out in a row
 //   Tools: pen (B) · ellipse (E: dashed guide, then drawn like a pen) · spotlight (S: the rest dims and blurs) · arrow (A)
-//   Esc = pointer tool, out of drawing mode: clicks reach the slide again
+//   Esc = clear the drawings and back to the pointer tool (clicks reach the slide again); Esc and Delete work even
+//   with the keyboard shortcuts switched off
 //   1–5 = color · Z (or ⌘/Ctrl+Z) = undo · Delete / Backspace = clear the slide
 //   The toolbar shows the tools, the timer, the color (its button opens the 5 colors beside the toolbar) and close;
-//   the arrow below opens, beside it, undo, clear, the options (anim.js: Export PDF) and a switch that turns off
+//   the gear below opens, beside it, undo, clear, Export (the options of anim.js: Export PDF) and a switch that turns off
 //   every keyboard shortcut of the toolbar (O too)
 //   T = timer (on by default): each shape fades out 4s after it is drawn; off, shapes stay until Delete
 // Drawings live in a layer outside .frame, so they are not paused or replayed with the slide; they last
@@ -236,7 +237,7 @@
     "<hr>" +
     `<button data-act="timer" data-tip="Timer: fade after 4s (T)" aria-label="Timer">${icon('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>')}</button>` +
     `<button class="draw-swatch" data-act="colors" data-tip="Color (1–5)" aria-label="Color" aria-haspopup="true"></button>` +
-    `<button class="draw-chevron" data-act="menu" data-tip="More" aria-label="More" aria-haspopup="true">${icon('<path d="M15 6l-6 6 6 6"/>')}</button>`;
+    `<button class="draw-chevron" data-act="menu" data-tip="Settings" aria-label="Settings" aria-haspopup="true">${icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>')}</button>`;
   // Flyouts (colors, more) next to the button that opens them: left of it with the toolbar on the right,
   // above it with the toolbar at the bottom. On the body, not in the toolbar, which scrolls and would clip them.
   const bottom = () => state.dock === "bottom";
@@ -266,7 +267,7 @@
   menu.innerHTML =
     `<button data-act="undo">${icon('<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>')}<span>Undo</span><kbd>Z</kbd></button>` +
     `<button data-act="clear">${icon('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')}<span>Clear drawings</span><kbd>Del</kbd></button>` +
-    `<button data-act="options">${icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>')}<span>Options</span><kbd>O</kbd></button>` +
+    `<button data-act="options">${icon('<path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/>')}<span>Export</span><kbd>O</kbd></button>` +
     `<hr><label class="draw-switch"><input type="checkbox" data-act="hotkeys"><span>Keyboard shortcuts</span><i></i></label>` +
     `<label class="draw-switch"><input type="checkbox" data-act="dock"><span>Toolbar at the bottom</span><i></i></label>`;
   const showPalette = (on) => { if (on) flyout(menu, false); flyout(palette, on, bar.querySelector(".draw-swatch")); };
@@ -392,17 +393,25 @@
   addEventListener("keydown", (e) => {
     if (e.altKey || e.target.closest?.("textarea, input")) return;
     const k = e.key.toLowerCase();
-    if (k === "escape") { showPalette(false); showMenu(false); }
+    // Esc and Delete work even with the shortcuts off. Esc: drawings cleared and back to the pointer, unless it is
+    // closing something else (slide menu, Export panel, a flyout)
+    if (k === "escape") {
+      const busy = palette.classList.contains("on") || menu.classList.contains("on")
+        || document.querySelector(".slide-menu.open, .options:not([hidden])");
+      showPalette(false);
+      showMenu(false);
+      if (!busy) { clear(); setTool(""); }
+      return;
+    }
+    if (k === "delete" || k === "backspace") { e.preventDefault(); return clear(); }
     if (state.hotkeys === false) return;
     if (k === "z" && !e.shiftKey) { if (e.metaKey || e.ctrlKey) e.preventDefault(); return undo(); }
     if (e.metaKey || e.ctrlKey) return;
     if (k === "d") setOpen(!state.open);
-    else if (k === "escape") { if (state.open) setTool(""); }
-    else if (k === "delete" || k === "backspace") { e.preventDefault(); clear(); }
     else if (toolKeys[k]) { state.tool = toolKeys[k]; setOpen(true); }
     else if (k === "t") setTimer(!state.timer);
     else if (state.open && /^[1-5]$/.test(e.key)) { state.color = +e.key - 1; render(); }
-  });
+  }, true); // capture: before anim.js closes the slide menu or the Export panel on the same Esc
 
   render();
 })();

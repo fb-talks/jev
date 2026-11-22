@@ -28,7 +28,9 @@ const decks = readdirSync(DOCS, { recursive: true })
     const js = readFileSync(join(dir, "_shared/anim.js"), "utf8");
     const script = js.match(/const SCRIPT = "([^"]+)"/)?.[1];
     if (script) cpSync(join(dir, script), join(OUT, d.name, script));
-    const files = [...js.match(/const slides = \[([\s\S]*?)\]/)[1].matchAll(/"([^"]+\.html)"/g)].map((m) => m[1]);
+    // Hidden slides (slideStatus in anim.js) are left out of the index, as the slides skip them
+    const hidden = new Set([...(js.match(/const slideStatus = \{([\s\S]*?)\}/)?.[1] ?? "").matchAll(/"([^"]+\.html)":\s*"hidden"/g)].map((m) => m[1]));
+    const files = [...js.match(/const slides = \[([\s\S]*?)\]/)[1].matchAll(/"([^"]+\.html)"/g)].map((m) => m[1]).filter((f) => !hidden.has(f));
     const slides = files.map((file) => {
       const html = readFileSync(join(dir, file), "utf8");
       return { file, title: html.match(/<title>([\s\S]*?)<\/title>/)?.[1].trim() ?? file };

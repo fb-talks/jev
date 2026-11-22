@@ -245,22 +245,18 @@ console.log(answers.offensive.noul); // 0.80
 
 🎙️ **VOCE**:
 
-⏸ 1.6s
 > Partiamo dal caso più semplice possibile.
 > Importo il client e la funzione `noul`, e creo il client.
+
+⏸ 1.9s
 > Nello state metto il testo da valutare: il commento dell'inizio, "Who taught you to code? Useless post."
+
+⏸ 4.2s
 > E faccio una sola domanda, sì o no: il commento è offensivo?
+
+⏸ 6.5s
 > La risposta è un numero solo: zero virgola ottanta, cioè ottanta per cento di probabilità che la risposta sia sì.
 > Tutto qui: uno state, una domanda, un numero. Adesso vediamo cosa succede con più domande insieme.
-
-⏸ 4.3s
-> wefew
-
-⏸ 5.9s
-> wqqwdwq
-
-⏸ 15.0s
->
 
 ✂️ Valore verificato a ottobre 2026 su `/1-jev/demo1` (0.79–0.81): ricontrollarlo prima di registrare.
 
@@ -290,9 +286,7 @@ const { answers } = await client.systemOne({
 ```
 
 🎙️ **VOCE**:
-⏸ 3.6s
-> Prendiamo un ticket di supporto: "I was charged twice for my payment, reply by today", cioè "mi hanno addebitato il pagamento due volte, rispondete entro oggi".
-> Con una sola chiamata gli chiedo tre cose: a quale reparto mandarlo, quanto è frustrato il cliente, e se è urgente.
+> Prendiamo un ticket di supporto: "I was charged twice for my payment, reply by today", cioè il cliente dice: "mi hanno addebitato il pagamento due volte, rispondete entro oggi".
 
 🖥️ **SCHERMO**: evidenzio le tre righe dei risultati.
 
@@ -303,10 +297,12 @@ answers.urgent.noul;         // 0.92
 ```
 
 🎙️ **VOCE**:
-⏸ 6.5s
-> Reparto: billing. E notate che in TypeScript è tipizzato: è una union delle opzioni che ho scritto io.
-> Frustrazione: uno virgola zero quattro, cioè "ƒfrustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
-> Urgente: novantadue per cento.
+⏸ 3.4s
+> Con una sola chiamata gli chiedo tre cose: a quale reparto mandarlo, quanto è frustrato il cliente, e se è urgente.
+>
+> • Reparto: billing (NOTA dietro le quinte: TypeScript è tipizzato: è una union delle opzioni che ho scritto io)
+> • Frustrazione: 1,04, cioè "frustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
+> • Urgente: novantadue per cento.
 
 ### 03e · noul
 
@@ -318,16 +314,33 @@ answers.urgent.noul;         // 0.92
 > Niente probabilities, niente confidence: il numero stesso dice quanto Jev è sicuro. Vicino a uno, sicuramente sì; vicino a zero, sicuramente no; intorno a metà, non lo sa.
 > E dove inizia il "sì" lo decide il vostro codice: per esempio, sopra zero virgola otto avviso il team.
 
+⏸ 5.4s
+> Facciamo un altra domanda:
+> "Quando hai un attimo, dimmi se ci sono sconti per i piani annuali"
+> Qui vediamo che l'urgenza è definita molto bassa.
+
+⏸ 9.7s
+> Possiamo tramite un banale IF decidere di effettuare un'azione, ad es. mandare notifica al team, se il risultato è superiore ad una certa soglia
+
 ### 03f · choice
 
 🎬 **ANIMAZIONE**: [`slides/03f-choice.html`](./slides/03f-choice.html). A sinistra la domanda `department` e la risposta con i suoi tre campi, evidenziati uno alla volta. A destra: probabilities (billing 100%), choice = l'opzione più probabile, confidence con due casi reali (questo ticket 1.00; un ticket fuori tema, "Is the Acme T-shirt free with the annual plan?", diviso sales 72 / billing 28 → 0.58) e cosa farne.
 
 🎙️ **VOCE**:
 > Una **choice** restituisce tre campi.
+
+⏸ 1.0s
 > **probabilities**: una scommessa su ogni opzione, con i nomi che ho scritto io. Qui è tutto su billing: cento per cento.
+
+⏸ 7.1s
 > **choice**: semplicemente l'opzione più probabile. In TypeScript è tipizzata, quindi ci posso fare uno switch.
-> **confidence**: quanto la scommessa è concentrata, da zero a uno. Qui è uno, perché è tutta su un'opzione. Ma se arriva un ticket fuori tema, "la T-shirt Acme è gratis con il piano annuale?", nessun team è quello giusto: la scommessa si divide, settantadue per cento sales e ventotto billing, e la confidence scende a zero virgola cinquantotto. Notate che non è la probabilità più alta: misura quanto è concentrata.
-> E vi dice **quando fidarvi**: se è alta, il codice può agire da solo; se è bassa, meglio chiedere a una persona. È il pattern che vediamo tra poco.
+
+⏸ 9.6s
+> **confidence**: quanto la scommessa è concentrata, da zero a uno. Qui è uno, perché è tutta su un'opzione.
+
+⏸ 12.6s
+> Ma se arriva un ticket fuori tema, "la T-shirt Acme è gratis con il piano annuale?", nessun team è quello giusto: la scommessa si divide, settantadue per cento sales e ventotto billing, e la confidence scende a 0.58. 
+> Vi dice **quando fidarvi**: se è alta, il codice può agire da solo; se è bassa, meglio chiedere a una persona. È il pattern che vediamo tra poco.
 
 ### 03g · score
 
@@ -335,11 +348,18 @@ answers.urgent.noul;         // 0.92
 
 🎙️ **VOCE**:
 > Una **score** ha le stesse probabilities e la stessa confidence della choice, più il campo **score**.
-> Qui le chiavi delle probabilities non sono nomi ma posizioni: zero, uno, due, nell'ordine in cui ho scritto i livelli. Tre per cento "calmo", ottantanove "frustrato ma educato", otto "molto arrabbiato".
-> Lo **score** è la media dei livelli, pesata con le probabilità. Ogni livello vale la sua posizione: moltiplico valore per probabilità, zero, zero virgola ottantanove, zero virgola sedici. Sommo, e ottengo circa uno virgola zero quattro.
-> Quindi lo score è una **posizione sulla mia scala**, non una percentuale: "frustrato ma educato", appena spostato verso "molto arrabbiato". E l'intervallo dipende da quanti livelli scrivete: con tre va da zero a due, con cinque da zero a quattro. Se vi serve un valore da zero a uno, dividete per l'ultimo livello, come fa la demo 3 con la tossicità.
-> È comodo proprio perché è un numero solo: lo potete ordinare o metterci una soglia. Per esempio, sopra uno virgola cinque passo il ticket a un responsabile.
-> E la confidence, zero virgola ottantadue, funziona come nella choice: la scommessa è concentrata, posso fidarmi.
+> Qui le chiavi delle probabilities non sono nomi ma posizioni: zero, uno, due, nell'ordine in cui ho scritto i livelli. Tre per cento "calmo", 89 "frustrato ma educato", 8 "molto arrabbiato".
+
+⏸ 1.7s
+> Lo **score** è la media dei livelli, pesata con le probabilità. Ogni livello vale la sua posizione: moltiplico valore per probabilità, zero, zero virgola ottantanove, zero virgola sedici. Sommo, e ottengo circa 1.4.
+
+⏸ 9.2s
+> Quindi lo score è una **posizione sulla mia scala**, non una percentuale: "frustrato ma educato", appena spostato verso "molto arrabbiato". E l'intervallo dipende da quanti livelli scrivete: con 3 va da 0 a 2, con cinque da 0 a 4. 
+> È comodo proprio perché è un numero solo: lo potete ordinare o metterci una soglia. Per esempio, sopra 1.5 passo il ticket a un responsabile.
+> E la confidence, 0.82, funziona come nella choice: la scommessa è concentrata, posso fidarmi.
+>
+> ---
+> NOTA: Se vi serve un valore da zero a uno, dividete per l'ultimo livello, come fa la demo 3 con la tossicità.
 
 ### Due dettagli (in camera)
 
@@ -367,13 +387,17 @@ else                          codaManuale();  // o escalation a un LLM più gran
 ```
 
 🎙️ **VOCE**:
+⏸ 0.1s
 > Se è sicuro, agite in automatico. Se è incerto, suggerite e lasciate che una persona confermi con un click. Se è molto incerto, lo mandate in coda manuale, o a un LLM più grande.
-> La confidenza diventa una **leva di prodotto**: potete tarare le soglie nel tempo, guardando quante volte gli operatori correggono i suggerimenti.
 
 🖥️ **SCHERMO**: `/1-jev/demo3`. Esempio 2 (il commento sarcastico sulla "ultimate guide"). Analizzo, poi muovo lentamente lo slider "Review from": il badge passa da **Needs review** a **Publish** e viceversa.
 
 🎙️ **VOCE**:
-> Questa è la demo di moderazione commenti che trovate nel repository. Guardate: muovo la soglia e la decisione cambia. **Senza richiamare Jev.** Le probabilità ce le abbiamo già; la policy è codice nostro.
+⏸ 6.4s
+> La confidenza diventa una **leva di prodotto**: potete tarare le soglie nel tempo, guardando quante volte gli operatori correggono i suggerimenti.
+
+⏸ 11.2s
+> Muovo la soglia e la decisione cambia. **Senza richiamare Jev.** Le probabilità ce le abbiamo già; la policy è codice nostro.
 
 ✂️ Zoom sul badge mentre cambia.
 
@@ -569,7 +593,6 @@ else                          codaManuale();  // o escalation a un LLM più gran
 
 🎙️ **VOCE**:
 > Non sostituisce un LLM: lo affianca, per le micro-decisioni ad alto volume.
-> Nel prossimo video partiamo da zero: configuriamo Vercel AI Gateway e scriviamo la prima demo, con una sola domanda. Il link al codice è in descrizione.
 
 ✂️ End screen: link al repository e al prossimo video. Il bonus sulle immagini (sezione 9) viene dopo: in montaggio va dopo l'end screen, oppure la frase "Nel prossimo video…" si sposta alla fine della sezione 9.
 
@@ -586,8 +609,10 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 🖥️ **SCHERMO**: `/3-jev-images/demo1`, foto del cane, campo vuoto, **Find it**: compare "dog · 100%" sul box.
 
 🎙️ **VOCE**:
-> Un bonus. Jev non legge solo testo: guarda anche le immagini.
+> Jev (experimental) e Gemini Decision non leggono solo testo ma anche immagini.
 > In questa demo carico una foto e non scrivo niente. Il codice chiede a Jev tre cose sul "soggetto principale": c'è? Dov'è? E cos'è, scegliendo da una lista: cane, gatto, persona, auto…
+
+⏸ 6.1s
 > Risposta: un rettangolo intorno al cane, e "dog", probabilità uno. Tutte le altre etichette a zero.
 > Attenzione: Jev non inventa il nome. Sceglie dalla **vostra** lista, come una choice qualsiasi.
 
@@ -657,10 +682,19 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 🎬 **ANIMAZIONE**: [`slides/10a-riscrive.html`](./slides/10a-riscrive.html). A sinistra il flusso dall'alto in basso: commento → Jev misura (0.78) → Gemini riscrive → Jev misura di nuovo (0.11) → prima e dopo. Una freccia tratteggiata torna da "Jev misura di nuovo" a "Gemini riscrive" ("still high? rewrite again"): è il loop possibile, non è nel codice della demo. A destra il codice di `/2-jev-and-gemini/demo1`, un blocco per passo. Dura 18 s.
 
 🎙️ **VOCE**:
-> Primo esempio: un commento maleducato. Jev misura quanto è offensivo: settantotto per cento.
+> Primo esempio: un commento maleducato.
+
+⏸ 2.0s
+> Jev misura quanto è offensivo: settantotto per cento.
+
+⏸ 4.2s
 > Gemini lo riscrive in tono educato, mantenendo il senso della critica.
+
+⏸ 6.5s
 > E Jev rifà **la stessa domanda** sul testo nuovo: undici per cento.
-> E se il numero restasse alto? Lo rimandiamo a Gemini, e il loop si chiude da solo. Nella demo basta un giro.
+
+⏸ 8.5s
+> E se il numero restasse alto? Lo rimandiamo a Gemini, e il loop si chiude da solo.
 > Gemini scrive, Jev dimostra con un numero che la riscrittura ha funzionato. E il codice è tutto qui: una domanda, due chiamate a Jev e una a Gemini, con la stessa chiave del gateway.
 
 ### 10b · Gemini risponde, Jev valuta
