@@ -49,6 +49,7 @@ const slides = [
   "10f-csv.html",
   "10g-router.html",
   "10h-demo.html",
+  "11-sommario.html",
 ];
 
 // Slides kept out of the talk without deleting them (set from ⋮ in the notes or in the slide list):

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10c · Gemini proposes, Jev picks</title>
+<title>10c · LLM proposes, Jev picks</title>
 <link rel="stylesheet" href="_shared/anim.css">
 <!--
   Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 3:
@@ -46,8 +46,8 @@
   .col.many .node { min-height: 62px; }
   .hl { flex: 1; position: relative; height: 4px; margin: 0 12px; border-radius: 2px; background: var(--ink); transform-origin: left; transform: scaleX(0); }
   .hl::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
-  .code { top: 440px; height: 330px; }
-  .caption { top: 820px; }
+  .code { top: 435px; height: 350px; }
+  .caption { top: 830px; }
 
   .flow { --w: 240px; }
   .n2 { width: 290px !important; } .n4 { width: 180px !important; }
@@ -55,9 +55,15 @@
   .code.l { left: 135px; width: 760px; } .code.r { left: 925px; width: 860px; }
   .blk pre { --fs: 18px; }
 
-  /* Dashed yellow curve: the questions defined in block 2 are the ones passed to every Jev call */
-  .qlink { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; pointer-events: none; opacity: 0; animation-name: qlink; }
-  .qlink path.line { fill: none; stroke: #ffd479; stroke-width: 3; stroke-dasharray: 9 8; stroke-linecap: round; stroke-linejoin: round; }
+  /* The questions defined in block 2 are the ones passed to every Jev call: both words light up together */
+  .q-def, .q-use { border-radius: 4px; animation-name: qlink; }
+
+  /* Curved arrow over the panels: the replies Gemini returns (left) are the ones Jev scores (right) */
+  .r-def, .r-use { border-radius: 4px; animation-name: rword; }
+  .rlink { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: visible; pointer-events: none; }
+  .rlink path { fill: none; stroke: var(--pink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  .rlink .shaft { stroke-dasharray: 1; stroke-dashoffset: 1; animation-name: rshaft; }
+  .rlink .head { opacity: 0; animation-name: rhead; }
 
   /* ---------- Animations ---------- */
   .n1 { animation-name: n1; }
@@ -81,7 +87,8 @@
      8–12%   node "Blog comment"
      14–18%  "Gemini proposes" + code block 1 (blue) until 26%
      28–32%  three "Jev scores" + code block 2 (pink) until 42% · 33–40% 0.50, 0.74, 1.00
-     34–37%  dashed arrow from "questions" (defined) to "questions" (used in the Jev call)
+     28–34%  pink curved arrow from "replies" (Gemini's output, left) to "replies" (scored by Jev, right), both light up
+     34–37%  "questions" lights up where it is defined and where the Jev call uses it
      44–48%  "highest score?" + code block 3
      52–56%  "Best reply"
      72–78%  caption
@@ -104,13 +111,16 @@
   @keyframes b3 { 0%, 44% { opacity: .3; border-color: transparent; background: none } 48%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
   @keyframes h4 { 0%, 50% { transform: scaleX(0) } 52%, 100% { transform: scaleX(1) } }
   @keyframes n5 { 0%, 52% { opacity: 0; transform: translateY(14px) } 56%, 100% { opacity: 1; transform: none } }
-  @keyframes qlink { 0%, 34% { opacity: 0 } 37%, 100% { opacity: 1 } }
+  @keyframes rshaft { 0%, 28% { stroke-dashoffset: 1 } 33%, 100% { stroke-dashoffset: 0 } }
+  @keyframes rhead { 0%, 32% { opacity: 0 } 34%, 100% { opacity: 1 } }
+  @keyframes rword { 0%, 32% { background: none; color: inherit } 34%, 100% { background: rgba(255,0,191,.35); color: #fff } }
+  @keyframes qlink { 0%, 34% { background: none; color: inherit } 37%, 100% { background: rgba(255,212,121,.3); color: #ffd479 } }
 </style>
 </head>
 <body>
 <div class="frame">
   <div class="stage">
-    <div class="kicker"><small>LLM + Decision Model</small>Gemini proposes, Jev picks</div>
+    <div class="kicker"><small>LLM + Decision Model</small>LLM proposes, Jev picks</div>
 
     <div class="flow">
       <div class="col"><div class="node n1"><div><b>Blog comment</b><small>a reader's question</small></div></div></div>
@@ -130,14 +140,13 @@
 
     <div class="code l">
       <div class="blk b1">
-        <h5>1 · GEMINI PROPOSES 3 REPLIES, AS DATA</h5>
-<pre><span class="k">const</span> { output } = <span class="k">await</span> generateText({
+        <h5>1 · GEMINI PROPOSES 3 REPLIES</h5>
+<pre><span class="k">const</span> { output: <span class="r-def">replies</span> } = <span class="k">await</span> generateText({
   model: <span class="s">"google/gemini-3.8-flash"</span>,
-  instructions: <span class="s">"Write 3 replies: curt, friendly, detailed"</span>,
+  instructions: <span class="s">"3 replies: curt, friendly, detailed"</span>,
   prompt: comment,
-  output: Output.object({ schema: repliesSchema }),
-});
-<span class="k">const</span> replies = Object.values(output); <span class="c">// 3 texts</span></pre>
+  output: Output.array({ element: z.string() }),
+});</pre>
       </div>
     </div>
 
@@ -145,22 +154,23 @@
       <div class="blk b2">
         <h5>2 · JEV SCORES THEM, IN PARALLEL</h5>
 <pre><span class="k">const</span> <span class="q-def">questions</span> = {
-  quality: score(<span class="s">"How helpful and polite is this reply?"</span>, [...]),
+  quality: score(<span class="s">"How helpful is this reply?"</span>, [...]),
 };
-<span class="c">// 3 calls at once: the time is the slowest one, not the sum</span>
-<span class="k">const</span> results = <span class="k">await</span> Promise.all(replies.map((reply) =>
-  jev.systemOne({ state: <span class="s">`${comment}\n${reply}`</span>, <span class="q-use">questions</span> })));</pre>
+<span class="k">const</span> results = <span class="k">await</span> Promise.all(<span class="r-use">replies</span>.map((reply) =>
+  jev.systemOne({ state: reply, <span class="q-use">questions</span> })
+));</pre>
       </div>
       <div class="blk b3">
         <h5>3 · OUR CODE PICKS THE BEST</h5>
-<pre><span class="k">const</span> scores = results.map((r) => r.answers.quality.score / <span class="n">3</span>);
-<span class="c">// </span><span class="n">[0.50, 0.74, 1.00]</span><span class="c"> → best: "detailed"</span></pre>
+<pre><span class="k">const</span> scores = results.map((r) => r.answers.quality.score);
+<span class="k">const</span> best = replies[scores.indexOf(Math.max(...scores))];
+<span class="c">// </span><span class="n">0.50 · 0.74 · 1.00</span><span class="c"> → best: "detailed"</span></pre>
       </div>
     </div>
 
-    <svg class="qlink" viewBox="0 0 1920 1080" aria-hidden="true">
-      <defs><marker id="qa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#ffd479"/></marker></defs>
-      <path class="line" d="M 1084 521 C 1080 590, 1500 540, 1530 618" marker-end="url(#qa)"/>
+    <svg class="rlink" viewBox="0 0 1920 1080" aria-hidden="true">
+      <path class="shaft" pathLength="1" d="M 392 484 L 392 444 Q 392 420 416 420 L 1354 420 Q 1378 420 1378 444 L 1378 556"/>
+      <path class="head" d="M 1366 540 L 1378 556 L 1390 540"/>
     </svg>
 
     <div class="caption">Instead of fixing one draft, <span class="underline-pink">Jev picks the best</span> of three.</div>

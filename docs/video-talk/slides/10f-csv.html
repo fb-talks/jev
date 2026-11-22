@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10f · CSV evaluation: Jev vs Gemini</title>
+<title>10f · CSV evaluation: DM vs LLM</title>
 <link rel="stylesheet" href="_shared/anim.css">
 <!--
   Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 6:
@@ -47,10 +47,10 @@
   .vl { position: relative; height: 34px; }
   .vl i { position: absolute; top: 0; width: 4px; height: 100%; margin-left: -2px; border-radius: 2px; background: var(--ink); transform-origin: top; transform: scaleY(0); }
   .vl .via { top: 4px; }
-  .code { left: 760px; top: 205px; width: 1025px; height: 640px; }
-  .caption { top: 880px; }
+  .code { left: 760px; top: 190px; width: 1025px; height: 690px; }
+  .caption { top: 905px; }
 
-  .blk pre { --fs: 19px; }
+  .blk pre { --fs: 18px; }
 
   /* ---------- Animations ---------- */
   .n1 { animation-name: n1; }
@@ -67,8 +67,9 @@
   /* ---------- Timeline (18s loop) ----------
      0–4%    scene in · 4–8% code card (dimmed)
      8–12%   node "CSV row"
-     14–18%  Jev and Gemini answer + the questions (block 1) until 26% · 18–22% the parallel calls (block 2) until 30%
-     34–38%  two "policy → decision" + block 3 (pink)
+     14–18%  DM and LLM answer + the questions (block 1) until 26%
+     22–26%  the two model calls (block 2) until 32%
+     34–38%  two "decide()" nodes + the policy and the comparison (block 3, stays pink)
      48–52%  "vs expected"
      72–78%  caption
      94%     final frame (playback stops here)        96–100% fade out */
@@ -79,7 +80,7 @@
   @keyframes l1 { 0%, 12% { transform: scaleY(0) } 14%, 100% { transform: scaleY(1) } }
   @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
   @keyframes b1 { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
-  @keyframes b2 { 0%, 18% { opacity: .3; border-color: transparent; background: none } 22%, 30% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 34%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b2 { 0%, 22% { opacity: .3; border-color: transparent; background: none } 26%, 32% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 35%, 100% { opacity: 1; border-color: transparent; background: none } }
   @keyframes l2 { 0%, 32% { transform: scaleY(0) } 34%, 100% { transform: scaleY(1) } }
   @keyframes n3 { 0%, 34% { opacity: 0; transform: translateY(14px) } 38%, 100% { opacity: 1; transform: none } }
   @keyframes b3 { 0%, 34% { opacity: .3; border-color: transparent; background: none } 38%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
@@ -90,19 +91,19 @@
 <body>
 <div class="frame">
   <div class="stage">
-    <div class="kicker"><small>LLM + Decision Model</small>CSV evaluation: Jev vs Gemini</div>
+    <div class="kicker"><small>LLM + Decision Model</small>CSV evaluation: DM vs LLM</div>
 
     <div class="flow">
       <div class="row"><div class="node n1"><div><b>CSV row</b><small>comment + expected decision</small></div></div></div>
       <div class="vl"><i class="l1" style="left: 25%"></i><i class="l1" style="left: 75%"></i></div>
       <div class="row pair">
-        <div class="node jev n2"><div><b>Jev answers</b><small>3 questions · probabilities</small></div></div>
-        <div class="node gem n2"><div><b>🤖 Gemini answers</b><small>3 questions · labels</small></div></div>
+        <div class="node jev n2"><div><b>DM answers</b><small>3 questions · probabilities</small></div></div>
+        <div class="node gem n2"><div><b>🤖 LLM answers</b><small>3 questions · labels</small></div></div>
       </div>
       <div class="vl"><i class="l2" style="left: 25%"></i><i class="l2" style="left: 75%"></i></div>
       <div class="row pair">
-        <div class="node if n3"><b>policy<br>→ decision</b></div>
-        <div class="node if n3"><b>policy<br>→ decision</b></div>
+        <div class="node if n3"><b>decide()<br>same policy</b></div>
+        <div class="node if n3"><b>decide()<br>same policy</b></div>
       </div>
       <div class="vl"><i class="l3" style="left: 25%"></i><i class="l3" style="left: 75%"></i></div>
       <div class="row"><div class="node ok n4"><div><b>vs expected</b><small>who agrees more with the human · how fast</small></div></div></div>
@@ -110,29 +111,32 @@
 
     <div class="code">
       <div class="blk b1">
-        <h5>THREE QUESTIONS, ONE OF EACH TYPE</h5>
-<pre><span class="k">const</span> jevQuestions = {
+        <h5>1 · THREE QUESTIONS, ONE OF EACH TYPE</h5>
+<pre><span class="k">const</span> questions = {
   category: choice(<span class="s">"What kind of comment is this?"</span>, categories),
   toxicity: score(<span class="s">"How offensive is the tone?"</span>, toxicityLevels),
   personal_data: noul(<span class="s">"Contains an email, phone number or address"</span>),
 };</pre>
       </div>
       <div class="blk b2">
-        <h5>BOTH MODELS ON EVERY CSV ROW</h5>
-<pre><span class="k">const</span> [jevResult, geminiResult] = <span class="k">await</span> Promise.all([
-  timed(() => jev.systemOne({ state: comment, questions: jevQuestions })),
-  timed(() => generateText({ model, prompt: comment, output })),
-]);</pre>
+        <h5>2 · BOTH MODELS ON THE SAME CSV ROW</h5>
+<pre><span class="k">const</span> dm = <span class="k">await</span> jev.systemOne({ state: row.comment, questions });
+<span class="k">const</span> llm = <span class="k">await</span> generateText({ model, prompt: row.comment, output });
+<span class="c">// the LLM's labels become the same shape, as 0 or 1</span></pre>
       </div>
       <div class="blk b3">
-        <h5>THE POLICY LIVES IN OUR CODE, NOT IN THE MODEL</h5>
-<pre><span class="k">const</span> signals = [
-  { name: <span class="s">"Spam"</span>, risk: a.category.probabilities.spam },
-  { name: <span class="s">"Toxicity"</span>, risk: a.toxicity.score / <span class="n">3</span> },
-  { name: <span class="s">"Personal data"</span>, risk: a.personal_data.noul },
-];
-<span class="k">const</span> verdict = (risk) =>
-  risk >= reject ? <span class="s">"reject"</span> : risk >= review ? <span class="s">"review"</span> : <span class="s">"publish"</span>;</pre>
+        <h5>3 · ONE POLICY IN OUR CODE, COMPARED WITH THE HUMAN</h5>
+<pre><span class="k">const</span> decide = (a) => {
+  <span class="k">const</span> risk = Math.max(
+    a.category.probabilities.spam,
+    a.toxicity.score / <span class="n">3</span>,
+    a.personal_data.noul,
+  );
+  <span class="k">return</span> risk >= <span class="n">0.85</span> ? <span class="s">"reject"</span> : risk >= <span class="n">0.5</span> ? <span class="s">"review"</span> : <span class="s">"publish"</span>;
+};
+
+decide(dm.answers) === row.expected;  <span class="c">// agrees with the human?</span>
+decide(llm.output) === row.expected;</pre>
       </div>
     </div>
 

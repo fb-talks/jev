@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 · Takeaways</title>
+<link rel="stylesheet" href="_shared/anim.css">
+<!--
+  Animation for "11. Sommario" in the video script (docs/video-talk/01-intro-jev-video-script.md):
+  the closing summary of the whole talk, five takeaways one at a time, then the closing title.
+  Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
+-->
+<style>
+  :root { --loop: 16s; }
+
+  .stage { position: absolute; inset: 0; animation-name: stage; }
+
+  /* ---------- Takeaways ---------- */
+  .list { position: absolute; left: 135px; top: 215px; width: 1650px; display: flex; flex-direction: column; gap: 16px; }
+  .item { display: flex; align-items: center; gap: 30px; height: 100px; padding: 0 36px; border-radius: 20px; background: #fff; border: 2.5px solid #dfe4ee; opacity: 0; }
+  .item .num { flex: none; width: 58px; height: 58px; border-radius: 50%; display: grid; place-items: center; background: var(--pink-bg); color: var(--pink); font-family: var(--hand); font-size: 34px; }
+  .item b { display: block; font-size: 33px; line-height: 1.2; }
+  .item small { display: block; margin-top: 2px; font-size: 22px; opacity: .55; }
+  .item code { font-family: var(--mono); font-size: .9em; color: var(--pink); }
+
+  .caption { position: absolute; left: 0; right: 0; top: 860px; text-align: center; font-family: var(--hand); font-size: 60px; opacity: 0; animation-name: caption; }
+
+  .i1 { animation-name: i1; } .i2 { animation-name: i2; } .i3 { animation-name: i3; } .i4 { animation-name: i4; } .i5 { animation-name: i5; }
+
+  /* ---------- Timeline (16s loop) ----------
+     0–4%    scene in
+     6–10%   1 · an LLM writes, a DM decides
+     18–22%  2 · three question types
+     30–34%  3 · the policy lives in our code
+     42–46%  4 · cheap and fast
+     54–58%  5 · better together
+     80–85%  closing title
+     94%     final frame (playback stops here)        96–100% fade out */
+  @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
+  @keyframes i1 { 0%, 6% { opacity: 0; transform: translateX(-24px) } 10%, 100% { opacity: 1; transform: none } }
+  @keyframes i2 { 0%, 18% { opacity: 0; transform: translateX(-24px) } 22%, 100% { opacity: 1; transform: none } }
+  @keyframes i3 { 0%, 30% { opacity: 0; transform: translateX(-24px) } 34%, 100% { opacity: 1; transform: none } }
+  @keyframes i4 { 0%, 42% { opacity: 0; transform: translateX(-24px) } 46%, 100% { opacity: 1; transform: none } }
+  @keyframes i5 { 0%, 54% { opacity: 0; transform: translateX(-24px) } 58%, 100% { opacity: 1; transform: none } }
+  @keyframes caption { 0%, 80% { opacity: 0; transform: translateY(12px) } 85%, 100% { opacity: 1; transform: none } }
+</style>
+</head>
+<body>
+<div class="frame">
+  <div class="stage">
+    <div class="kicker"><small>To sum up</small>Takeaways</div>
+
+    <div class="list">
+      <div class="item i1"><span class="num">1</span><div><b>An LLM writes, a Decision Model decides</b><small>not an essay: an answer with its probability</small></div></div>
+      <div class="item i2"><span class="num">2</span><div><b>Three question types: <code>noul</code> · <code>choice</code> · <code>score</code></b><small>yes or no, one option among many, a level on a scale</small></div></div>
+      <div class="item i3"><span class="num">3</span><div><b>The policy lives in our code, not in the prompt</b><small>thresholds on probabilities: change them without calling the model again</small></div></div>
+      <div class="item i4"><span class="num">4</span><div><b>Fast and cheap, built for high volume</b><small>pay only the input, the output is free · one state, many questions</small></div></div>
+      <div class="item i5"><span class="num">5</span><div><b>Better together: DM + LLM</b><small>the DM checks, picks, guards and routes · the LLM only when needed</small></div></div>
+    </div>
+
+    <div class="caption">It doesn't replace an LLM: <span class="underline-pink">it works alongside it</span>.</div>
+  </div>
+</div>
+<script src="_shared/anim.js"></script>
+</body>
+</html>

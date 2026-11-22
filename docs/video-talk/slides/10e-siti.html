@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10e · Jev vs Gemini on 20 websites</title>
+<title>10e · DM vs LLM on 20 websites</title>
 <link rel="stylesheet" href="_shared/anim.css">
 <!--
   Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), example 5:
@@ -12,6 +12,7 @@
   Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
 -->
 <style>
+  @property --n { syntax: "<integer>"; inherits: false; initial-value: 0; }
   :root { --loop: 18s; }
 
   .stage { position: absolute; inset: 0; animation-name: stage; }
@@ -37,22 +38,39 @@
   .blk pre { margin: 0; font-family: var(--mono); font-size: var(--fs, 19px); line-height: 1.38; white-space: pre; }
   .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
 
-  .caption { position: absolute; left: 0; right: 0; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
 
   /* ---------- Flow, top, left to right ---------- */
-  .flow { position: absolute; left: 135px; top: 195px; width: 1650px; height: 210px; display: flex; align-items: center; }
+  .flow { position: absolute; left: 135px; top: 150px; width: 1650px; height: 200px; display: flex; align-items: center; }
   .col { flex: none; display: flex; flex-direction: column; gap: 12px; }
   .col .node { width: var(--w); min-height: 92px; }
   .col.many .node { min-height: 62px; }
   .hl { flex: 1; position: relative; height: 4px; margin: 0 12px; border-radius: 2px; background: var(--ink); transform-origin: left; transform: scaleX(0); }
   .hl::after { content: ""; position: absolute; right: -4px; top: -8px; border: 10px solid transparent; border-left: 14px solid var(--ink); border-right: 0; }
-  .code { top: 440px; height: 330px; }
-  .caption { top: 820px; }
+  .code { top: 600px; height: 300px; }
+  .code.s { top: 385px; left: 570px; width: 780px; height: auto; padding: 14px 20px; }
+  .code.s .blk { margin: 0; }
+
+  /* ---------- Curved pink arrows: shared criteria → both snippets (revealed top to bottom) ---------- */
+  .arrows { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; overflow: visible; clip-path: inset(0 0 100% 0); animation-name: arrows; }
+  .arrows path:not(marker path) { fill: none; stroke: var(--pink); stroke-width: 5; stroke-linecap: round; }
+
+  /* ---------- Race bars under the cards (illustrative: Jev ≈ 1/10 of Gemini's time, not measured) ---------- */
+  .race { position: absolute; top: 915px; height: 56px; display: flex; align-items: center; gap: 18px; opacity: 0; animation-name: racein; }
+  .race.l { left: 135px; width: 790px; } .race.r { left: 955px; width: 830px; }
+  .race .who { flex: none; width: 210px; font-family: var(--sans); font-weight: 700; font-size: 24px; }
+  .race.l .who { color: var(--pink); } .race.r .who { color: var(--blue); }
+  .race .track { flex: 1; height: 22px; border-radius: 11px; background: #e7eaf2; overflow: hidden; }
+  .race .fill { display: block; height: 100%; border-radius: 11px; transform-origin: left; transform: scaleX(0); }
+  .race.l .fill { background: var(--pink); animation-name: fillJev; animation-timing-function: linear; }
+  .race.r .fill { background: var(--blue); animation-name: fillLlm; animation-timing-function: linear; }
+  .race .t { flex: none; width: 110px; font-family: var(--sans); font-weight: 700; font-size: 30px; text-align: right; font-variant-numeric: tabular-nums; counter-reset: v var(--n); animation-timing-function: linear; }
+  .race .t::after { content: counter(v) "/20"; }
+  .race.l .t { color: var(--pink); animation-name: tJev; } .race.r .t { color: var(--blue); animation-name: tLlm; }
 
   .flow { --w: 300px; }
-  .col.many .node { width: 360px; min-height: 92px; }
+  .col.many .node { width: 360px; min-height: 82px; }
   .code.l { left: 135px; width: 790px; } .code.r { left: 955px; width: 830px; }
-  .blk pre { --fs: 18px; }
+  .blk pre { --fs: 17px; }
 
   /* ---------- Animations ---------- */
   .n1 { animation-name: n1; }
@@ -60,6 +78,7 @@
   .n2 { animation-name: n2; }
   .h2 { animation-name: h2; }
   .n3 { animation-name: n3; }
+  .b0 { animation-name: b0; }
   .b1 { animation-name: b1; }
   .b2 { animation-name: b2; }
   .h3 { animation-name: h3; }
@@ -68,29 +87,37 @@
   /* ---------- Timeline (18s loop) ----------
      0–4%    scene in · 4–8% code panels (dimmed)
      8–12%   node "Website URL" · 14–18% "Scrape once"
-     26–30%  Jev and Gemini side by side + the shared criteria (left block) until 40%
-     30–34%  the parallel calls (right block) until 44%
-     48–52%  "Compare"
-     72–78%  caption
+     26–30%  Decision Model and LLM side by side · shared criteria (top box) highlighted 26–34%
+     31–35%  pink curved arrows from the shared box down to both snippets
+     34–37%  Jev code (left block) highlighted until 41%
+     41–44%  Gemini code (right block) highlighted until 48%
+     48–52%  "Compare" · race bars appear
+     52–85%  race: Decision Model fills 52–55.3%, LLM fills 52–85% (10× slower); counters 0/20 → 20/20 pages
      94%     final frame (playback stops here)        96–100% fade out */
   @keyframes stage { 0% { opacity: 0 } 4%, 96% { opacity: 1 } 100% { opacity: 0 } }
   @keyframes codein { 0%, 4% { opacity: 0 } 8%, 100% { opacity: 1 } }
-  @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
+  @keyframes arrows { 0%, 31% { clip-path: inset(0 0 100% 0) } 35%, 100% { clip-path: inset(0 0 0 0) } }
+  @keyframes b0 { 0%, 26% { opacity: .3; border-color: transparent; background: none } 29%, 34% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 37%, 100% { opacity: 1; border-color: transparent; background: none } }
   @keyframes n1 { 0%, 8% { opacity: 0; transform: translateY(14px) } 12%, 100% { opacity: 1; transform: none } }
   @keyframes h1 { 0%, 12% { transform: scaleX(0) } 14%, 100% { transform: scaleX(1) } }
   @keyframes n2 { 0%, 14% { opacity: 0; transform: translateY(14px) } 18%, 100% { opacity: 1; transform: none } }
   @keyframes h2 { 0%, 24% { transform: scaleX(0) } 26%, 100% { transform: scaleX(1) } }
   @keyframes n3 { 0%, 26% { opacity: 0; transform: translateY(14px) } 30%, 100% { opacity: 1; transform: none } }
-  @keyframes b1 { 0%, 26% { opacity: .3; border-color: transparent; background: none } 30%, 40% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 44%, 100% { opacity: 1; border-color: transparent; background: none } }
-  @keyframes b2 { 0%, 30% { opacity: .3; border-color: transparent; background: none } 34%, 44% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 48%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b1 { 0%, 34% { opacity: .3; border-color: transparent; background: none } 37%, 41% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } 44%, 100% { opacity: 1; border-color: transparent; background: none } }
+  @keyframes b2 { 0%, 41% { opacity: .3; border-color: transparent; background: none } 44%, 48% { opacity: 1; border-color: var(--blue); background: rgba(60,120,255,.08) } 51%, 100% { opacity: 1; border-color: transparent; background: none } }
   @keyframes h3 { 0%, 46% { transform: scaleX(0) } 48%, 100% { transform: scaleX(1) } }
+  @keyframes racein { 0%, 48% { opacity: 0 } 51%, 100% { opacity: 1 } }
+  @keyframes fillJev { 0%, 52% { transform: scaleX(0) } 55.3%, 100% { transform: scaleX(1) } }
+  @keyframes fillLlm { 0%, 52% { transform: scaleX(0) } 85%, 100% { transform: scaleX(1) } }
+  @keyframes tJev { 0%, 52% { --n: 0 } 55.3%, 100% { --n: 20 } }
+  @keyframes tLlm { 0%, 52% { --n: 0 } 85%, 100% { --n: 20 } }
   @keyframes n4 { 0%, 48% { opacity: 0; transform: translateY(14px) } 52%, 100% { opacity: 1; transform: none } }
 </style>
 </head>
 <body>
 <div class="frame">
   <div class="stage">
-    <div class="kicker"><small>LLM + Decision Model</small>Jev vs Gemini on 20 websites</div>
+    <div class="kicker"><small>LLM + Decision Model</small>DM vs LLM on 20 websites</div>
 
     <div class="flow">
       <div class="col"><div class="node n1"><div><b>Website URL</b><small>20 home pages</small></div></div></div>
@@ -98,45 +125,60 @@
       <div class="col"><div class="node step n2"><div><b>Scrape once</b><small>title · description · text</small></div></div></div>
       <div class="hl h2"></div>
       <div class="col many">
-        <div class="node jev n3"><div><b>Jev classifies</b><small>type · sector · commercial</small></div></div>
-        <div class="node gem n3"><div><b>🤖 Gemini classifies</b><small>the same 3 questions</small></div></div>
+        <div class="node jev n3"><div><b>Decision Model classifies</b><small>type · sector · commercial</small></div></div>
+        <div class="node gem n3"><div><b>🤖 LLM classifies</b><small>the same 3 questions</small></div></div>
       </div>
       <div class="hl h3"></div>
       <div class="col"><div class="node ok n4"><div><b>Compare</b><small>time · agreement</small></div></div></div>
     </div>
 
-    <div class="code l">
-      <div class="blk b1">
-        <h5>THE SAME CRITERIA FOR BOTH MODELS</h5>
+    <div class="code s">
+      <div class="blk b0">
+        <h5>SHARED CRITERIA</h5>
 <pre><span class="k">const</span> types = { ecommerce: <span class="s">"Online shop"</span>, news: <span class="s">"News outlet"</span> };
 <span class="k">const</span> sectors = { tech: <span class="s">"Technology"</span>, finance: <span class="s">"Banking"</span> };
+<span class="k">const</span> levels = [<span class="s">"Informative"</span>, <span class="s">"Promotional"</span>, <span class="s">"Aggressive"</span>];</pre>
+      </div>
+    </div>
 
-<span class="k">const</span> jevQuestions = {
+    <svg class="arrows" viewBox="0 0 1920 1080" aria-hidden="true">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--pink)"/></marker></defs>
+      <path d="M 562 470 C 450 470, 530 500, 530 585" marker-end="url(#ah)"/>
+      <path d="M 1358 470 C 1470 470, 1370 500, 1370 585" marker-end="url(#ah)"/>
+    </svg>
+
+    <div class="code l">
+      <div class="blk b1">
+        <h5>JEV · DECISION MODEL</h5>
+<pre><span class="k">const</span> questions = {
   type: choice(<span class="s">"What kind of website is this?"</span>, types),
   sector: choice(<span class="s">"Which sector does it belong to?"</span>, sectors),
   commercial: score(<span class="s">"How commercial is this page?"</span>, levels),
 };
-<span class="c">// Gemini: the same keys, as an enum in its JSON schema</span></pre>
+
+<span class="k">const</span> jevResult = <span class="k">await</span> jev.systemOne({ state: page.text, questions });</pre>
       </div>
     </div>
 
     <div class="code r">
       <div class="blk b2">
-        <h5>SAME TEXT, BOTH MODELS, AT THE SAME TIME</h5>
-<pre><span class="k">const</span> page = <span class="k">await</span> scrape(url); <span class="c">// once</span>
-
-<span class="k">const</span> [jevResult, geminiResult] = <span class="k">await</span> Promise.all([
-  timed(() => jev.systemOne({ state: page.text, questions })),
-  timed(() => generateText({
-    model: <span class="s">"google/gemini-3.8-flash"</span>,
-    prompt: page.text,
-    output: Output.object({ schema: geminiSchema }),
-  })),
-]);</pre>
+        <h5>GEMINI FLASH · LLM</h5>
+<pre><span class="k">const</span> geminiSchema = jsonSchema({ type: <span class="s">"object"</span>, properties: {
+  type: { enum: Object.keys(types) },
+  sector: { enum: Object.keys(sectors) },
+  commercial: { type: <span class="s">"integer"</span>, minimum: <span class="n">0</span>, maximum: levels.length - <span class="n">1</span> },
+}});
+<span class="k">const</span> geminiResult = <span class="k">await</span> generateText({
+  model: <span class="s">"google/gemini-3.8-flash"</span>,
+  prompt: page.text,
+  output: Output.object({ schema: geminiSchema }),
+});</pre>
       </div>
     </div>
 
-    <div class="caption">Same text, same questions: <span class="underline-pink">only the model changes</span>.</div>
+    <div class="race l"><span class="who">Decision Model</span><div class="track"><i class="fill"></i></div><span class="t"></span></div>
+    <div class="race r"><span class="who">LLM</span><div class="track"><i class="fill"></i></div><span class="t"></span></div>
+
   </div>
 </div>
 <script src="_shared/anim.js"></script>

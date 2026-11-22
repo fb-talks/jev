@@ -715,11 +715,9 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 ⏸ 2.1s
 > e Gemini prepara la risposta.
 
-⏸ 4.1s
+⏸ 4.0s
 > Prima che parta, Jev la controlla con due domande: la risposta affronta davvero il problema? Una **choice**. E come tratta il cliente? Uno **score** su quattro livelli.
 > Jev vede tutti e due i testi, il messaggio e la risposta: la pertinenza ha senso solo rispetto alla richiesta.
-
-⏸ 7.5s
 > Qui la risposta è generica e scortese: "generic", e tono 2.74: su una scala da 0, educato, a 3, tossico, è quasi tossico. Non si manda.
 
 ### 10c · Gemini propone, Jev sceglie
@@ -727,9 +725,17 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 🎬 **ANIMAZIONE**: [`slides/10c-propone.html`](./slides/10c-propone.html). Verticale. Commento → Gemini propone 3 risposte come dati → tre "Jev scores" in parallelo (0.50, 0.74, 1.00) → "highest score?" → la risposta migliore, "detailed". Sotto, la chiamata a Gemini con structured output e le tre chiamate a Jev con `Promise.all`. Dura 18 s.
 
 🎙️ **VOCE**:
-> Invece di correggere una bozza, ne faccio scrivere tre a Gemini: una secca, una cordiale, una dettagliata. Come dati strutturati, niente testo da interpretare.
-> Jev le valuta tutte e tre **in parallelo**: il tempo è quello della più lenta, non la somma.
-> E il nostro codice tiene quella con il punteggio più alto.
+> Immaginiamo l'utente che inserisce un commento in un blog e vogliamo una risposta automatica tramite un LLM.
+
+⏸ 2.0s
+> Invece di correggere una bozza, ne faccio scrivere tre a Gemini: una secca, una cordiale, una dettagliata. Come dati strutturati (output schema), niente testo da interpretare.
+
+⏸ 3.6s
+> Jev le valuta tutte e tre **in parallelo**
+> Il tempo richiesto per l'operazione non è la somma ma quello della più lenta.
+
+⏸ 6.9s
+> Alla fine il nostro codice tiene quella con il punteggio più alto.
 
 ### 10d · Email to Data: Jev fa da guardia, Gemini estrae
 
@@ -737,12 +743,19 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 
 🎙️ **VOCE**:
 > Gemini trasforma un'email in dati: date, importi, azioni. Ma un'email può contenere testo nascosto che dà ordini all'AI.
+
+⏸ 2.1s
 > Allora prima la legge Jev, con una domanda: ci sono istruzioni per un assistente AI? Qui: cento per cento.
+
+⏸ 4.0s
 > La decisione è nel nostro codice, una soglia leggibile. Sopra la soglia, l'email **non arriva mai a Gemini**: zero token.
+
+⏸ 7.6s
+> Altrimenti processiamo la mail tramite un LLM e gli facciamo creare la risposta
 
 ### 10e · Jev contro Gemini su 20 siti
 
-🎬 **ANIMAZIONE**: [`slides/10e-siti.html`](./slides/10e-siti.html). Verticale. URL → scraping una volta → Jev e Gemini classificano lo stesso testo in parallelo → confronto di tempi e accordo. Sotto, gli stessi criteri per i due modelli e le due chiamate in `Promise.all`. Dura 18 s.
+🎬 **ANIMAZIONE**: [`slides/10e-siti.html`](./slides/10e-siti.html). Verticale. URL → scraping una volta → Decision Model e LLM classificano lo stesso testo in parallelo → confronto di tempi e accordo. Sotto, i criteri condivisi (types, sectors, levels) con due frecce rosa verso i due snippet: a sinistra Jev (domande e `systemOne`), a destra solo Gemini Flash (schema e `generateText`); sotto ogni card una barra: il Decision Model arriva in un decimo del tempo (illustrativo, non misurato). Dura 18 s.
 
 🎙️ **VOCE**:
 > Un confronto onesto: venti home page, lette una volta sola. Jev e Gemini ricevono lo stesso testo e le stesse tre domande: tipo di sito, settore, quanto è commerciale.
@@ -750,7 +763,7 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 
 ### 10f · Valutazione di un CSV: Jev contro Gemini
 
-🎬 **ANIMAZIONE**: [`slides/10f-csv.html`](./slides/10f-csv.html). Orizzontale. Riga del CSV → Jev e Gemini rispondono → la stessa policy trasforma le risposte in una decisione → confronto con la decisione attesa. A destra le tre domande (una per tipo), le chiamate in parallelo e la policy. Dura 18 s.
+🎬 **ANIMAZIONE**: [`slides/10f-csv.html`](./slides/10f-csv.html). Orizzontale. Riga del CSV → DM e LLM rispondono → la stessa policy (`decide()`) trasforma le risposte in una decisione → confronto con la decisione attesa. A destra: 1 · le tre domande (una per tipo), 2 · i due modelli sulla stessa riga, 3 · la policy `decide()` (rischio massimo + soglie) e `decide(...) === row.expected` per entrambi. Dura 18 s.
 
 🎙️ **VOCE**:
 > Un CSV di commenti, ognuno con la decisione che avrebbe preso un moderatore umano.
@@ -772,6 +785,22 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 
 🎙️ **VOCE**:
 > _da scrivere_
+
+---
+
+## 11. Sommario
+
+### 11 · Takeaways
+
+🎬 **ANIMAZIONE**: [`slides/11-sommario.html`](./slides/11-sommario.html). Cinque punti, uno alla volta: l'LLM scrive e il Decision Model decide; tre tipi di domanda (noul, choice, score); la policy sta nel nostro codice; veloce ed economico; meglio insieme, DM + LLM. Poi il titolo di chiusura: "It doesn't replace an LLM: it works alongside it". Dura 16 s.
+
+🎙️ **VOCE**:
+> Riassumendo. Un LLM scrive, un decision model decide: una risposta con la sua probabilità.
+> Tre tipi di domanda: noul, choice e score.
+> La policy sta nel nostro codice, non nel prompt: sono soglie sulle probabilità.
+> È veloce ed economico: si paga solo l'input.
+> E insieme funzionano meglio: il decision model controlla, sceglie, fa da guardia e smista. L'LLM solo quando serve.
+> Non sostituisce un LLM: lo affianca.
 
 ---
 

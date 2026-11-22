@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>10b · Gemini replies, Jev evaluates</title>
+<title>10b · LLM replies, Jev evaluates</title>
 <link rel="stylesheet" href="_shared/anim.css">
 <!--
   Animation for "10. In pratica" in the video script (docs/video-talk/01-intro-jev-video-script.md), second example:
-  /2-jev-and-gemini/demo2. Vertical layout: the flow on top, left to right; the code below.
+  /2-jev-and-gemini/demo2. Vertical layout: the flow on top, left to right; the code below: Gemini then Jev on the left,
+  the questions on the right, with a curved arrow to where the Jev call uses them.
   Each step of the flow lights up the code that does it. The code is the talk version in app/2-jev-and-gemini/demo2/page.tsx,
   shortened to fit; "generic" and 2.74 are the values in its comments.
   Shared base (style, scaling, controls): _shared/anim.css and _shared/anim.js.
@@ -30,15 +31,22 @@
   .n1 { animation-name: n1; } .n2 { animation-name: n2; } .n3 { animation-name: n3; } .n4 { animation-name: n4; }
   .l1 { animation-name: l1; } .l2 { animation-name: l2; } .l3 { animation-name: l3; }
 
-  /* ---------- Code, below: questions on the left, the two steps on the right ---------- */
+  /* ---------- Code, below: the two steps on the left, the questions on the right ---------- */
   .code { position: absolute; top: 350px; height: 448px; padding: 22px 26px; border-radius: 22px; background: #1f2230; color: #e8ebf4; opacity: 0; animation-name: codein; }
-  .q { left: 135px; width: 810px; }
-  .steps { left: 975px; width: 810px; }
+  .steps { left: 135px; width: 820px; }
+  .q { left: 1035px; width: 750px; }
   .blk { margin: 0 0 14px; padding: 10px 16px 10px 18px; border-left: 5px solid transparent; border-radius: 8px; opacity: .3; }
   .blk h5 { margin: 0 0 6px; font-family: var(--sans); font-size: 19px; font-weight: 600; letter-spacing: .3px; color: #9aa3b8; }
   .blk pre { margin: 0; font-family: var(--mono); font-size: 19px; line-height: 1.42; white-space: pre; }
   .blk .c { color: #7d869c; } .blk .s { color: #9fe0b0; } .blk .k { color: #ff8fd8; } .blk .n { color: #ffd479; }
   .bq { animation-name: bq; } .bg { animation-name: bg; } .bj { animation-name: bj; }
+  .qref { border-radius: 4px; animation-name: qref; }
+
+  /* Curved arrow: from the questions panel to "questions" in the Jev call */
+  .arrow { position: absolute; inset: 0; width: 1920px; height: 1080px; pointer-events: none; overflow: visible; }
+  .arrow path { fill: none; stroke: var(--pink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  .arrow .shaft { stroke-dasharray: 1; stroke-dashoffset: 1; animation-name: shaft; }
+  .arrow .head { opacity: 0; animation-name: head; }
 
   .caption { position: absolute; left: 0; right: 0; top: 862px; text-align: center; font-family: var(--hand); font-size: 52px; opacity: 0; animation-name: caption; }
 
@@ -47,6 +55,7 @@
      8–12%   node "Customer message"
      14–18%  node "Gemini writes" + its code block (blue border) until 28%
      28–32%  node "Jev evaluates" + the questions and the Jev block (pink border)
+     32–38%  curved arrow from the questions to "questions" in jev.systemOne(), the word lights up
      44–48%  node "Verdict": hold it, the reply is generic and rude
      72–78%  caption
      94%     final frame (playback stops here)        96–100% fade out */
@@ -63,13 +72,16 @@
   @keyframes bg { 0%, 14% { opacity: .3; border-color: transparent; background: none } 18%, 26% { opacity: 1; border-color: var(--blue); background: rgba(13,153,255,.1) } 30%, 100% { opacity: 1; border-color: transparent; background: none } }
   @keyframes bq { 0%, 28% { opacity: .3; border-color: transparent; background: none } 32%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
   @keyframes bj { 0%, 28% { opacity: .3; border-color: transparent; background: none } 32%, 100% { opacity: 1; border-color: var(--pink); background: rgba(255,0,191,.08) } }
+  @keyframes shaft { 0%, 32% { stroke-dashoffset: 1 } 37%, 100% { stroke-dashoffset: 0 } }
+  @keyframes head { 0%, 36% { opacity: 0 } 38%, 100% { opacity: 1 } }
+  @keyframes qref { 0%, 36% { background: none; color: inherit } 38%, 100% { background: rgba(255,0,191,.35); color: #fff } }
   @keyframes caption { 0%, 72% { opacity: 0; transform: translateY(12px) } 78%, 100% { opacity: 1; transform: none } }
 </style>
 </head>
 <body>
 <div class="frame">
   <div class="stage">
-    <div class="kicker"><small>LLM + Decision Model</small>Gemini replies, Jev evaluates</div>
+    <div class="kicker"><small>LLM + Decision Model</small>LLM replies, Jev evaluates</div>
 
     <div class="flow">
       <div class="node n1"><b>Customer message</b><span>a problem to solve</span></div>
@@ -79,6 +91,26 @@
       <div class="node jev n3"><b>Jev evaluates</b><span>relevance + tone</span></div>
       <div class="link l3"></div>
       <div class="node ok n4"><b>✋ Verdict: hold it</b><span>generic · tone 2.74, near toxic</span></div>
+    </div>
+
+    <div class="code steps">
+      <div class="blk bg">
+        <h5>1 · GEMINI WRITES THE REPLY</h5>
+<pre><span class="k">const</span> { text: reply } = <span class="k">await</span> generateText({
+  model: <span class="s">"google/gemini-3.8-flash"</span>,
+  instructions: style,   <span class="c">// how to reply</span>
+  prompt: message,       <span class="c">// what to reply to</span>
+});</pre>
+      </div>
+      <div class="blk bj">
+        <h5>2 · JEV EVALUATES IT</h5>
+<pre><span class="c">// both texts: relevance needs the request</span>
+<span class="k">const</span> state = <span class="s">`Customer: ${message}\nReply: ${reply}`</span>;
+<span class="k">const</span> { answers } = <span class="k">await</span> jev.systemOne({ state, <span class="qref">questions</span> });
+
+answers.relevance.choice; <span class="c">// </span><span class="n">"generic"</span>
+answers.tone.score;       <span class="c">// </span><span class="n">2.74</span><span class="c"> (0 polite → 3 toxic)</span></pre>
+      </div>
     </div>
 
     <div class="code q">
@@ -100,25 +132,11 @@
       </div>
     </div>
 
-    <div class="code steps">
-      <div class="blk bg">
-        <h5>1 · GEMINI WRITES THE REPLY</h5>
-<pre><span class="k">const</span> { text: reply } = <span class="k">await</span> generateText({
-  model: <span class="s">"google/gemini-3.8-flash"</span>,
-  instructions: style,   <span class="c">// how to reply</span>
-  prompt: message,       <span class="c">// what to reply to</span>
-});</pre>
-      </div>
-      <div class="blk bj">
-        <h5>2 · JEV EVALUATES IT</h5>
-<pre><span class="c">// both texts: relevance needs the request</span>
-<span class="k">const</span> state = <span class="s">`Customer: ${message}\nReply: ${reply}`</span>;
-<span class="k">const</span> { answers } = <span class="k">await</span> jev.systemOne({ state, questions });
 
-answers.relevance.choice; <span class="c">// </span><span class="n">"generic"</span>
-answers.tone.score;       <span class="c">// </span><span class="n">2.74</span><span class="c"> (0 polite → 3 toxic)</span></pre>
-      </div>
-    </div>
+    <svg class="arrow" viewBox="0 0 1920 1080" aria-hidden="true">
+      <path class="shaft" pathLength="1" d="M 1050 432 C 990 620, 880 765, 832 695"/>
+      <path class="head" d="M 834 719 L 832 695 L 853 705"/>
+    </svg>
 
     <div class="caption">Gemini writes the reply, <span class="underline-pink">Jev checks it</span> before it goes out.</div>
   </div>
