@@ -59,7 +59,7 @@ Runtime changes go in `docs/_engine/`, never in a deck's `_shared/`. `.github/pa
   Published decks (no such header) stay read-only.
 - `page.html#t=0.5` freezes the slide at 50% of its timeline (used by `snap.mjs`).
 - Click-through steps (video-talk deck only for now): `<div class="frame" data-stops="0.26,0.5">` makes the slide wait
-  at those fractions of the loop, with a pulsing › bottom-right. Click the slide, → / PageDown or Space to go on;
+  at those fractions of the loop. → / PageDown or Space go on (a click on the slide does nothing: the mouse is for pointing and drawing);
   → while a step plays jumps to its stop. Pick stops at the start of each beat (from the Timeline comment).
   Stops only apply while playing, so `#t=`, `snap.mjs` and `export.mjs` are unaffected.
 - Navigation follows the `slides` array in `anim.js`, not the file system: **every slide must be listed there**.

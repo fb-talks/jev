@@ -7,8 +7,8 @@
 //   Space = pause / resume (replay once ended) · R = restart · page.html#t=0.3 = freeze at 30%
 //   ← / → (or PageUp / PageDown) = previous / next slide
 //   Stops: "⏸ 6.0s" above a spoken part in the script = the slide waits there (set them from the notes editor:
-//   slider + markers); without any, data-stops="0.26,0.5" on .frame (fractions of the loop). Click the slide,
-//   → / PageDown or Space to go on (→ while a step is playing jumps to the end of that step)
+//   slider + markers); without any, data-stops="0.26,0.5" on .frame (fractions of the loop). → / PageDown
+//   or Space to go on (not the mouse: it is for pointing and drawing) (→ while a step is playing jumps to the end of that step)
 //   H = hide / show the on-screen controls (slide number, play button), remembered across slides
 //   N = open / close the speaker notes (bottom or right panel: the two buttons in the dock) · click the slide number = jump to any slide
 //   Slides with stops show one square per step, bottom right: pink = on screen, grey = still to come
@@ -134,8 +134,7 @@ const restart = () => {
   animations().forEach((a) => { a.currentTime = 0; a.play(); });
 };
 
-// A click on the slide goes on to the next step (the squares bottom right show where it is)
-frame.addEventListener("click", (e) => { if (stops.length && !e.target.closest("a, button")) proceed(); });
+// A click on the slide does nothing: the mouse is for pointing and drawing, → / Space go on
 
 // Links marked data-next (e.g. the cover's Start button) open the next slide in the deck
 const linkNext = () => {

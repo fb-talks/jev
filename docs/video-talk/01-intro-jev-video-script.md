@@ -677,6 +677,14 @@ Sezione bonus, dopo la chiusura. Demo: `/3-jev-images/demo1`. Valori verificati 
 
 Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice che lo realizza. Ogni passo del diagramma illumina il blocco di codice corrispondente. Due impaginazioni alternate: orizzontale (diagramma a sinistra, codice a destra: 10a, 10d, 10f) e verticale (diagramma sopra, codice sotto: 10b, 10c, 10e, 10g).
 
+### 10 · Come combinare Decision Models + LLM
+
+🎬 **ANIMAZIONE**: [`slides/10-combinare.html`](./slides/10-combinare.html). Separatore della serie: titolo grande al centro, poi i due pezzi entrano dai lati e si uniscono con un "+": l'LLM (es. Gemini Flash) scrive righe di testo, il decision model (es. Jev) riempie una barra fino a 0.92. Sotto, "writes" e "decides". Dura 12 s.
+
+🎙️ **VOCE**:
+> Come si combinano un decision model e un LLM? Ognuno fa quello che sa fare: l'LLM scrive, il decision model decide, con un numero che il nostro codice può controllare.
+> Nelle prossime demo li mettiamo insieme in quattro modi: l'LLM scrive e Jev controlla, l'LLM propone e Jev sceglie, Jev fa da guardia prima dell'LLM, e Jev smista, chiamando l'LLM solo quando serve.
+
 ### 10a · Gemini riscrive, Jev conferma
 
 🎬 **ANIMAZIONE**: [`slides/10a-riscrive.html`](./slides/10a-riscrive.html). A sinistra il flusso dall'alto in basso: commento → Jev misura (0.78) → Gemini riscrive → Jev misura di nuovo (0.11) → prima e dopo. Una freccia tratteggiata torna da "Jev misura di nuovo" a "Gemini riscrive" ("still high? rewrite again"): è il loop possibile, non è nel codice della demo. A destra il codice di `/2-jev-and-gemini/demo1`, un blocco per passo. Dura 18 s.
@@ -685,7 +693,7 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 > Primo esempio: un commento maleducato.
 
 ⏸ 2.0s
-> Jev misura quanto è offensivo: settantotto per cento.
+> Jev misura quanto è offensivo: 78%.
 
 ⏸ 4.2s
 > Gemini lo riscrive in tono educato, mantenendo il senso della critica.
@@ -702,9 +710,16 @@ Le sette demo del gruppo `/2-jev-and-gemini`: per ognuna il flusso e il codice c
 🎬 **ANIMAZIONE**: [`slides/10b-risponde.html`](./slides/10b-risponde.html). In alto il flusso da sinistra a destra: messaggio del cliente → Gemini scrive → Jev valuta → verdetto "hold it". Sotto, a sinistra le domande per Jev (una choice e uno score), a destra le due chiamate di `/2-jev-and-gemini/demo2`. Dura 18 s.
 
 🎙️ **VOCE**:
-> Secondo esempio: un cliente scrive al supporto, e Gemini prepara la risposta.
+> Secondo esempio: un cliente scrive al supporto
+
+⏸ 2.1s
+> e Gemini prepara la risposta.
+
+⏸ 4.1s
 > Prima che parta, Jev la controlla con due domande: la risposta affronta davvero il problema? Una **choice**. E come tratta il cliente? Uno **score** su quattro livelli.
 > Jev vede tutti e due i testi, il messaggio e la risposta: la pertinenza ha senso solo rispetto alla richiesta.
+
+⏸ 7.5s
 > Qui la risposta è generica e scortese: "generic", e tono 2.74: su una scala da 0, educato, a 3, tossico, è quasi tossico. Non si manda.
 
 ### 10c · Gemini propone, Jev sceglie

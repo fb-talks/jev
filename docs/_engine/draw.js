@@ -91,21 +91,76 @@
     `H${x + r}A${r} ${r} 0 0 1 ${x} ${y + h - r}V${y + r}A${r} ${r} 0 0 1 ${x + r} ${y}Z`;
 
   // Spotlight: one at a time, under the strokes. The dim + blur layer has a hole cut out with clip-path.
+  // Its edges and corners can be dragged to resize it: handles show up when the pointer is near them, with the
+  // matching arrows (↔ ↕ ⤡ ⤢), with any tool or none.
   const SPILL = 4000;
-  const spotlight = (b) => {
+  const MIN = 40;
+  // While resizing only the ring moves (its wide shadow dims the rest): changing the clip-path of the blurred
+  // layer on every move made Chrome paint it for a frame without its hole (the whole slide dimmed, a flicker)
+  const placeSpot = (spot, b, dim = true) => {
+    spot.box = b;
     const r = Math.min(18, b.w / 2, b.h / 2);
+    if (dim) {
+      const hole = roundRect({ ...b, x: b.x + SPILL, y: b.y + SPILL }, r);
+      spot.dim.style.clipPath = `path(evenodd, "M0 0H${1920 + 2 * SPILL}V${1080 + 2 * SPILL}H0Z ${hole}")`;
+    }
+    Object.assign(spot.ring.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px`, borderRadius: `${r}px` });
+  };
+  // [handle, cursor]: n/s move the top/bottom edge, e/w the right/left one, the corners both
+  const HANDLES = [["n", "ns-resize"], ["s", "ns-resize"], ["e", "ew-resize"], ["w", "ew-resize"],
+    ["nw", "nwse-resize"], ["se", "nwse-resize"], ["ne", "nesw-resize"], ["sw", "nesw-resize"]];
+  const spotlight = (b) => {
     const spot = document.createElement("div");
     spot.className = "draw-spot";
-    const dim = document.createElement("div");
-    dim.className = "draw-spot-dim";
+    spot.dim = document.createElement("div");
+    spot.dim.className = "draw-spot-dim";
     // The dim spills SPILL px past the slide on every side so the margins dim too; the path is in its own coordinates
-    dim.style.inset = `-${SPILL}px`;
-    const hole = roundRect({ ...b, x: b.x + SPILL, y: b.y + SPILL }, r);
-    dim.style.clipPath = `path(evenodd, "M0 0H${1920 + 2 * SPILL}V${1080 + 2 * SPILL}H0Z ${hole}")`;
-    const ring = document.createElement("div");
-    ring.className = "draw-spot-ring";
-    Object.assign(ring.style, { left: `${b.x}px`, top: `${b.y}px`, width: `${b.w}px`, height: `${b.h}px`, borderRadius: `${r}px` });
-    spot.append(dim, ring);
+    spot.dim.style.inset = `-${SPILL}px`;
+    spot.ring = document.createElement("div");
+    spot.ring.className = "draw-spot-ring";
+    spot.append(spot.dim, spot.ring);
+    for (const [side, cursor] of HANDLES) {
+      const el = document.createElement("div");
+      el.className = `draw-spot-handle h-${side}`;
+      el.style.cursor = cursor;
+      el.addEventListener("pointerenter", () => spot.classList.add("resizable"));
+      el.addEventListener("pointerleave", () => { if (!spot.resizing) spot.classList.remove("resizable"); });
+      el.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0) return;
+        e.preventDefault();
+        e.stopPropagation();
+        el.setPointerCapture(e.pointerId);
+        clearTimeout(timers.get(spot));
+        timers.delete(spot);
+        spot.getAnimations().forEach((a) => a.cancel());
+        spot.resizing = { start: point(e), box: { ...spot.box } };
+        spot.classList.add("resizable", "resizing");
+      });
+      el.addEventListener("pointermove", (e) => {
+        if (!spot.resizing) return;
+        const p = point(e);
+        const o = spot.resizing.box;
+        const dx = p.x - spot.resizing.start.x, dy = p.y - spot.resizing.start.y;
+        let { x, y, w, h } = o;
+        if (side.includes("w")) { x = Math.min(o.x + dx, o.x + o.w - MIN); w = o.x + o.w - x; }
+        if (side.includes("e")) w = Math.max(MIN, o.w + dx);
+        if (side.includes("n")) { y = Math.min(o.y + dy, o.y + o.h - MIN); h = o.y + o.h - y; }
+        if (side.includes("s")) h = Math.max(MIN, o.h + dy);
+        placeSpot(spot, { x, y, w, h }, false);
+      });
+      const end = () => {
+        if (!spot.resizing) return;
+        spot.resizing = null;
+        // The blurred layer gets its new hole while still hidden, and shows again two frames later
+        placeSpot(spot, spot.box);
+        requestAnimationFrame(() => requestAnimationFrame(() => { if (!spot.resizing) spot.classList.remove("resizing"); }));
+        if (state.timer) expire(spot);
+      };
+      el.addEventListener("pointerup", end);
+      el.addEventListener("pointercancel", end);
+      spot.ring.append(el);
+    }
+    placeSpot(spot, b);
     return spot;
   };
 

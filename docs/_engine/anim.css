@@ -301,6 +301,32 @@ html:not(.notes-right) .notes-head { padding-left: max(12px, calc((100% - 1336px
 .draw-spot { position: absolute; inset: 0; animation: draw-fade .35s ease-out both; }
 .draw-spot-dim { position: absolute; background: rgba(15,18,30,.55); backdrop-filter: blur(6px) saturate(.6); }
 .draw-spot-ring { position: absolute; box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 24px 60px -12px rgba(0,0,0,.6); }
+/* Resize handles on the spotlight's edges and corners (in slide px): invisible grab zones, a white mark shows on hover */
+.draw-layer svg { pointer-events: none; }
+.draw-spot-handle { position: absolute; z-index: 1; pointer-events: auto; --g: 30px; }
+.draw-spot-handle.h-n, .draw-spot-handle.h-s { left: var(--g); right: var(--g); height: var(--g); }
+.draw-spot-handle.h-e, .draw-spot-handle.h-w { top: var(--g); bottom: var(--g); width: var(--g); }
+.draw-spot-handle.h-n { top: calc(var(--g) / -2); }
+.draw-spot-handle.h-s { bottom: calc(var(--g) / -2); }
+.draw-spot-handle.h-w { left: calc(var(--g) / -2); }
+.draw-spot-handle.h-e { right: calc(var(--g) / -2); }
+.draw-spot-handle.h-nw, .draw-spot-handle.h-ne, .draw-spot-handle.h-sw, .draw-spot-handle.h-se { width: calc(var(--g) * 1.4); height: calc(var(--g) * 1.4); }
+.draw-spot-handle.h-nw { left: calc(var(--g) * -.7); top: calc(var(--g) * -.7); }
+.draw-spot-handle.h-ne { right: calc(var(--g) * -.7); top: calc(var(--g) * -.7); }
+.draw-spot-handle.h-sw { left: calc(var(--g) * -.7); bottom: calc(var(--g) * -.7); }
+.draw-spot-handle.h-se { right: calc(var(--g) * -.7); bottom: calc(var(--g) * -.7); }
+.draw-spot-handle::after {
+  content: ""; position: absolute; left: 50%; top: 50%; translate: -50% -50%; border-radius: 6px; background: #fff;
+  box-shadow: 0 0 0 2px var(--pink), 0 4px 12px rgba(0,0,0,.35); opacity: 0; transition: opacity .15s;
+}
+.draw-spot-handle.h-n::after, .draw-spot-handle.h-s::after { width: 56px; height: 10px; }
+.draw-spot-handle.h-e::after, .draw-spot-handle.h-w::after { width: 10px; height: 56px; }
+.draw-spot-handle.h-nw::after, .draw-spot-handle.h-ne::after, .draw-spot-handle.h-sw::after, .draw-spot-handle.h-se::after { width: 18px; height: 18px; border-radius: 50%; }
+.draw-spot.resizable .draw-spot-handle::after { opacity: 1; }
+.draw-spot.resizing, .draw-spot.resizing * { transition: none; }
+/* Resizing: the blurred layer hides and the ring's wide shadow dims the rest (no clip-path change, no flicker) */
+.draw-spot.resizing .draw-spot-dim { visibility: hidden; }
+.draw-spot.resizing .draw-spot-ring { box-shadow: 0 0 0 4px rgba(255,255,255,.95), 0 0 0 9000px rgba(15,18,30,.6); }
 @keyframes draw-fade { from { opacity: 0; } }
 
 /* Toolbar, top right (next to the notes on the right, or the window edge); the launcher button takes its place
