@@ -71,11 +71,11 @@ Legenda:
 🎬 **ANIMAZIONE**: [`slides/01c-jev.html`](./slides/01c-jev.html). Uno schema disegnato, quasi senza testo. Sopra: dati → LLM → un paragrafo (righe grigie) → va bene per una persona ✓, ma per il codice è un "?". Sotto: dati → Jev → un numero, 0.92 → il codice lo usa ✓ → branch, sort, route. Poi "An LLM writes for people. Jev answers your code." Dura 14 s.
 
 🎙️ **VOCE**:
-> LLM contro Jev, in uno schema.
-> Sopra, un LLM: gli date i vostri dati e vi risponde con un paragrafo. Perfetto se a leggerlo è una persona.
-> Ma se a usarlo è il vostro **codice**, quel paragrafo è un problema: dovete chiedergli un formato preciso, fare il parsing, e sperare che sia sempre giusto.
+> Con un LLM: gli date i vostri dati e vi risponde con un paragrafo. Perfetto se a leggerlo è una persona.
+> Ma se a usarlo è il vostro **codice**, quel paragrafo è un problema: dovete chiedergli un formato preciso, fare il parsing, e sperare che sia sempre giusto
 
-> Sotto, Jev: stessi dati, ma niente testo. Risponde con un numero, zero novantadue, e il codice lo usa subito: per un `if`, per ordinare, per smistare.
+⏸ 6.0s
+> Con un decision model (come Jev): stessi dati, ma niente testo. Risponde con un numero, zero novantadue, e il codice lo usa subito: per un `if`, per ordinare, per smistare.
 > Un LLM scrive per le persone. **Jev risponde al vostro codice.**
 
 ### 01e · Scrivere o scegliere
@@ -85,7 +85,11 @@ Legenda:
 🎙️ **VOCE**:
 > Prima di dirvi cos'è Jev, un passo indietro. I modelli di AI fanno, a grandi linee, due mestieri.
 > Ci sono i modelli **generativi**, come gli LLM: **scrivono**. Producono testo libero, una parola alla volta.
+
+⏸ 2.9s
 > E ci sono i modelli **discriminativi**, i **classificatori**: **scelgono**. Gli date un testo, e vi dicono a quale opzione appartiene, con una probabilità. Questa mail è spam al 97%.
+
+⏸ 6.3s
 > Li usate da anni senza saperlo: il filtro antispam, il sentiment delle recensioni, le schede di Gmail. Ognuno addestrato per un solo compito.
 > Jev è un classificatore. Ma con una differenza: **le opzioni gliele date voi**, a ogni richiesta.
 
@@ -96,8 +100,13 @@ Legenda:
 🎙️ **VOCE** (in camera):
 > Jev è un modello di **TypeSafe AI**, una startup di San Francisco nata nel 2024. È uscito in early access a settembre 2026.
 >
->Il nome Jev non è un acronimo, ma deriva dall'economista e logico ottocentesco William Stanley Jevons. 
+> Il nome Jev non è un acronimo, ma deriva dall'economista e logico ottocentesco William Stanley Jevons. 
 > La startup TypeSafe AI ha scelto questo nome per via del celebre Paradosso di Jevons. In economia, questo principio dimostra che quando il progresso tecnologico rende l'uso di una risorsa più efficiente (riducendone i costi), il consumo totale di quella risorsa tende ad aumentare anziché diminuire, poiché si aprono infinite nuove possibilità di utilizzo
+>
+> Tecnicamente Jev è un **modello discriminativo**. Non genera testo: classifica, o stima un valore.
+> Per ogni domanda vi restituisce una **distribuzione di probabilità** sulle opzioni che gli passate voi. E basta.
+>
+> TypeSafe lo chiama un modello **"System One"**, come il Sistema 1 di Kahneman: il pensiero veloce, intuitivo. Quello che usate quando riconoscete una faccia, non quando fate una moltiplicazione.
 
 🗑️ **TO DELETE** — la tabella LLM/Jev ripete 01c e 01e: è il quarto confronto LLM vs Jev in due minuti, e la slide 02 non la mostra.
 
@@ -109,10 +118,6 @@ Legenda:
 | "Il commento sembra offensivo perché…" | `offensive: 0.80` |
 
 🎙️ **VOCE**:
-> Tecnicamente Jev è un **modello discriminativo**. Non genera testo: classifica, o stima un valore.
-> Per ogni domanda vi restituisce una **distribuzione di probabilità** sulle opzioni che gli passate voi. E basta.
->
-> TypeSafe lo chiama un modello **"System One"**, come il Sistema 1 di Kahneman: il pensiero veloce, intuitivo. Quello che usate quando riconoscete una faccia, non quando fate una moltiplicazione.
 
 ### 02a · Tre modi di classificare
 
@@ -121,7 +126,11 @@ Legenda:
 🎙️ **VOCE**:
 > Se avete già classificato del testo, l'avete fatto in due modi.
 > Con un **classificatore classico**: raccogliete un dataset etichettato, lo addestrate, ed è veloce ed economico. Ma le etichette sono fisse: se aggiungete una categoria, si riaddestra.
+
+⏸ 3.6s
 > Oppure con un **LLM e un prompt**: flessibile, ma vi risponde con del testo da interpretare e validare, ed è lento e caro.
+
+⏸ 7.4s
 > Jev sta in mezzo: **non dovete addestrarlo**. Gli date le categorie a ogni richiesta, come in un prompt, e vi risponde con un valore tipizzato e le probabilità, come un classificatore.
 > Questa categoria di modelli si chiama **decision model**. "System One" è il nome che gli dà TypeSafe e Google lo chiama invece Gemini Decision API.
 > Attenzione: "non dovete addestrarlo" non vuol dire che non sia addestrato. Il linguaggio lo conosce già, e come fa lo vediamo più avanti. Quello che non serve è addestrarlo sui **vostri** dati.
@@ -139,7 +148,8 @@ Legenda:
 > Pensate a tutte le micro-decisioni ad alto volume.
 >
 > In un **CMS**: moderazione dei commenti, classificazione degli articoli per sezione o livello del lettore, una checklist pre-pubblicazione con tante domande sì/no in parallelo, una per ogni regola editoriale.
->
+
+⏸ 3.8s
 > In un **CRM**: smistamento di ticket ed email, lead scoring dal form contatti, deduplicazione dei contatti, rischio di abbandono in un batch notturno, oppure la "next best action" scelta da un insieme chiuso di azioni.
 >
 > In tutti questi casi non vi serve una frase. Vi serve **un tipo e una confidenza**.
@@ -149,10 +159,14 @@ Legenda:
 🎬 **ANIMAZIONE**: [`slides/05c-immobiliare-chiavi.html`](./slides/05c-immobiliare-chiavi.html). Diagramma, niente codice, in quattro passi da sinistra a destra: la textarea con la richiesta ("I want to buy…") e i candidati evidenziati dalle regole → cinque domande chiuse, ognuna con "not stated", due con la loro istruzione; le opzioni di "Buy or rent?" mostrano la chiave (`sale`, `rent`) con la descrizione sotto, e una legenda spiega chi legge cosa → Jev sceglie (una chiamata) → il modulo dei filtri compilato, che mostra "Buy" al visitatore ma passa `sale` alla ricerca. Le probabilità e il numero di annunci sono illustrativi. Dura 20 s.
 
 🎙️ **VOCE**:
-> Un esempio concreto: un sito immobiliare, dove il visitatore scrive quello che cerca in una frase.
-> Il testo lo legge prima il nostro codice, nel browser: regole semplici tirano fuori i possibili valori. Città e zone, importi, superfici, le stanze nominate. Così a Jev non chiediamo di inventare niente: i candidati li prepariamo noi.
+> Un esempio concreto che ho applicato di recente: un sito in cui c'è una ricerca, dove il visitatore scrive quello che cerca in una frase. (Leggere frase)
+
+⏸ 5.1s
+> Possiamo ipotizzare regole semplici che estrapolano possibili valori. 
+> Città e zone, importi, superfici, le stanze nominate. Così a Jev non chiediamo di inventare niente: i candidati li prepariamo noi.
 > A Jev facciamo solo **domande a risposta chiusa**: vuole comprare o affittare? Tra 200.000 e 90, qual è il prezzo massimo? Vuole un balcone? Ogni domanda ha anche la risposta "la frase non lo dice", così Jev non è costretto a forzare un valore. E sulle cose che la frase non tocca non facciamo domande: una sola chiamata, veloce ed economica.
-> Le regole di interpretazione sono scritte come **istruzioni**, non come codice: "il solo prezzo non dice se è vendita o affitto", "una zona non è una città". Se Jev sbaglia, si corregge quella frase. Per aggiungere un filtro, basta aggiungerlo all'elenco.
+
+⏸ 9.9s
 > Le risposte sicure e valide diventano i filtri della ricerca normale: il visitatore li vede e li può correggere, e gli annunci arrivano dalla stessa ricerca della lista immobili. E la frase va dal browser a Jev con la chiave del visitatore: il nostro server riceve solo i filtri.
 >
 > E se il database si aspetta un valore preciso? Non c'è niente da forzare: quel valore non lo scrive Jev, lo decidiamo noi in anticipo.
@@ -161,12 +175,6 @@ Legenda:
 > "Buy" nel modulo è solo l'etichetta per il visitatore. Alla ricerca arriva `sale`, lo stesso valore che la lista immobili si aspetta già.
 > Le regole trovano i candidati, Jev sceglie una delle nostre chiavi, e la ricerca è quella di sempre.
 
-### 05d · Variante: uno step alla volta
-
-🎬 **ANIMAZIONE**: [`slides/05d-immobiliare-click.html`](./slides/05d-immobiliare-click.html). La stessa slide della 05c, ma dopo il primo step si ferma e aspetta un click (o → / Spazio) prima di ogni passo: domande, istruzioni, Jev sceglie, filtri, frase finale. Da confrontare con la 05c.
-
-🎙️ **VOCE**: la stessa della 05c, detta un passo alla volta.
-
 ---
 
 ## 4. Come si usa: state + domande (3:30 – 5:15)
@@ -174,9 +182,15 @@ Legenda:
 ### 03a · State + domande
 
 🎙️ **VOCE**:
-> Prendiamo uno di questi casi: lo smistamento dei ticket di supporto. Usarlo è semplice. Gli mandate due cose.
+> Prendiamo uno di questi casi: lo smistamento dei ticket di supporto.
+
+⏸ 1.9s
+> Usarlo è semplice. Gli mandate due cose.
 > Uno **state**: il testo da valutare. Può essere una stringa, un oggetto JSON o un array.
 > E una o più **domande**. Tutte a scelta multipla.
+
+⏸ 4.6s
+> Il JSON di risultato contiene le 3 risposteae
 
 🎬 **ANIMAZIONE**: [`slides/03a-state-domande.html`](./slides/03a-state-domande.html). Il ticket di supporto come flusso: state e tre domande entrano in Jev in parallelo, escono tre risposte.
 
@@ -195,12 +209,17 @@ Legenda:
 🎙️ **VOCE**:
 > Ci sono tre tipi di domanda.
 > **noul**: sì o no. Vi dà la probabilità del sì.
-> **choice**: una opzione da una lista, senza un ordine. Per esempio: reparto vendite, tecnico o pagamenti.
-> **score**: una posizione su una scala ordinata. Per esempio: da "calmo" a "molto arrabbiato".
 
 🖥️ **SCHERMO**: sotto ogni card compaiono i campi che Jev restituisce ("Jev returns").
 
 🎙️ **VOCE**:
+⏸ 5.7s
+> **choice**: una opzione da una lista, senza un ordine. Per esempio: reparto vendite, tecnico o pagamenti.
+
+⏸ 11.0s
+>
+> **score**: una posizione su una scala ordinata. Per esempio: da "calmo" a "molto arrabbiato".
+>
 > Sotto ogni tipo vedete i campi che Jev vi restituisce: `noul`, `choice` o `score`, e per choice e score anche **probabilities** e **confidence**. Tra poco vediamo cosa contengono, con un esempio vero.
 
 ### 03c · La chiamata più semplice
@@ -225,12 +244,23 @@ console.log(answers.offensive.noul); // 0.80
 ```
 
 🎙️ **VOCE**:
+
+⏸ 1.6s
 > Partiamo dal caso più semplice possibile.
 > Importo il client e la funzione `noul`, e creo il client.
 > Nello state metto il testo da valutare: il commento dell'inizio, "Who taught you to code? Useless post."
 > E faccio una sola domanda, sì o no: il commento è offensivo?
 > La risposta è un numero solo: zero virgola ottanta, cioè ottanta per cento di probabilità che la risposta sia sì.
 > Tutto qui: uno state, una domanda, un numero. Adesso vediamo cosa succede con più domande insieme.
+
+⏸ 4.3s
+> wefew
+
+⏸ 5.9s
+> wqqwdwq
+
+⏸ 15.0s
+>
 
 ✂️ Valore verificato a ottobre 2026 su `/1-jev/demo1` (0.79–0.81): ricontrollarlo prima di registrare.
 
@@ -260,6 +290,7 @@ const { answers } = await client.systemOne({
 ```
 
 🎙️ **VOCE**:
+⏸ 3.6s
 > Prendiamo un ticket di supporto: "I was charged twice for my payment, reply by today", cioè "mi hanno addebitato il pagamento due volte, rispondete entro oggi".
 > Con una sola chiamata gli chiedo tre cose: a quale reparto mandarlo, quanto è frustrato il cliente, e se è urgente.
 
@@ -272,8 +303,9 @@ answers.urgent.noul;         // 0.92
 ```
 
 🎙️ **VOCE**:
+⏸ 6.5s
 > Reparto: billing. E notate che in TypeScript è tipizzato: è una union delle opzioni che ho scritto io.
-> Frustrazione: uno virgola zero quattro, cioè "frustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
+> Frustrazione: uno virgola zero quattro, cioè "ƒfrustrato ma educato". È una media pesata dei livelli, quindi in altri casi può cadere anche a metà tra due livelli.
 > Urgente: novantadue per cento.
 
 ### 03e · noul

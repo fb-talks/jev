@@ -3,7 +3,9 @@
 Used by the `anim-slide-new` and `anim-slide-edit` skills. Paths below are relative to this folder
 (`anim-slides-shared/`) unless they start with `<deck>/`.
 
-A **deck** is a folder of slides plus a `_shared/` folder with the runtime. Each slide is a
+A **deck** is a folder of slides plus a `_shared/` folder with its settings. The runtime is **one shared engine**,
+`docs/_engine/` (`anim.js`, `anim.css`, `draw.js`), loaded by every deck: a change there reaches all decks, present
+and future, so never copy the runtime into a deck. Each slide is a
 self-contained HTML page with a CSS-only animation, used as the screen for one section of a video script.
 
 ## Finding things in the project
@@ -20,15 +22,18 @@ self-contained HTML page with a CSS-only animation, used as the screen for one s
 | File | Role |
 |---|---|
 | `<deck>/NN-name.html` | One slide. `NN` orders the deck (`05a`, `05b`… for sub-steps). Follow the deck's existing naming and on-screen language. |
-| `<deck>/_shared/anim.css` | Design tokens, 1920×1080 `.frame`, building blocks, replay button. **Live copy** for that deck. |
-| `<deck>/_shared/anim.js` | Scaling, play-once + replay, keyboard, **slide order** (`slides` array). **Live copy** for that deck. |
-| `assets/anim.css`, `assets/anim.js` | Starter runtime, copied into `<deck>/_shared/` when creating a new deck. |
+| `docs/_engine/anim.js` | The runtime of every deck: scaling, play-once + replay, stops, keyboard, speaker notes and their editor, options (Export PDF). |
+| `docs/_engine/anim.css` | Design tokens, 1920×1080 `.frame`, building blocks, controls. Shared by every deck. |
+| `docs/_engine/draw.js` | Drawing toolbar (D), loaded by anim.js. |
+| `<deck>/_shared/anim.js` | The deck's settings only: **slide order** (`slides` array) and `SCRIPT` (its speaker notes), then it loads the engine. |
+| `<deck>/_shared/anim.css` | Imports the engine's anim.css; below it, styles for that deck only (usually none). |
+| `assets/anim.css`, `assets/anim.js` | Starters for a new deck's `_shared/` (settings + engine import). |
 | `template.html` | Starting point for a new slide (copy into the deck folder). |
 | `scripts/serve.mjs` | Local server for the decks (`npm run slides` → http://localhost:3210/, serves `docs/`): no caching, URLs keep `.html` (clean-URL servers like `npx serve` break the navigation). |
 | `scripts/snap.mjs` | Screenshots slides at chosen points of their timeline (verification). |
 | `scripts/export.mjs` | Exports slides as MP4 (frame by frame, 0 → 94%, then holds the last frame) and PNG stills, controls hidden. Output in `<deck>/_export/` (git-ignored). |
 
-When changing the runtime in a deck, ask whether the starter in `assets/` should get the same change.
+Runtime changes go in `docs/_engine/`, never in a deck's `_shared/`. `.github/pages/build.mjs` publishes `docs/_engine/` next to the decks.
 
 ## Runtime behaviour (anim.js)
 

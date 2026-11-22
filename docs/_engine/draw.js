@@ -4,6 +4,9 @@
 //   Tools: pen (B) · ellipse (E: dashed guide, then drawn like a pen) · spotlight (S: the rest dims and blurs) · arrow (A)
 //   Esc = pointer tool, out of drawing mode: clicks reach the slide again
 //   1–5 = color · Z (or ⌘/Ctrl+Z) = undo · Delete / Backspace = clear the slide
+//   The toolbar shows the tools, the timer, the color (its button opens the 5 colors beside the toolbar) and close;
+//   the arrow below opens, beside it, undo, clear, the options (anim.js: Export PDF) and a switch that turns off
+//   every keyboard shortcut of the toolbar (O too)
 //   T = timer (on by default): each shape fades out 4s after it is drawn; off, shapes stay until Delete
 // Drawings live in a layer outside .frame, so they are not paused or replayed with the slide; they last
 // until the page changes (or the timer takes them). The layer covers the whole window, so drawings can start and
@@ -227,12 +230,65 @@
     `<button class="draw-grip" data-tip="Move" aria-label="Move the toolbar">${icon('<g fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></g>')}</button>` +
     Object.entries(tools).map(([k, [name, key, d]]) => `<button data-tool="${k}" data-tip="${name} (${key})" aria-label="${name}">${icon(d)}</button>`).join("") +
     "<hr>" +
-    colors.map((c, i) => `<button class="draw-color" data-color="${i}" style="--c: ${c}" data-tip="Color ${i + 1} (${i + 1})" aria-label="Color ${i + 1}"></button>`).join("") +
-    "<hr>" +
     `<button data-act="timer" data-tip="Timer: fade after 4s (T)" aria-label="Timer">${icon('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>')}</button>` +
-    `<button data-act="undo" data-tip="Undo (Z)" aria-label="Undo">${icon('<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>')}</button>` +
-    `<button data-act="clear" data-tip="Clear (Delete)" aria-label="Clear">${icon('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')}</button>` +
-    `<button data-act="close" data-tip="Close (D)" aria-label="Close the toolbar">${icon('<path d="M6 6l12 12M18 6L6 18"/>')}</button>`;
+    `<button class="draw-swatch" data-act="colors" data-tip="Color (1–5)" aria-label="Color" aria-haspopup="true"></button>` +
+    `<button data-act="close" data-tip="Close (D)" aria-label="Close the toolbar">${icon('<path d="M6 6l12 12M18 6L6 18"/>')}</button>` +
+    `<button class="draw-chevron" data-act="menu" data-tip="More" aria-label="More" aria-haspopup="true">${icon('<path d="M15 6l-6 6 6 6"/>')}</button>`;
+  // Flyouts beside the toolbar (colors, more), vertically centered on it, on the side with room: left of the
+  // toolbar, or right of it near the left edge. On the body, not in the toolbar, which scrolls and would clip them.
+  const flyout = (el, on) => {
+    el.classList.toggle("on", on);
+    if (!on) return;
+    const r = bar.getBoundingClientRect();
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const left = r.left - w - 10 > 4;
+    el.style.left = `${left ? r.left - w - 10 : r.right + 10}px`;
+    el.style.top = `${Math.max(4, Math.min(r.top + r.height / 2 - h / 2, innerHeight - h - 4))}px`;
+    el.classList.toggle("right", !left);
+  };
+  // Colors: a vertical bar
+  const palette = document.createElement("div");
+  palette.className = "draw-palette";
+  palette.setAttribute("role", "menu");
+  palette.innerHTML = colors.map((c, i) => `<button class="draw-color" data-color="${i}" style="--c: ${c}" data-tip="Color ${i + 1} (${i + 1})" aria-label="Color ${i + 1}"><span class="draw-key">${i + 1}</span></button>`).join("");
+  // More: undo, clear, options, and the switch for the toolbar's keyboard shortcuts
+  const menu = document.createElement("div");
+  menu.className = "draw-menu";
+  menu.setAttribute("role", "menu");
+  menu.innerHTML =
+    `<button data-act="undo">${icon('<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>')}<span>Undo</span><kbd>Z</kbd></button>` +
+    `<button data-act="clear">${icon('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')}<span>Clear drawings</span><kbd>Del</kbd></button>` +
+    `<button data-act="options">${icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>')}<span>Options</span><kbd>O</kbd></button>` +
+    `<hr><label class="draw-switch"><input type="checkbox" data-act="hotkeys"><span>Keyboard shortcuts</span><i></i></label>`;
+  const showPalette = (on) => { if (on) flyout(menu, false); flyout(palette, on); };
+  const showMenu = (on) => { if (on) flyout(palette, false); flyout(menu, on); };
+  palette.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-color]");
+    if (!b) return;
+    state.color = +b.dataset.color;
+    if (!state.tool) state.tool = "pen";
+    showPalette(false);
+    render();
+  });
+  menu.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    b.blur();
+    showMenu(false);
+    if (b.dataset.act === "undo") undo();
+    else if (b.dataset.act === "clear") clear();
+    else if (b.dataset.act === "options") dispatchEvent(new CustomEvent("anim-options"));
+  });
+  menu.querySelector("[data-act=hotkeys]").addEventListener("change", (e) => { state.hotkeys = e.target.checked; render(); });
+  addEventListener("pointerdown", (e) => {
+    if (palette.classList.contains("on") && !palette.contains(e.target) && !e.target.closest?.(".draw-swatch")) showPalette(false);
+    if (menu.classList.contains("on") && !menu.contains(e.target) && !e.target.closest?.(".draw-chevron")) showMenu(false);
+  });
+  // Each button shows its shortcut, the key in brackets in its tooltip ("Pen (B)" → B)
+  bar.querySelectorAll("[data-tip]").forEach((b) => {
+    const k = b.dataset.tip.match(/\(([^)]+)\)$/)?.[1];
+    if (k) b.insertAdjacentHTML("beforeend", `<span class="draw-key">${k === "Delete" ? "Del" : k}</span>`);
+  });
   const launcher = document.createElement("button");
   launcher.className = "draw-launcher";
   launcher.dataset.tip = "Draw (D)";
@@ -241,7 +297,7 @@
   // Tooltip: one element on the body, left of the hovered button (the bar scrolls, so it cannot hold it)
   const tip = document.createElement("div");
   tip.className = "draw-tip";
-  document.body.append(bar, launcher, tip);
+  document.body.append(bar, launcher, tip, palette, menu);
   const showTip = (e) => {
     const b = e.target.closest?.("[data-tip]");
     if (!b) return tip.classList.remove("on");
@@ -254,7 +310,7 @@
     tip.style.top = `${r.top + r.height / 2}px`;
     tip.classList.add("on");
   };
-  for (const el of [bar, launcher]) {
+  for (const el of [bar, launcher, palette]) {
     el.addEventListener("pointerover", showTip);
     el.addEventListener("pointerleave", () => tip.classList.remove("on"));
   }
@@ -263,9 +319,13 @@
   const place = () => {
     if (!state.pos) return;
     const w = bar.offsetWidth || 56, h = bar.offsetHeight || 0;
-    const x = Math.max(4, Math.min(state.pos.x, innerWidth - w - 4));
+    // Not over the notes panel when it sits on the right (--notes-w, set by anim.js)
+    const notesW = parseFloat(getComputedStyle(root).getPropertyValue("--notes-w")) || 0;
+    const x = Math.max(4, Math.min(state.pos.x, innerWidth - notesW - w - 4));
     const y = Math.max(4, Math.min(state.pos.y, innerHeight - Math.min(h, 120) - 4));
     for (const el of [bar, launcher]) Object.assign(el.style, { left: `${x}px`, top: `${y}px`, right: "auto", transform: "none" });
+    // Near the left edge the flyouts open on the right: the arrow points there
+    bar.classList.toggle("at-left", x < 220);
   };
   const grip = bar.querySelector(".draw-grip");
   grip.addEventListener("pointerdown", (e) => {
@@ -281,6 +341,7 @@
     grip.addEventListener("pointercancel", up, { once: true });
   });
   addEventListener("resize", place);
+  addEventListener("anim-layout", place);
 
   const penCursor = (c) =>
     `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="${NS}" width="16" height="16"><circle cx="8" cy="8" r="5" fill="${c}" stroke="white" stroke-width="2"/></svg>`)}") 8 8, crosshair`;
@@ -291,7 +352,13 @@
     root.classList.toggle("drawing", !!tool);
     bar.style.setProperty("--draw-color", colors[state.color]);
     bar.querySelectorAll("[data-tool]").forEach((b) => b.classList.toggle("on", b.dataset.tool === tool));
-    bar.querySelectorAll("[data-color]").forEach((b) => b.classList.toggle("on", +b.dataset.color === state.color));
+    palette.querySelectorAll("[data-color]").forEach((b) => b.classList.toggle("on", +b.dataset.color === state.color));
+    bar.querySelector(".draw-swatch").style.setProperty("--c", colors[state.color]);
+    if (!state.open) { showPalette(false); showMenu(false); }
+    // Shortcuts off: no key does anything to the toolbar, and the buttons stop showing them
+    const hotkeys = state.hotkeys !== false;
+    root.classList.toggle("draw-no-keys", !hotkeys);
+    menu.querySelector("[data-act=hotkeys]").checked = hotkeys;
     const timerBtn = bar.querySelector('[data-act="timer"]');
     timerBtn.classList.toggle("on", state.timer);
     timerBtn.setAttribute("aria-pressed", state.timer);
@@ -318,10 +385,9 @@
     if (!b || b === grip) return;
     b.blur();
     if (b.dataset.tool !== undefined) setTool(b.dataset.tool);
-    else if (b.dataset.color) { state.color = +b.dataset.color; if (!state.tool) state.tool = "pen"; render(); }
+    else if (b.dataset.act === "colors") showPalette(!palette.classList.contains("on"));
+    else if (b.dataset.act === "menu") showMenu(!menu.classList.contains("on"));
     else if (b.dataset.act === "timer") setTimer(!state.timer);
-    else if (b.dataset.act === "undo") undo();
-    else if (b.dataset.act === "clear") clear();
     else if (b.dataset.act === "close") setOpen(false);
   });
   launcher.addEventListener("click", () => { launcher.blur(); setOpen(true); });
@@ -329,6 +395,8 @@
   addEventListener("keydown", (e) => {
     if (e.altKey || e.target.closest?.("textarea, input")) return;
     const k = e.key.toLowerCase();
+    if (k === "escape") { showPalette(false); showMenu(false); }
+    if (state.hotkeys === false) return;
     if (k === "z" && !e.shiftKey) { if (e.metaKey || e.ctrlKey) e.preventDefault(); return undo(); }
     if (e.metaKey || e.ctrlKey) return;
     if (k === "d") setOpen(!state.open);

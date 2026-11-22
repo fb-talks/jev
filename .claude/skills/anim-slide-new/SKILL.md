@@ -31,7 +31,9 @@ Read `../anim-slides-shared/REFERENCE.md` first, every time: page contract, time
 
 ## New deck
 
-1. Create the folder and copy `../anim-slides-shared/assets/anim.css` and `anim.js` into `<deck>/_shared/`.
+1. Create the folder and copy `../anim-slides-shared/assets/anim.css` and `anim.js` into `<deck>/_shared/`: they hold
+   the deck's settings and load the shared engine `docs/_engine/` (fix the `../../../_engine/` path if the deck is not
+   at `docs/<name>/slides/`). Set `SCRIPT` to the deck's script. Never copy the engine itself into the deck.
 2. Then create each slide with the workflow above; the `slides` array starts empty.
 
 ## Verify

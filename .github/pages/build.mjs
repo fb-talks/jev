@@ -1,5 +1,5 @@
 // Builds the GitHub Pages site in _site/: every deck in docs/, at any depth (a folder with _shared/anim.js),
-// is copied as is at the same path, plus an index.html that lists its slides in the order set in anim.js.
+// is copied as is at the same path, with the shared engine docs/_engine/ that the decks load, plus an index.html that lists its slides in the order set in anim.js.
 // The video script named by `const SCRIPT` in anim.js (speaker notes) is copied too, at the same relative path.
 //   node .github/pages/build.mjs
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -12,6 +12,8 @@ const escape = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", 
 
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT);
+// The shared engine (anim.js, anim.css, draw.js) that every deck's _shared/anim.js loads, at the same path
+cpSync(join(DOCS, "_engine"), join(OUT, "_engine"), { recursive: true });
 
 // e.g. docs/video-talk/slides/_shared/anim.js → the deck "video-talk/slides"
 const decks = readdirSync(DOCS, { recursive: true })

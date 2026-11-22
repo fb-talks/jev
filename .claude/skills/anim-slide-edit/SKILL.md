@@ -1,6 +1,6 @@
 ---
 name: anim-slide-edit
-description: Modifies existing animated HTML slides of a video deck (CSS-only 1920×1080 pages sharing _shared/anim.css and _shared/anim.js): text, layout, timing, keyframes, colors, shared styles, playback or keyboard controls. Use when the user asks to change, fix, retime, restyle, reorder or remove a slide or animation, or reports something wrong in one.
+description: Modifies existing animated HTML slides of a video deck (CSS-only 1920×1080 pages sharing the engine in docs/_engine/ through _shared/anim.css and _shared/anim.js): text, layout, timing, keyframes, colors, shared styles, playback or keyboard controls. Use when the user asks to change, fix, retime, restyle, reorder or remove a slide or animation, or reports something wrong in one.
 ---
 
 # Edit animated slides
@@ -15,8 +15,8 @@ Read `../anim-slides-shared/REFERENCE.md` first, every time: page contract, time
    the Timeline comment tells you which percentages each beat uses.
 2. **Decide the scope.**
    - One slide only → edit that file.
-   - Same look/behaviour on every slide → edit `<deck>/_shared/anim.css` or `anim.js`, never copy into
-     each page; then ask whether the starter in `../anim-slides-shared/assets/` should change too.
+   - Same look/behaviour on every slide → edit the shared engine `docs/_engine/anim.css` or `anim.js` (it reaches
+     every deck); only a style for one deck goes below the import in `<deck>/_shared/anim.css`. Never copy into each page.
    - Same text repeated across slides (a label, a price) → `grep -rn` and change every occurrence,
      including the video script and related notes if they say the same thing.
 3. **Edit, keeping the timeline consistent.**
