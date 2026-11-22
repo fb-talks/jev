@@ -111,7 +111,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .notes-right .notes-head { flex-wrap: wrap; row-gap: 10px; }
 .notes-right .notes-head-tl { order: 1; flex-basis: 100%; }
 /* Preview and Save on the left of the first row, ⋮, the side and ✕ on the right */
-.notes-right .notes-more { margin-left: auto; }
+.notes-right .notes-head-save { margin-right: auto; }
+.notes-details[hidden] { display: none; }
 .notes-head-tl:empty { margin: 0; }
 .notes-place {
   display: grid; place-items: center; width: 34px; height: 30px; padding: 0; border-radius: 8px; cursor: pointer;
@@ -128,7 +129,6 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 }
 .notes-place-menu[hidden] { display: none; }
 .notes-place-item[hidden] { display: none; }
-.slide-details-item { margin-top: 4px; border-top: 1px solid #eef0f4; border-radius: 0 0 8px 8px; }
 /* ⋮ → Slide details: label and title of the slide, in a small panel under the ⋮ */
 .slide-details {
   position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; width: 340px; display: grid; gap: 10px; padding: 14px;
@@ -142,6 +142,8 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #fafbff; }
 .slide-details input:focus { outline: 2px solid var(--pink); outline-offset: -1px; }
 .slide-details-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .slide-details .notes-status { color: #6b7280; font-size: 12px; }
+.slide-details.no-kicker label, .slide-details.no-kicker .save { display: none; }
+.slide-details.no-kicker .notes-status { flex-basis: 100%; order: -1; line-height: 1.4; }
 .notes-place-item {
   display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: 0; border-radius: 8px;
   background: none; color: var(--ink); font: 500 14px var(--sans); text-align: left; cursor: pointer;

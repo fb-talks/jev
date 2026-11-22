@@ -50,6 +50,12 @@ const slides = [
   "10h-demo.html",
 ];
 
+// Slides kept out of the talk without deleting them (set from ⋮ in the notes or in the slide list):
+// "draft" = shown with a DRAFT badge; "hidden" = skipped by ← / →, the numbering and the export, only in the slide list
+const slideStatus = {
+  "10h-demo.html": "hidden",
+};
+
 // Speaker notes and slide titles: for each slide, the section of this script that holds its 🎬 link
 const SCRIPT = "../01-intro-jev-video-script.md";
 

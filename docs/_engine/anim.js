@@ -384,7 +384,7 @@ const headClose = Object.assign(document.createElement("button"), { className: "
 headClose.setAttribute("aria-label", "Close the notes");
 headClose.addEventListener("click", () => { headClose.blur(); setNotes(false); });
 const headTimeline = Object.assign(document.createElement("div"), { className: "notes-head-tl" });
-// ⋮ opens a dropdown: Slide details, Export, Status
+// ⋮ opens a dropdown: Export, Status (the gear next to it: Slide details)
 const placeWrap = Object.assign(document.createElement("div"), { className: "notes-more" });
 const placeToggle = Object.assign(document.createElement("button"), { className: "notes-place notes-dots", title: "More" });
 placeToggle.setAttribute("aria-label", "More");
@@ -394,14 +394,16 @@ const placeMenu = Object.assign(document.createElement("div"), { className: "not
 placeMenu.setAttribute("role", "menu");
 placeToggle.addEventListener("click", () => {
   placeToggle.blur();
-  detailsItem.hidden = !(dev && document.querySelector(".kicker"));
   details.hidden = true;
   statusGroup.hidden = !dev;
   if (dev) statusGroup.replaceChildren(...statusItems(file, () => { placeMenu.hidden = true; }));
   placeMenu.hidden = !placeMenu.hidden;
 });
-addEventListener("pointerdown", (e) => { if (!placeWrap.contains(e.target)) placeMenu.hidden = details.hidden = true; });
-// Slide details (⋮ → Slide details, with npm run slides): the small label and the title at the top left of
+addEventListener("pointerdown", (e) => {
+  if (!placeWrap.contains(e.target)) placeMenu.hidden = true;
+  if (!detailsWrap.contains(e.target)) details.hidden = true;
+});
+// Slide details (the gear in the notes head, with npm run slides): the small label and the title at the top left of
 // the slide (its .kicker), saved into the slide's .html; the <title> of the page follows the title
 const details = Object.assign(document.createElement("form"), { className: "slide-details", hidden: true });
 details.innerHTML = '<b>Slide details</b>'
@@ -409,9 +411,10 @@ details.innerHTML = '<b>Slide details</b>'
   + '<label>Title<input name="title" autocomplete="off" required></label>'
   + '<div class="slide-details-actions"><button class="notes-btn save">Save</button>'
   + '<button type="button" class="notes-btn cancel">Cancel</button><span class="notes-status"></span></div>';
-const detailsItem = Object.assign(document.createElement("button"), { className: "notes-place-item slide-details-item", hidden: true });
-detailsItem.setAttribute("role", "menuitem");
-detailsItem.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 11h10M4 16h7"/></svg><span>Slide details</span>';
+const detailsWrap = Object.assign(document.createElement("div"), { className: "notes-more notes-details", hidden: true });
+const detailsItem = Object.assign(document.createElement("button"), { className: "notes-place notes-gear", title: "Slide details: label and title" });
+detailsItem.setAttribute("aria-label", "Slide details");
+detailsItem.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>';
 const field = (name) => details.querySelector(`[name="${name}"]`);
 const KICKER = /<div class="kicker">(?:<small>([\s\S]*?)<\/small>)?([\s\S]*?)<\/div>/;
 const kickerParts = () => {
@@ -421,7 +424,19 @@ const kickerParts = () => {
   return { k, small, label: small?.textContent.trim() || "", title };
 };
 detailsItem.addEventListener("click", () => {
+  detailsItem.blur();
   placeMenu.hidden = true;
+  if (!details.hidden) { details.hidden = true; return; }
+  // A slide with its own layout (cover, title, speakers…) has no label + title at the top left: say so
+  const none = !document.querySelector(".kicker");
+  details.classList.toggle("no-kicker", none);
+  details.querySelectorAll("input, .save").forEach((el) => (el.disabled = none));
+  if (none) {
+    field("label").value = field("title").value = "";
+    details.querySelector(".notes-status").textContent = "This slide has its own layout, without the label and title at the top left: change its text in the .html.";
+    details.hidden = false;
+    return;
+  }
   const { label, title } = kickerParts();
   field("label").value = label;
   field("title").value = title;
@@ -462,16 +477,17 @@ details.addEventListener("submit", (e) => {
       : err === "kicker" ? "No kicker found in the slide's .html." : "Not saved: is npm run slides running (restarted)?";
   });
 });
-placeWrap.append(placeToggle, placeMenu, details);
+placeWrap.append(placeToggle, placeMenu);
+detailsWrap.append(detailsItem, details);
 const headPreview = Object.assign(document.createElement("button"), { className: "notes-btn notes-head-preview", textContent: "Preview", title: "Back to the notes as you read them while presenting (saves first)" });
 headPreview.addEventListener("click", () => { headPreview.blur(); previewEdit?.(); });
-notes.querySelector(".notes-head").append(headTimeline, headPreview, headSave, placeWrap, sideToggle, headClose);
+notes.querySelector(".notes-head").append(headTimeline, headPreview, headSave, detailsWrap, placeWrap, sideToggle, headClose);
 // ⋮ → Export: the same panel as O and the toolbar's gear
 const exportItem = Object.assign(document.createElement("button"), { className: "notes-place-item" });
 exportItem.setAttribute("role", "menuitem");
 exportItem.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg><span>Export</span>';
 exportItem.addEventListener("click", () => { exportItem.blur(); placeMenu.hidden = true; showOptions(true); });
-placeMenu.append(detailsItem, exportItem);
+placeMenu.append(exportItem);
 // ⋮ → Status (with npm run slides): Normal, Draft or Hidden for this slide, the same as ⋮ in the slide list
 const statusGroup = Object.assign(document.createElement("div"), { className: "status-group", hidden: true });
 placeMenu.append(statusGroup);
@@ -662,6 +678,7 @@ const loadNotes = () => fetch(SCRIPT, { cache: "no-store" })
   .then((r) => {
     dev = r.headers.has("X-Slides-Dev");
     menu.classList.toggle("dev", dev);
+    detailsWrap.hidden = !dev;
     return r.ok ? r.text() : Promise.reject(r.status);
   })
   .then((md) => {
