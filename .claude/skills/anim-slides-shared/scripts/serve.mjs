@@ -2,7 +2,7 @@
 //   node serve.mjs [dir] [--port 3210]      (dir defaults to docs)
 // URLs keep their .html: anim.js finds the current slide from the file name, so no clean-URL redirects.
 // Dev mode: every response carries X-Slides-Dev, which makes the speaker notes editable in anim.js, and
-// POST /__notes saves an edited section back into the script .md, and POST /__pdf renders the Export PDF of
+// POST /__notes saves an edited section back into the script .md (or the slide's kicker into its .html), and POST /__pdf renders the Export PDF of
 // the options (anim.js) with headless Chrome ($CHROME overrides the macOS default path). Listens on localhost only.
 import http from "node:http";
 import fs from "node:fs";
@@ -40,7 +40,7 @@ const saveNotes = (req, res) => {
     try {
       const { path: p, original, updated } = JSON.parse(body);
       const file = path.join(root, decodeURIComponent(p));
-      if (!inside(file) || path.extname(file) !== ".md" || typeof original !== "string" || typeof updated !== "string" || !original) {
+      if (!inside(file) || ![".md", ".html"].includes(path.extname(file)) || typeof original !== "string" || typeof updated !== "string" || !original) {
         return res.writeHead(400, headers).end();
       }
       const md = fs.readFileSync(file, "utf8");

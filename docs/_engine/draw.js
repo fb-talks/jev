@@ -1,6 +1,7 @@
 // Drawing toolbar over the slide, for presenting live. Loaded by anim.js (not in the notes window).
-//   D = open / close the toolbar (open state, tool, color and position are remembered across slides)
-//   The grip at the top of the toolbar drags it anywhere in the window
+//   D = open / close the toolbar (open state, tool, color and place are remembered across slides)
+//   It sits top right, next to the notes panel or the window edge; the ‹ menu can put it at the bottom
+//   center instead (between the slide number and the notes button), laid out in a row
 //   Tools: pen (B) · ellipse (E: dashed guide, then drawn like a pen) · spotlight (S: the rest dims and blurs) · arrow (A)
 //   Esc = pointer tool, out of drawing mode: clicks reach the slide again
 //   1–5 = color · Z (or ⌘/Ctrl+Z) = undo · Delete / Backspace = clear the slide
@@ -227,24 +228,31 @@
   bar.setAttribute("role", "toolbar");
   bar.setAttribute("aria-label", "Draw on the slide");
   bar.innerHTML =
-    `<button class="draw-grip" data-tip="Move" aria-label="Move the toolbar">${icon('<g fill="currentColor" stroke="none"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></g>')}</button>` +
+    // A small ✕ in the corner
+    '<div class="draw-top">' +
+    `<button class="draw-x" data-act="close" data-tip="Close (D)" aria-label="Close the toolbar">${icon('<path d="M7 7l10 10M17 7L7 17"/>')}</button>` +
+    "</div>" +
     Object.entries(tools).map(([k, [name, key, d]]) => `<button data-tool="${k}" data-tip="${name} (${key})" aria-label="${name}">${icon(d)}</button>`).join("") +
     "<hr>" +
     `<button data-act="timer" data-tip="Timer: fade after 4s (T)" aria-label="Timer">${icon('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/>')}</button>` +
     `<button class="draw-swatch" data-act="colors" data-tip="Color (1–5)" aria-label="Color" aria-haspopup="true"></button>` +
-    `<button data-act="close" data-tip="Close (D)" aria-label="Close the toolbar">${icon('<path d="M6 6l12 12M18 6L6 18"/>')}</button>` +
     `<button class="draw-chevron" data-act="menu" data-tip="More" aria-label="More" aria-haspopup="true">${icon('<path d="M15 6l-6 6 6 6"/>')}</button>`;
-  // Flyouts beside the toolbar (colors, more), vertically centered on it, on the side with room: left of the
-  // toolbar, or right of it near the left edge. On the body, not in the toolbar, which scrolls and would clip them.
-  const flyout = (el, on) => {
+  // Flyouts (colors, more) next to the button that opens them: left of it with the toolbar on the right,
+  // above it with the toolbar at the bottom. On the body, not in the toolbar, which scrolls and would clip them.
+  const bottom = () => state.dock === "bottom";
+  const flyout = (el, on, anchor) => {
     el.classList.toggle("on", on);
     if (!on) return;
-    const r = bar.getBoundingClientRect();
+    const b = anchor.getBoundingClientRect(), r = bar.getBoundingClientRect();
     const w = el.offsetWidth, h = el.offsetHeight;
-    const left = r.left - w - 10 > 4;
-    el.style.left = `${left ? r.left - w - 10 : r.right + 10}px`;
-    el.style.top = `${Math.max(4, Math.min(r.top + r.height / 2 - h / 2, innerHeight - h - 4))}px`;
-    el.classList.toggle("right", !left);
+    el.classList.toggle("up", bottom());
+    if (bottom()) {
+      el.style.left = `${Math.max(4, Math.min(b.left + b.width / 2 - w / 2, innerWidth - w - 4))}px`;
+      el.style.top = `${r.top - h - 10}px`;
+    } else {
+      el.style.left = `${Math.max(4, r.left - w - 10)}px`;
+      el.style.top = `${Math.max(4, Math.min(b.top + b.height / 2 - h / 2, innerHeight - h - 4))}px`;
+    }
   };
   // Colors: a vertical bar
   const palette = document.createElement("div");
@@ -259,9 +267,10 @@
     `<button data-act="undo">${icon('<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/>')}<span>Undo</span><kbd>Z</kbd></button>` +
     `<button data-act="clear">${icon('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>')}<span>Clear drawings</span><kbd>Del</kbd></button>` +
     `<button data-act="options">${icon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/>')}<span>Options</span><kbd>O</kbd></button>` +
-    `<hr><label class="draw-switch"><input type="checkbox" data-act="hotkeys"><span>Keyboard shortcuts</span><i></i></label>`;
-  const showPalette = (on) => { if (on) flyout(menu, false); flyout(palette, on); };
-  const showMenu = (on) => { if (on) flyout(palette, false); flyout(menu, on); };
+    `<hr><label class="draw-switch"><input type="checkbox" data-act="hotkeys"><span>Keyboard shortcuts</span><i></i></label>` +
+    `<label class="draw-switch"><input type="checkbox" data-act="dock"><span>Toolbar at the bottom</span><i></i></label>`;
+  const showPalette = (on) => { if (on) flyout(menu, false); flyout(palette, on, bar.querySelector(".draw-swatch")); };
+  const showMenu = (on) => { if (on) flyout(palette, false); flyout(menu, on, bar.querySelector(".draw-chevron")); };
   palette.addEventListener("click", (e) => {
     const b = e.target.closest("[data-color]");
     if (!b) return;
@@ -280,12 +289,17 @@
     else if (b.dataset.act === "options") dispatchEvent(new CustomEvent("anim-options"));
   });
   menu.querySelector("[data-act=hotkeys]").addEventListener("change", (e) => { state.hotkeys = e.target.checked; render(); });
+  menu.querySelector("[data-act=dock]").addEventListener("change", (e) => {
+    state.dock = e.target.checked ? "bottom" : "right";
+    showMenu(false);
+    render();
+  });
   addEventListener("pointerdown", (e) => {
     if (palette.classList.contains("on") && !palette.contains(e.target) && !e.target.closest?.(".draw-swatch")) showPalette(false);
     if (menu.classList.contains("on") && !menu.contains(e.target) && !e.target.closest?.(".draw-chevron")) showMenu(false);
   });
   // Each button shows its shortcut, the key in brackets in its tooltip ("Pen (B)" → B)
-  bar.querySelectorAll("[data-tip]").forEach((b) => {
+  bar.querySelectorAll("[data-tip]:not(.draw-x)").forEach((b) => {
     const k = b.dataset.tip.match(/\(([^)]+)\)$/)?.[1];
     if (k) b.insertAdjacentHTML("beforeend", `<span class="draw-key">${k === "Delete" ? "Del" : k}</span>`);
   });
@@ -303,11 +317,11 @@
     if (!b) return tip.classList.remove("on");
     const r = b.getBoundingClientRect();
     tip.textContent = b.dataset.tip;
-    // Left of the button, or right of it when the toolbar sits near the left edge
-    const left = r.left > 220;
-    tip.style.left = left ? "" : `${r.right + 10}px`;
-    tip.style.right = left ? `${innerWidth - r.left + 10}px` : "";
-    tip.style.top = `${r.top + r.height / 2}px`;
+    // Left of the button, or above it with the toolbar at the bottom
+    tip.classList.toggle("up", bottom());
+    tip.style.left = bottom() ? `${r.left + r.width / 2}px` : "";
+    tip.style.right = bottom() ? "" : `${innerWidth - r.left + 10}px`;
+    tip.style.top = bottom() ? `${r.top - 10}px` : `${r.top + r.height / 2}px`;
     tip.classList.add("on");
   };
   for (const el of [bar, launcher, palette]) {
@@ -315,31 +329,13 @@
     el.addEventListener("pointerleave", () => tip.classList.remove("on"));
   }
 
-  // ---------- Moving the toolbar: drag the grip; the launcher takes the same spot ----------
+  // ---------- Place: top right (next to the notes on the right, or the window edge) or bottom center; CSS does
+  // the rest (--notes-w / --notes-h from anim.js). Open flyouts follow.
+  delete state.pos;
   const place = () => {
-    if (!state.pos) return;
-    const w = bar.offsetWidth || 56, h = bar.offsetHeight || 0;
-    // Not over the notes panel when it sits on the right (--notes-w, set by anim.js)
-    const notesW = parseFloat(getComputedStyle(root).getPropertyValue("--notes-w")) || 0;
-    const x = Math.max(4, Math.min(state.pos.x, innerWidth - notesW - w - 4));
-    const y = Math.max(4, Math.min(state.pos.y, innerHeight - Math.min(h, 120) - 4));
-    for (const el of [bar, launcher]) Object.assign(el.style, { left: `${x}px`, top: `${y}px`, right: "auto", transform: "none" });
-    // Near the left edge the flyouts open on the right: the arrow points there
-    bar.classList.toggle("at-left", x < 220);
+    root.classList.toggle("draw-bottom", bottom());
+    for (const [el, show, a] of [[palette, showPalette], [menu, showMenu]]) if (el.classList.contains("on")) show(true);
   };
-  const grip = bar.querySelector(".draw-grip");
-  grip.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0) return;
-    e.preventDefault();
-    grip.setPointerCapture(e.pointerId);
-    const r = bar.getBoundingClientRect();
-    const dx = e.clientX - r.left, dy = e.clientY - r.top;
-    const move = (ev) => { state.pos = { x: ev.clientX - dx, y: ev.clientY - dy }; place(); tip.classList.remove("on"); };
-    const up = () => { grip.removeEventListener("pointermove", move); save(); };
-    grip.addEventListener("pointermove", move);
-    grip.addEventListener("pointerup", up, { once: true });
-    grip.addEventListener("pointercancel", up, { once: true });
-  });
   addEventListener("resize", place);
   addEventListener("anim-layout", place);
 
@@ -359,6 +355,7 @@
     const hotkeys = state.hotkeys !== false;
     root.classList.toggle("draw-no-keys", !hotkeys);
     menu.querySelector("[data-act=hotkeys]").checked = hotkeys;
+    menu.querySelector("[data-act=dock]").checked = bottom();
     const timerBtn = bar.querySelector('[data-act="timer"]');
     timerBtn.classList.toggle("on", state.timer);
     timerBtn.setAttribute("aria-pressed", state.timer);
@@ -382,7 +379,7 @@
 
   bar.addEventListener("click", (e) => {
     const b = e.target.closest("button");
-    if (!b || b === grip) return;
+    if (!b) return;
     b.blur();
     if (b.dataset.tool !== undefined) setTool(b.dataset.tool);
     else if (b.dataset.act === "colors") showPalette(!palette.classList.contains("on"));

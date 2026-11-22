@@ -11,7 +11,7 @@
 //   → / PageDown or Space to go on (→ while a step is playing jumps to the end of that step)
 //   H = hide / show the on-screen controls (slide number, play button), remembered across slides
 //   N = open / close the speaker notes (bottom or right panel: the two buttons in the dock) · click the slide number = jump to any slide
-//   Slides with stops show one square per step, bottom right: grey = on screen, pink = still to come
+//   Slides with stops show one square per step, bottom right: pink = on screen, grey = still to come
 //   P = open the speaker notes in their own window (e.g. a second monitor), kept in sync with the slides
 //   D = drawing toolbar over the slide: pen, ellipse, spotlight, arrow (see draw.js)
 //   O (or the gear in the drawing toolbar) = options: Export PDF, every slide at its last frame, with or without notes
@@ -90,13 +90,10 @@ const holdAt = (time) => {
   held = true;
   nextStop++;
   seek(time, once());
-  replay.classList.remove("show");
-  hint.classList.add("show");
 };
 const proceed = () => {
   if (held) {
     held = false;
-    hint.classList.remove("show");
     once().forEach((a) => a.play());
     return true;
   }
@@ -104,7 +101,6 @@ const proceed = () => {
   if (!ended && nextStop < stops.length) {
     const time = stops[nextStop++] * loop;
     once().forEach((a) => { a.currentTime = time; a.play(); });
-    replay.classList.remove("show");
     return true;
   }
   return false;
@@ -114,28 +110,15 @@ const togglePause = () => {
   animations().forEach((a) => (running ? a.pause() : a.play()));
 };
 
-const replay = document.createElement("button");
-replay.className = "replay";
-replay.setAttribute("aria-label", "Play again");
-replay.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
-document.body.append(replay);
-
+// No play-again button: once a slide ends, Space or R plays it again
 const restart = () => {
   ended = false;
   held = false;
   nextStop = 0;
-  hint?.classList.remove("show");
-  replay.classList.remove("show");
   animations().forEach((a) => { a.currentTime = 0; a.play(); });
 };
-replay.addEventListener("click", restart);
 
-// Shown while the slide waits at a stop
-const hint = document.createElement("div");
-hint.className = "stop-hint";
-hint.setAttribute("aria-hidden", "true");
-hint.innerHTML = '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>';
-document.body.append(hint);
+// A click on the slide goes on to the next step (the squares bottom right show where it is)
 frame.addEventListener("click", (e) => { if (stops.length && !e.target.closest("a, button")) proceed(); });
 
 // Links marked data-next (e.g. the cover's Start button) open the next slide in the deck
@@ -154,7 +137,10 @@ const index = slides.indexOf(file);
 badge.textContent = prefix(file) + (index === -1 ? "" : ` · ${index + 1} / ${slides.length}`);
 const notesToggle = document.createElement("button");
 notesToggle.className = "notes-toggle";
-notesToggle.textContent = "Notes";
+// An icon (a page with lines); hidden while the notes are open, the panel has its own ✕
+notesToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>';
+notesToggle.title = "Speaker notes (N)";
+notesToggle.setAttribute("aria-label", "Speaker notes");
 const notesWindow = document.createElement("button");
 notesWindow.className = "notes-window";
 notesWindow.textContent = "↗";
@@ -176,18 +162,51 @@ const placeButton = (right) => {
   });
   return b;
 };
-dock.append(badge, notesToggle, notesWindow);
+dock.append(badge);
+// Bottom right: Notes and ↗ (the notes in their own window)
+const dockRight = Object.assign(document.createElement("div"), { className: "dock dock-right" });
+// In the notes window only: put the notes back into the slides window (and close this one)
+const notesBack = Object.assign(document.createElement("button"), { className: "notes-back", textContent: "⇲ Back to the slides window" });
+notesBack.title = "Close this window and open the notes in the slides window";
+dockRight.append(notesToggle, notesWindow, notesBack);
 
 const menu = document.createElement("nav");
 menu.className = "slide-menu";
 const slideTitle = (f) => f.replace(/^[^-]+-/, "").replace(/\.html$/, "").replaceAll("-", " ");
-menu.innerHTML = slides
+const current = (f) => (f === file ? ' class="current" aria-current="page"' : "");
+// Two views, switched from the sticky buttons on top (remembered): a list, or cards three to a row with a
+// preview of each slide (its last frame, ?still, loaded as it scrolls into view)
+menu.innerHTML = '<div class="menu-head"><button data-view="list">List</button><button data-view="cards">Cards</button></div>'
+  + '<div class="menu-list">' + slides
   // Position in the deck (what the presenter says and the badge counts), then the file prefix
-  .map((f, i) => `<a href="${f}"${f === file ? ' class="current" aria-current="page"' : ""}><b class="slide-n">${i + 1}</b><code>${prefix(f)}</code><span>${slideTitle(f)}</span></a>`)
-  .join("");
+  .map((f, i) => `<a href="${f}"${current(f)}><b class="slide-n">${i + 1}</b><code>${prefix(f)}</code><span>${slideTitle(f)}</span></a>`)
+  .join("") + '</div><div class="menu-cards"></div>';
+const VIEW = "anim-menu-view";
+let menuView = "list";
+try { menuView = localStorage.getItem(VIEW) === "cards" ? "cards" : "list"; } catch {}
+const cards = menu.querySelector(".menu-cards");
+// The previews are 1920×1080 pages scaled to the card width
+new ResizeObserver(() => {
+  const w = cards.querySelector(".card-shot")?.clientWidth;
+  if (w) cards.style.setProperty("--s", w / 1920);
+}).observe(cards);
+const setView = (view) => {
+  menuView = view;
+  try { localStorage.setItem(VIEW, view); } catch {}
+  menu.classList.toggle("cards", view === "cards");
+  menu.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
+  if (view === "cards" && !cards.children.length) {
+    const titles = [...menu.querySelectorAll(".menu-list a span")].map((s) => s.innerHTML);
+    cards.innerHTML = slides.map((f, i) => `<a href="${f}"${current(f)}><div class="card-shot">`
+      + `<iframe src="${f}?still" loading="lazy" tabindex="-1" aria-hidden="true"></iframe><b class="slide-n">${i + 1}</b></div>`
+      + `<span>${titles[i]}</span></a>`).join("");
+  }
+  if (menu.classList.contains("open")) menu.querySelector(`.menu-${view} .current`)?.scrollIntoView({ block: "center" });
+};
+menu.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => { b.blur(); setView(b.dataset.view); }));
 const openMenu = (on) => {
   menu.classList.toggle("open", on);
-  if (on) menu.querySelector(".current")?.scrollIntoView({ block: "center" });
+  if (on) setView(menuView);
 };
 badge.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -195,6 +214,85 @@ badge.addEventListener("click", (e) => {
   openMenu(!menu.classList.contains("open"));
 });
 addEventListener("click", (e) => { if (!menu.contains(e.target)) openMenu(false); });
+
+// Deck bar: a thin line along the top of the slide area, filled up to this slide. Near it a thumb and a
+// tooltip show the slide under the pointer (number and title); click or drag it to jump to another slide.
+const deckBar = document.createElement("div");
+deckBar.className = "deck-bar";
+deckBar.innerHTML = '<div class="deck-track"><div class="deck-fill"></div><div class="deck-thumb"></div></div>'
+  + '<div class="deck-tip"><div class="deck-shot"><iframe tabindex="-1" aria-hidden="true"></iframe></div><b></b><span></span></div>';
+document.body.append(deckBar);
+{
+  const track = deckBar.querySelector(".deck-track");
+  const fill = deckBar.querySelector(".deck-fill");
+  const thumb = deckBar.querySelector(".deck-thumb");
+  const tip = deckBar.querySelector(".deck-tip");
+  const last = Math.max(1, slides.length - 1);
+  const pos = (i) => `${(i / last) * 100}%`;
+  // Preview of the slide under the pointer: its last frame (?still), loaded a moment after the pointer stops
+  // on it, only while the tooltip is shown
+  const frameEl = tip.querySelector("iframe");
+  let shotTimer = 0, shotOf = -1;
+  const preview = (i) => {
+    clearTimeout(shotTimer);
+    if (!deckBar.classList.contains("hover") || i === shotOf || !slides[i]) return;
+    shotTimer = setTimeout(() => {
+      shotOf = i;
+      tip.classList.add("loading");
+      frameEl.onload = () => tip.classList.remove("loading");
+      frameEl.src = `${slides[i]}?still`;
+    }, 60);
+  };
+  const pick = (x) => {
+    const r = track.getBoundingClientRect();
+    return Math.round(Math.min(1, Math.max(0, (x - r.left) / r.width)) * last);
+  };
+  // Thumb and tooltip on slide i (the fill follows only while dragging); the tooltip kept inside the bar
+  const show = (i) => {
+    thumb.style.left = pos(i);
+    if (dragging || i === index) fill.style.width = pos(i);
+    tip.querySelector("b").textContent = i + 1;
+    tip.querySelector("span").textContent = menu.querySelectorAll(".menu-list a span")[i]?.textContent || "";
+    preview(i);
+    const r = track.getBoundingClientRect();
+    const half = tip.offsetWidth / 2;
+    const x = r.left + (i / last) * r.width;
+    tip.style.left = `${Math.min(innerWidth - notesWidth - half - 8, Math.max(half + 8, x))}px`;
+  };
+  let dragging = false;
+  // Back on this slide: fill and thumb only. The tooltip stays where it is while it fades out (moving it to this
+  // slide, and loading its preview, made it jump across the bar)
+  const rest = () => { clearTimeout(shotTimer); fill.style.width = thumb.style.left = pos(Math.max(0, index)); };
+  rest();
+  addEventListener("anim-layout", rest);
+  addEventListener("resize", rest);
+  // The tooltip is part of the bar: it can be grabbed and dragged too. Leaving closes it after a moment,
+  // so the pointer can move from the line up to the tooltip
+  let leaving = 0;
+  deckBar.addEventListener("pointerenter", (e) => { clearTimeout(leaving); deckBar.classList.add("hover"); show(pick(e.clientX)); });
+  deckBar.addEventListener("pointermove", (e) => { if (dragging || !tip.contains(e.target)) show(pick(e.clientX)); });
+  deckBar.addEventListener("pointerleave", () => {
+    if (dragging) return;
+    leaving = setTimeout(() => { deckBar.classList.remove("hover"); rest(); }, 350);
+  });
+  deckBar.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragging = true;
+    deckBar.setPointerCapture(e.pointerId);
+    deckBar.classList.add("hover", "dragging");
+    show(pick(e.clientX));
+  });
+  deckBar.addEventListener("pointerup", (e) => {
+    if (!dragging) return;
+    dragging = false;
+    deckBar.classList.remove("dragging");
+    const i = pick(e.clientX);
+    if (index !== -1 && i !== index) go(i - index);
+    else { deckBar.classList.remove("hover"); rest(); }
+  });
+  deckBar.addEventListener("click", (e) => e.stopPropagation());
+}
 
 const notes = document.createElement("aside");
 notes.className = "notes";
@@ -214,14 +312,80 @@ placeToggle.setAttribute("aria-haspopup", "true");
 placeToggle.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
 const placeMenu = Object.assign(document.createElement("div"), { className: "notes-place-menu", hidden: true });
 placeMenu.setAttribute("role", "menu");
-placeToggle.addEventListener("click", () => { placeToggle.blur(); placeMenu.hidden = !placeMenu.hidden; });
-addEventListener("pointerdown", (e) => { if (!placeMenu.hidden && !placeWrap.contains(e.target)) placeMenu.hidden = true; });
-placeWrap.append(placeToggle, placeMenu);
+placeToggle.addEventListener("click", () => {
+  placeToggle.blur();
+  detailsItem.hidden = !(dev && document.querySelector(".kicker"));
+  details.hidden = true;
+  placeMenu.hidden = !placeMenu.hidden;
+});
+addEventListener("pointerdown", (e) => { if (!placeWrap.contains(e.target)) placeMenu.hidden = details.hidden = true; });
+// Slide details (⋮ → Slide details, with npm run slides): the small label and the title at the top left of
+// the slide (its .kicker), saved into the slide's .html; the <title> of the page follows the title
+const details = Object.assign(document.createElement("form"), { className: "slide-details", hidden: true });
+details.innerHTML = '<b>Slide details</b>'
+  + '<label>Label<input name="label" autocomplete="off" placeholder="Intro to Jev · 4"></label>'
+  + '<label>Title<input name="title" autocomplete="off" required></label>'
+  + '<div class="slide-details-actions"><button class="notes-btn save">Save</button>'
+  + '<button type="button" class="notes-btn cancel">Cancel</button><span class="notes-status"></span></div>';
+const detailsItem = Object.assign(document.createElement("button"), { className: "notes-place-item slide-details-item", hidden: true });
+detailsItem.setAttribute("role", "menuitem");
+detailsItem.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 11h10M4 16h7"/></svg><span>Slide details</span>';
+const field = (name) => details.querySelector(`[name="${name}"]`);
+const KICKER = /<div class="kicker">(?:<small>([\s\S]*?)<\/small>)?([\s\S]*?)<\/div>/;
+const kickerParts = () => {
+  const k = document.querySelector(".kicker");
+  const small = k.querySelector("small");
+  const title = [...k.childNodes].filter((n) => n !== small).map((n) => n.textContent).join("").trim();
+  return { k, small, label: small?.textContent.trim() || "", title };
+};
+detailsItem.addEventListener("click", () => {
+  placeMenu.hidden = true;
+  const { label, title } = kickerParts();
+  field("label").value = label;
+  field("title").value = title;
+  details.querySelector(".notes-status").textContent = "";
+  details.hidden = false;
+  field("title").focus();
+});
+details.querySelector(".cancel").addEventListener("click", () => { details.hidden = true; });
+details.addEventListener("keydown", (e) => { e.stopPropagation(); if (e.key === "Escape") details.hidden = true; });
+details.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const status = details.querySelector(".notes-status");
+  const label = field("label").value.trim();
+  const title = field("title").value.trim();
+  const post = (original, updated) => fetch("/__notes", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ path: location.pathname, original, updated }),
+  }).then((r) => { if (!r.ok) throw r.status; });
+  status.textContent = "Saving…";
+  fetch(location.pathname, { cache: "no-store" }).then((r) => r.text()).then(async (src) => {
+    const m = src.match(KICKER);
+    if (!m) throw "kicker";
+    await post(m[0], `<div class="kicker">${label ? `<small>${esc(label)}</small>` : ""}${esc(title)}</div>`);
+    // "<title>03c · The simplest call</title>": only the part after the prefix, if it was the old title
+    const t = src.match(/<title>([^<]*?) · ([^<]*)<\/title>/);
+    if (t && t[2].trim() === m[2].trim()) await post(t[0], `<title>${t[1]} · ${esc(title)}</title>`);
+    // On screen right away, without reloading the slide (its animation keeps going)
+    const { k, small } = kickerParts();
+    [...k.childNodes].filter((n) => n !== small).forEach((n) => n.remove());
+    if (label) (small || k.appendChild(document.createElement("small"))).textContent = label;
+    else small?.remove();
+    k.append(title);
+    if (t && t[2].trim() === m[2].trim()) document.title = `${t[1]} · ${title}`;
+    details.hidden = true;
+  }).catch((err) => {
+    status.textContent = err === 409 ? "The slide changed in the file: reload and try again."
+      : err === "kicker" ? "No kicker found in the slide's .html." : "Not saved: is npm run slides running (restarted)?";
+  });
+});
+placeWrap.append(placeToggle, placeMenu, details);
 const headPreview = Object.assign(document.createElement("button"), { className: "notes-btn notes-head-preview", textContent: "Preview", title: "Back to the notes as you read them while presenting (saves first)" });
 headPreview.addEventListener("click", () => { headPreview.blur(); previewEdit?.(); });
 notes.querySelector(".notes-head").append(headTimeline, headPreview, headSave, placeWrap, headClose);
-placeMenu.append(placeButton(false), placeButton(true));
-document.body.append(menu, dock, notes);
+placeMenu.append(placeButton(false), placeButton(true), detailsItem);
+document.body.append(menu, dock, dockRight, notes);
 
 // N opens the notes; the choice is remembered across slides, like their place (bottom or right, the dock buttons)
 const NOTES = "anim-notes";
@@ -425,8 +589,6 @@ const scrub = (t) => {
   seek(t * 1000, once());
   ended = false;
   held = true;
-  hint.classList.remove("show");
-  replay.classList.remove("show");
   nextStop = stops.filter((x) => x * loop <= t * 1000 + 1).length;
 };
 
@@ -688,8 +850,8 @@ if (!still) {
   try { setBare(localStorage.getItem(BARE) === "1"); } catch {}
 }
 
-// Step indicator, bottom right (slides with stops only): one square per step, grey for the steps already
-// on screen, pink for those still to come
+// Step indicator, bottom right (slides with stops only): one square per step, pink for the steps already
+// on screen, grey for those still to come
 const steps = document.createElement("div");
 steps.className = "steps";
 steps.setAttribute("aria-hidden", "true");
@@ -715,7 +877,6 @@ const watch = () => {
   else if (!ended && now >= END * loop) {
     ended = true;
     seek(END * loop, once());
-    replay.classList.add("show");
   }
   requestAnimationFrame(watch);
 };
@@ -724,18 +885,47 @@ requestAnimationFrame(watch);
 // The slides window announces its slide on every load and the notes window follows it; a notes window
 // that has just opened asks which slide is on screen. Keys pressed in the notes window drive the slides.
 // After a notes edit is saved, the other window reloads its notes.
+// Several tabs can show the same deck: each one has an id (kept across its slides) and the time it was last
+// used (loaded while focused, or focused). The notes window follows only one of them, the last used, and
+// drives only that one; otherwise two tabs on different slides would bounce it back and forth for ever.
+let tabId = "";
+try { tabId = sessionStorage.getItem("anim-tab") || ""; } catch {}
+if (!tabId) {
+  tabId = Math.random().toString(36).slice(2);
+  try { sessionStorage.setItem("anim-tab", tabId); } catch {}
+}
+let usedAt = document.hasFocus() ? Date.now() : 0;
+const announce = () => send({ slide: file, tab: tabId, at: usedAt });
+let leader = null;
+try { leader = JSON.parse(sessionStorage.getItem("anim-leader")); } catch {}
+const follow = (data) => {
+  if (leader && data.tab !== leader.tab && data.at <= leader.at) return;
+  leader = { tab: data.tab, at: Math.max(data.at, leader?.tab === data.tab ? leader.at : 0) };
+  try { sessionStorage.setItem("anim-leader", JSON.stringify(leader)); } catch {}
+  if (data.slide !== file) location.replace(`${data.slide}?notes`);
+};
+const mine = (data) => !data.tab || data.tab === tabId;
 if (channel) channel.onmessage = ({ data }) => {
   if (data.notes) loadNotes();
   if (presenter) {
-    if (data.slide && data.slide !== file) location.replace(`${data.slide}?notes`);
+    if (data.slide && data.tab) follow(data);
     return;
   }
-  if (data.hello) send({ slide: file });
+  if (data.hello) announce();
+  if (!mine(data)) return;
+  if (data.dock) setNotes(true);
   if (data.go) data.go === 1 && proceed() || go(data.go);
   if (data.key === "space") ended ? restart() : held ? proceed() : togglePause();
   if (data.key === "restart") restart();
 };
-send(presenter ? { hello: true } : { slide: file });
+if (presenter) {
+  send({ hello: true });
+  notesBack.addEventListener("click", () => { send({ dock: true, tab: leader?.tab }); window.close(); });
+}
+else {
+  announce();
+  addEventListener("focus", () => { usedAt = Date.now(); announce(); });
+}
 
 addEventListener("keydown", (e) => {
   if (still || e.target.closest?.("textarea, input")) return;
@@ -743,9 +933,10 @@ addEventListener("keydown", (e) => {
   if (presenter) {
     const step = { ArrowRight: 1, PageDown: 1, ArrowLeft: -1, PageUp: -1 }[e.key];
     if (step || e.code === "Space") e.preventDefault();
-    if (step) send({ go: step });
-    else if (e.code === "Space") send({ key: "space" });
-    else if (e.key === "r" || e.key === "R") send({ key: "restart" });
+    const to = leader?.tab;
+    if (step) send({ go: step, tab: to });
+    else if (e.code === "Space") send({ key: "space", tab: to });
+    else if (e.key === "r" || e.key === "R") send({ key: "restart", tab: to });
     return;
   }
   if (e.code === "Space") {

@@ -52,7 +52,7 @@ Runtime changes go in `docs/_engine/`, never in a deck's `_shared/`. `.github/pa
   To change the notes, edit the script. `.github/pages/build.mjs` publishes the script next to the deck.
 - Dev mode: served by `npm run slides` (`scripts/serve.mjs`, which adds `X-Slides-Dev` to its responses), the notes
   panel has an **Edit** button: one textarea per block of the slide's section (split at blank lines and where `>`
-  quotes start/end; quotes are edited without `>`), `⌘S` saves the section back into the script via `POST /__notes`.
+  quotes start/end; quotes are edited without `>`), `⌘S` saves the section back into the script via `POST /__notes`. The ⋮ menu of the notes also has **Slide details**: the `.kicker` label (`<small>`) and title of the slide, saved into its `.html` (and its `<title>`) through the same endpoint.
   The 🎬 line and `---` are not editable. The save is refused (409) if the section changed in the file meanwhile.
   Published decks (no such header) stay read-only.
 - `page.html#t=0.5` freezes the slide at 50% of its timeline (used by `snap.mjs`).
