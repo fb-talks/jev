@@ -24,15 +24,15 @@
     -webkit-mask-image: linear-gradient(90deg, #000 42%, transparent 58%); mask-image: linear-gradient(90deg, #000 42%, transparent 58%);
     -webkit-mask-size: 240% 100%; mask-size: 240% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
     animation-name: wipe; animation-timing-function: cubic-bezier(.45,.05,.55,.95); }
-  .name text { font-family: var(--hand); font-size: 300px; fill: var(--ink); fill-opacity: 0; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round;
+  .name text { font-family: var(--hand); font-size: 150px; fill: var(--ink); fill-opacity: 0; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round;
     stroke-dasharray: 1600; stroke-dashoffset: 1600; animation-name: pen, ink; animation-timing-function: ease-in-out, ease-out; }
 
   /* ---------- What it runs on ---------- */
-  .with { position: absolute; left: 0; right: 0; top: 525px; text-align: center; font-family: var(--hand); font-size: 56px; opacity: 0; animation-name: with; }
+  .with { position: absolute; left: 0; right: 0; top: 440px; text-align: center; font-family: var(--hand); font-size: 150px; line-height: 1.1; opacity: 0; animation-name: with; }
   .with span { color: var(--pink); }
 
   /* ---------- One answer, as a number ---------- */
-  .answer { position: absolute; left: 610px; top: 635px; width: 700px; display: flex; align-items: center; gap: 28px; opacity: 0; animation-name: answer; }
+  .answer { position: absolute; left: 610px; top: 670px; width: 700px; display: flex; align-items: center; gap: 28px; opacity: 0; animation-name: answer; }
   .answer .bar { flex: 1; height: 30px; }
   .answer .bar > i { width: 0; animation-name: fill; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
   .answer b { width: 150px; text-align: right; font-family: var(--mono); font-size: 56px; font-weight: 500; color: var(--pink); --n: 0; counter-reset: n var(--n); animation-name: count; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
@@ -40,14 +40,14 @@
 
   /* ---------- The four question types, around the name ---------- */
   .chip { position: absolute; font-family: var(--mono); font-size: 30px; font-weight: 500; opacity: 0; }
-  .c1 { left: 400px; top: 230px; rotate: -8deg; animation-name: c1; }
-  .c2 { left: 1380px; top: 260px; rotate: 6deg; animation-name: c2; }
-  .c3 { left: 440px; top: 470px; rotate: 5deg; animation-name: c3; }
-  .c4 { left: 1360px; top: 480px; rotate: -5deg; animation-name: c4; border-color: var(--pink); color: var(--pink); }
+  .c1 { left: 560px; top: 200px; rotate: -8deg; animation-name: c1; }
+  .c2 { left: 1220px; top: 215px; rotate: 6deg; animation-name: c2; }
+  .c3 { left: 470px; top: 340px; rotate: 5deg; animation-name: c3; }
+  .c4 { left: 1330px; top: 345px; rotate: -5deg; animation-name: c4; border-color: var(--pink); color: var(--pink); }
 
   /* ---------- Tagline ---------- */
-  .tag { position: absolute; left: 0; right: 0; top: 760px; text-align: center; font-family: var(--hand); font-size: 64px; opacity: 0; animation-name: tag; }
-  .sub { position: absolute; left: 0; right: 0; top: 870px; text-align: center; font-size: 26px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; opacity: 0; animation-name: sub; }
+  .tag { position: absolute; left: 0; right: 0; top: 780px; text-align: center; font-family: var(--hand); font-size: 64px; opacity: 0; animation-name: tag; }
+  .sub { position: absolute; left: 0; right: 0; top: 890px; text-align: center; font-size: 26px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; opacity: 0; animation-name: sub; }
   .sub span { opacity: .45; }
 
   /* ---------- Timeline (9s loop) ----------
@@ -76,7 +76,7 @@
 <body>
 <div class="frame">
   <div class="stage">
-    <svg class="name" viewBox="0 0 900 380"><text x="450" y="300" text-anchor="middle">Jev</text></svg>
+    <svg class="name" viewBox="0 0 900 380"><text x="450" y="210" text-anchor="middle">Jev</text></svg>
 
     <div class="with"><span>&amp;</span> Gemini Decision API</div>
 
@@ -88,7 +88,7 @@
     <span class="chip c4">box</span>
 
     <div class="tag">It doesn't write. <span class="underline-pink">It decides.</span></div>
-    <div class="sub">TypeSafe AI <span>·</span> a System One model</div>
+    <div class="sub">a System One model</div>
   </div>
 </div>
 <script src="_shared/anim.js"></script>
