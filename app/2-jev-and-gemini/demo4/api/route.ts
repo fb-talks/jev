@@ -1,6 +1,6 @@
 import { choice } from "@typesafe-ai/sdk";
-import { generateText, jsonSchema, Output } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate, jsonSchema } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // The descriptions are our "prompt": the clearer they are, the better the probabilities.
 const questions = {
@@ -80,20 +80,19 @@ export async function POST(request: Request) {
           if (blocked) return;
         }
 
-        // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
+        // Gemini with the Google SDK and the key from the 🔑 panel, or the server one (see lib/gemini.ts)
         // The email goes straight into the prompt, as many real assistants do: without the guardrail,
         // only Gemini's own resistance stands between the hidden instructions and the user.
         const start = performance.now();
-        const { output, usage } = await generateText({
-          model: geminiModel(keys),
+        const { output, tokens } = await generate(keys, {
           // today's date, so dates without a year land in the right one
           instructions: `You are the email assistant of the user. Extract the key data of the email below. Be terse. Today is ${new Date().toISOString().slice(0, 10)}.`,
           prompt: email,
-          output: Output.object({ schema: dataSchema }),
+          schema: dataSchema,
         });
         const ms = Math.round(performance.now() - start);
 
-        send({ step: "gemini", ms, data: output, tokens: usage.totalTokens ?? 0 });
+        send({ step: "gemini", ms, data: output, tokens: tokens.inputTokens + tokens.outputTokens });
       } catch (err) {
         console.error(err);
         const message = err instanceof Error ? err.message : "Unknown error";

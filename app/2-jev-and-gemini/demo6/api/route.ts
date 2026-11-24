@@ -1,6 +1,6 @@
 import { choice, noul, score } from "@typesafe-ai/sdk";
-import { generateText, jsonSchema, Output } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate, jsonSchema } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // The criteria, written once and shared by both models, so the comparison is fair.
 const categories = {
@@ -65,11 +65,10 @@ export async function POST(request: Request) {
       runJev ? timed(() => jev.systemOne({ state: text, questions: jevQuestions })) : null,
       runGemini
         ? timed(() =>
-            generateText({
-              model: geminiModel(keys),
+            generate(keys, {
               instructions: geminiInstructions,
               prompt: text,
-              output: Output.object({ schema: geminiSchema }),
+              schema: geminiSchema,
             }),
           )
         : null,

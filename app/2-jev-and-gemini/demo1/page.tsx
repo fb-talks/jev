@@ -28,13 +28,15 @@ before.answers.offensive.noul; // 0.78`,
   },
   {
     title: "2 · Gemini rewrites it",
-    code: `import { generateText } from "ai";
+    code: `import { GoogleGenAI } from "@google/genai";
 
-const { text: rewritten } = await generateText({
-  model: "google/gemini-3.8-flash", // same AI Gateway, same key
-  instructions:
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const { output_text: rewritten } = await ai.interactions.create({
+  model: "gemini-3.8-flash",
+  system_instruction:
     "Rewrite the comment in a polite, respectful tone, keeping its meaning and criticism.",
-  prompt: text,
+  input: text,
 });`,
   },
   {

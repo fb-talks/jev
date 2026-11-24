@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { GATEWAY_COOKIE, TYPESAFE_COOKIE } from "@/lib/key-cookies";
+import { GATEWAY_COOKIE, GEMINI_COOKIE, TYPESAFE_COOKIE } from "@/lib/key-cookies";
 
-type Keys = { typesafe: string; gateway: string };
+type Keys = { typesafe: string; gemini: string; gateway: string };
 
-const STORAGE = { typesafe: "jev.typesafeKey", gateway: "jev.gatewayKey" } as const;
-const COOKIE = { typesafe: TYPESAFE_COOKIE, gateway: GATEWAY_COOKIE } as const;
+const STORAGE = { typesafe: "jev.typesafeKey", gemini: "jev.geminiKey", gateway: "jev.gatewayKey" } as const;
+const COOKIE = { typesafe: TYPESAFE_COOKIE, gemini: GEMINI_COOKIE, gateway: GATEWAY_COOKIE } as const;
 const CHANGE = "jev-keys-change";
 
 function read(name: keyof Keys) {
@@ -30,7 +30,7 @@ function subscribe(onChange: () => void) {
 // localStorage is the source of truth; the cookies are its copy, sent with every API call.
 function persist(keys: Keys) {
   const secure = location.protocol === "https:" ? "; secure" : "";
-  for (const name of ["typesafe", "gateway"] as const) {
+  for (const name of ["typesafe", "gemini", "gateway"] as const) {
     const value = keys[name].trim();
     try {
       if (value) localStorage.setItem(STORAGE[name], value);
@@ -43,29 +43,30 @@ function persist(keys: Keys) {
   window.dispatchEvent(new Event(CHANGE));
 }
 
-// A 🔑 button on every page: whoever tries the demos can use their own TypeSafe or Vercel key.
+// A 🔑 button on every page: whoever tries the demos can use their own TypeSafe, Gemini or Vercel key.
 export function ApiKeysPanel() {
   const [open, setOpen] = useState(false);
-  const [draft, setDraft] = useState<Keys>({ typesafe: "", gateway: "" });
+  const [draft, setDraft] = useState<Keys>({ typesafe: "", gemini: "", gateway: "" });
   const [show, setShow] = useState(false);
   const saved: Keys = {
     typesafe: useSyncExternalStore(subscribe, () => read("typesafe"), () => ""),
+    gemini: useSyncExternalStore(subscribe, () => read("gemini"), () => ""),
     gateway: useSyncExternalStore(subscribe, () => read("gateway"), () => ""),
   };
 
   // on load, copy the saved keys into the cookies again (they may have expired or been cleared)
-  useEffect(() => persist({ typesafe: read("typesafe"), gateway: read("gateway") }), []);
+  useEffect(() => persist({ typesafe: read("typesafe"), gemini: read("gemini"), gateway: read("gateway") }), []);
 
   const save = (keys: Keys) => {
-    const clean = { typesafe: keys.typesafe.trim(), gateway: keys.gateway.trim() };
+    const clean = { typesafe: keys.typesafe.trim(), gemini: keys.gemini.trim(), gateway: keys.gateway.trim() };
     persist(clean);
     setDraft(clean);
   };
 
   // the same choice lib/keys.ts makes on the server
-  const custom = Boolean(saved.typesafe || saved.gateway);
+  const custom = Boolean(saved.typesafe || saved.gemini || saved.gateway);
   const jev = saved.typesafe ? "TypeSafe (direct)" : saved.gateway ? "Vercel AI Gateway" : "server keys, if the site has them";
-  const gemini = saved.gateway ? "Vercel AI Gateway" : custom ? "no key: add a Vercel one" : "server keys, if the site has them";
+  const gemini = saved.gemini ? "Google (direct)" : "server keys, if the site has them";
 
   return (
     <>
@@ -100,13 +101,14 @@ export function ApiKeysPanel() {
             </p>
           </div>
 
+          {/* new-password: with "off" Chrome fills these fields with a saved password */}
           <label className="flex flex-col gap-1">
             <span className="font-medium">TypeSafe API key</span>
             <input
               type={show ? "text" : "password"}
               value={draft.typesafe}
               onChange={(e) => setDraft({ ...draft, typesafe: e.target.value })}
-              autoComplete="off"
+              autoComplete="new-password"
               spellCheck={false}
               className="rounded-lg border border-zinc-300 px-3 py-2 font-mono text-xs dark:border-zinc-700 dark:bg-zinc-950"
             />
@@ -120,17 +122,36 @@ export function ApiKeysPanel() {
           </label>
 
           <label className="flex flex-col gap-1">
+            <span className="font-medium">Gemini API key</span>
+            <input
+              type={show ? "text" : "password"}
+              value={draft.gemini}
+              onChange={(e) => setDraft({ ...draft, gemini: e.target.value })}
+              autoComplete="new-password"
+              spellCheck={false}
+              className="rounded-lg border border-zinc-300 px-3 py-2 font-mono text-xs dark:border-zinc-700 dark:bg-zinc-950"
+            />
+            <span className="text-xs text-zinc-500">
+              All the Gemini models, Gemini Decision included. From{" "}
+              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noreferrer" className="underline">
+                Google AI Studio
+              </a>
+              .
+            </span>
+          </label>
+
+          <label className="flex flex-col gap-1">
             <span className="font-medium">Vercel AI Gateway key</span>
             <input
               type={show ? "text" : "password"}
               value={draft.gateway}
               onChange={(e) => setDraft({ ...draft, gateway: e.target.value })}
-              autoComplete="off"
+              autoComplete="new-password"
               spellCheck={false}
               className="rounded-lg border border-zinc-300 px-3 py-2 font-mono text-xs dark:border-zinc-700 dark:bg-zinc-950"
             />
             <span className="text-xs text-zinc-500">
-              Jev and Gemini through the gateway: the Gemini demos need this one.
+              Optional, only for Jev: used when there is no TypeSafe key.
             </span>
           </label>
 
@@ -149,7 +170,7 @@ export function ApiKeysPanel() {
           <div className="flex justify-end gap-2">
             <button
               type="button"
-              onClick={() => save({ typesafe: "", gateway: "" })}
+              onClick={() => save({ typesafe: "", gemini: "", gateway: "" })}
               className="rounded-lg border border-zinc-300 px-3 py-1.5 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
             >
               Clear

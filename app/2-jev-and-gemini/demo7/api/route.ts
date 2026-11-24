@@ -1,6 +1,6 @@
 import { choice } from "@typesafe-ai/sdk";
-import { generateText } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // The descriptions are our "prompt": the clearer they are, the better the probabilities.
 const questions = {
@@ -51,15 +51,14 @@ export async function POST(request: Request) {
       }
     }
 
-    // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
+    // Gemini with the Google SDK and the key from the 🔑 panel, or the server one (see lib/gemini.ts)
     const geminiStart = performance.now();
-    const { text, usage } = await generateText({
-      model: geminiModel(keys),
+    const { text, tokens } = await generate(keys, {
       instructions:
         "You are a customer support agent of a software company. Reply to the customer's message in 1-3 sentences. Only the reply, no quotes, no signature.",
       prompt: message,
     });
-    const gemini = { ms: Math.round(performance.now() - geminiStart), tokens: usage.totalTokens ?? 0 };
+    const gemini = { ms: Math.round(performance.now() - geminiStart), tokens: tokens.inputTokens + tokens.outputTokens };
 
     return Response.json({ route: "gemini", reply: text.trim(), jev, gemini, ms: Math.round(performance.now() - start) });
   } catch (err) {

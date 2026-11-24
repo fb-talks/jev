@@ -18,28 +18,29 @@ answers.offensive.noul; // 0.78
 usage.input_tokens;     // what we pay: Jev has no output tokens`,
   },
   {
-    title: "Gemini Decision: the same kind of question",
-    code: `import { experimental_decide as decide } from "ai";
+    title: "Gemini Decision: the very same question",
+    code: `import { GoogleGenAI } from "@google/genai";
 
-const { answers, usage } = await decide({
-  model: gateway.decision("google/gemini-decision-1"),
-  state: text,
-  questions: { offensive: { type: "boolean", instructions: "The comment is offensive or insulting" } },
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const { answers, usage } = await ai.decisions.create({
+  model: "gemini-decision-1",
+  input: text,
+  questions, // the same object as Jev: { type: "noul", instructions: "..." }
 });
 
-answers.offensive.probability; // 0.92
-usage.inputTokens;             // only input is billed: 0 output tokens`,
+answers.offensive.noul;  // the probability of "yes", from 0 to 1
+usage.total_input_tokens; // only input is billed: 0 output tokens`,
   },
   {
     title: "Gemini Flash: we ask for a number",
-    code: `const { output, usage } = await generateText({
-  model: gateway("google/gemini-3.8-flash"), // or "google/gemini-3.5-flash-lite"
-  instructions: 'Return the probability, from 0 to 1, that this statement is true: "The comment is offensive or insulting".',
-  prompt: text,
-  output: Output.object({ schema }), // { probability: number }
+    code: `const interaction = await ai.interactions.create({
+  model: "gemini-3.8-flash", // or "gemini-3.5-flash-lite"
+  system_instruction: 'Return the probability, from 0 to 1, that this statement is true: "The comment is offensive or insulting".',
+  input: text,
+  response_format: { type: "text", mime_type: "application/json", schema },
 });
 
-output.probability;            // a number the model writes, token by token
-usage.inputTokens + usage.outputTokens; // output includes the reasoning tokens`,
+JSON.parse(interaction.output_text).probability; // a number the model writes, token by token`,
   },
 ];

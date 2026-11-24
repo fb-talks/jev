@@ -14,13 +14,13 @@ const snippets: Snippet[] = [
 const questions = {
   category: { type: "choice", instructions: "What kind of comment is this?", criteria: categories },
   toxicity: { type: "score", instructions: "How offensive is the tone?", criteria: toxicityLevels },
-  personal_data: { type: "boolean", instructions: "The comment contains personal data" },
+  personal_data: { type: "noul", instructions: "The comment contains personal data" },
 };
 await jev.systemOne({ state: text, questions });                                      // TypeSafe SDK
-await decide({ model: gateway.decision("google/gemini-decision-1"), state: text, questions }); // AI SDK
+await ai.decisions.create({ model: "gemini-decision-1", input: text, questions });   // Google SDK, the same questions
 
 // Gemini Flash / Flash Lite: the same questions in the prompt, the probabilities written as JSON
-await generateText({ model: gateway("google/gemini-3.8-flash"), instructions, prompt: text, output: Output.object({ schema }) });`,
+await ai.interactions.create({ model: "gemini-3.8-flash", system_instruction, input: text, response_format });`,
   },
   {
     title: "2 · Every model on its own, all at the same time",

@@ -1,8 +1,8 @@
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import { choice, score } from "@typesafe-ai/sdk";
-import { generateText, jsonSchema, Output } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate, jsonSchema } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // Scraping, Jev and Gemini in one request: Gemini alone can take 20+ seconds.
 export const maxDuration = 60;
@@ -107,11 +107,10 @@ export async function POST(request: Request) {
       runJev ? timed(() => jev.systemOne({ state: page.text, questions: jevQuestions })) : null,
       runGemini
         ? timed(() =>
-            generateText({
-              model: geminiModel(keys),
+            generate(keys, {
               instructions: geminiInstructions,
               prompt: page.text,
-              output: Output.object({ schema: geminiSchema }),
+              schema: geminiSchema,
             }),
           )
         : null,
@@ -129,7 +128,7 @@ export async function POST(request: Request) {
       },
       gemini: geminiResult && {
         answers: geminiResult.value.output,
-        inputTokens: geminiResult.value.usage.inputTokens ?? null,
+        inputTokens: geminiResult.value.tokens.inputTokens,
         ms: geminiResult.ms,
       },
     });

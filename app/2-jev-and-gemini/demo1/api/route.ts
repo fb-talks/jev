@@ -1,6 +1,6 @@
 import { noul } from "@typesafe-ai/sdk";
-import { generateText } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 const questions = { offensive: noul("The comment is offensive or insulting") };
 
@@ -28,10 +28,9 @@ export async function POST(request: Request) {
         // the question goes back too, so the page shows the exact text Jev received
         send({ step: "before", ms: Math.round(performance.now() - start), question: questions.offensive.instructions, offensive: before.answers.offensive.noul });
 
-        // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
+        // Gemini with the Google SDK and the key from the 🔑 panel, or the server one (see lib/gemini.ts)
         start = performance.now();
-        const gemini = await generateText({
-          model: geminiModel(keys),
+        const gemini = await generate(keys, {
           instructions: "Rewrite the comment in a polite, respectful tone, keeping its meaning and criticism. Only the rewritten comment, no quotes.",
           prompt: text,
         });

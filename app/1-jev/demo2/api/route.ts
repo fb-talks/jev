@@ -1,5 +1,7 @@
 import { choice, noul, score } from "@typesafe-ai/sdk";
-import { apiKeys, jevClient } from "@/lib/keys";
+import { apiKeys } from "@/lib/keys";
+import { ask } from "../../ask";
+import { models, type ModelId } from "../../models";
 
 // The descriptions are our "prompt": the clearer they are, the better the probabilities.
 const questions = {
@@ -20,20 +22,22 @@ const questions = {
 
 // Demo 2: one question of each type (choice, score, noul), with all their probabilities.
 export async function POST(request: Request) {
-  const { text } = await request.json();
+  const { text, model } = (await request.json()) as { text: unknown; model: ModelId };
   const keys = await apiKeys();
+  const m = models.find((m) => m.id === model);
 
   if (typeof text !== "string" || !text.trim()) {
     return Response.json({ error: "Write a comment to analyze." }, { status: 400 });
   }
+  if (!m) {
+    return Response.json({ error: `Unknown model: ${model}` }, { status: 400 });
+  }
 
   try {
-    // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
-    const jev = jevClient(keys);
-
-    const { answers } = await jev.systemOne({ state: text, questions });
-    // the questions go back too, so the page shows the exact text Jev received
-    return Response.json({ questions, answers });
+    // Jev, Gemini Decision or an LLM: the same questions, the answers in the same shape (see ask.ts)
+    const { model: modelId, answers, usage } = await ask(keys, m, text, questions);
+    // the questions go back too, so the page shows the exact text the model received
+    return Response.json({ questions, model: modelId, answers, usage });
   } catch (err) {
     console.error(err);
     const message = err instanceof Error ? err.message : "Unknown error";

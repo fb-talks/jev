@@ -1,6 +1,6 @@
 import { score } from "@typesafe-ai/sdk";
-import { generateText, jsonSchema, Output } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate, jsonSchema } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 const questions = {
   quality: score("How helpful and polite is this reply from the post's author?", [
@@ -36,13 +36,12 @@ export async function POST(request: Request) {
       const send = (event: object) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
 
       try {
-        // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
+        // Gemini with the Google SDK and the key from the 🔑 panel, or the server one (see lib/gemini.ts)
         let start = performance.now();
-        const { output } = await generateText({
-          model: geminiModel(keys),
+        const { output } = await generate(keys, {
           instructions: "You are the author of a tech blog post. Write 3 very different replies to the reader's comment: one curt, one friendly, one detailed.",
           prompt: text,
-          output: Output.object({ schema: repliesSchema }),
+          schema: repliesSchema,
         });
         const replies = styles.map((style) => ({ style, text: output[style].trim() }));
         send({ step: "gemini", ms: Math.round(performance.now() - start), replies });

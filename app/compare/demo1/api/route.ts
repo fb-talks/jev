@@ -1,16 +1,13 @@
 import { noul } from "@typesafe-ai/sdk";
-import { experimental_decide as decide, generateText, jsonSchema, Output } from "ai";
-import { apiKeys, decisionModel, geminiModel, jevClient } from "@/lib/keys";
+import { decide, generate, jsonSchema } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 import { estimateCost, models, type ModelId } from "../../models";
 
 // The same statement for every model, so the comparison is fair.
 const statement = "The comment is offensive or insulting";
 
-// Jev: TypeSafe SDK
-const jevQuestions = { offensive: noul(statement) };
-
-// Gemini Decision: the AI SDK decide(), the same kind of typed yes/no question
-const decisionQuestions = { offensive: { type: "boolean", instructions: statement } } as const;
+// Jev and Gemini Decision take the very same question
+const questions = { offensive: noul(statement) };
 
 // Gemini Flash / Flash Lite can't return a probability by themselves: we ask for one, as a number from 0 to 1.
 const schema = jsonSchema<{ probability: number }>({
@@ -40,26 +37,23 @@ export async function POST(request: Request) {
 
     if (m.id === "jev") {
       // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
-      const { answers, usage } = await jevClient(keys).systemOne({ state: text, questions: jevQuestions });
+      const { answers, usage } = await jevClient(keys).systemOne({ state: text, questions });
       probability = answers.offensive.noul;
       inputTokens = usage.input_tokens ?? 0;
       outputTokens = usage.output_tokens ?? 0;
     } else if (m.kind === "decision") {
-      const { answers, usage } = await decide({ model: decisionModel(keys, m.gateway), state: text, questions: decisionQuestions });
-      probability = answers.offensive.probability;
-      inputTokens = usage.inputTokens ?? 0;
-      outputTokens = usage.outputTokens ?? 0;
+      const { answers, tokens } = await decide(keys, { model: m.model, input: text, questions });
+      probability = answers.offensive.noul;
+      ({ inputTokens, outputTokens } = tokens);
     } else {
-      const { output, usage } = await generateText({
-        model: geminiModel(keys, m.gateway),
+      const { output, tokens } = await generate(keys, {
+        model: m.model,
         instructions,
         prompt: text,
-        output: Output.object({ schema }),
+        schema,
       });
       probability = output.probability;
-      inputTokens = usage.inputTokens ?? 0;
-      outputTokens = usage.outputTokens ?? 0; // reasoning tokens included: they are billed as output
-      reasoningTokens = usage.outputTokenDetails.reasoningTokens ?? 0;
+      ({ inputTokens, outputTokens, reasoningTokens } = tokens); // outputTokens includes the thinking: it's billed as output
     }
 
     const ms = Math.round(performance.now() - start);

@@ -25,7 +25,7 @@ const snippets: Snippet[] = [
     code: `const [jevResult, geminiResult] = await Promise.all([
   timed(() => jev.systemOne({ state: comment, questions: jevQuestions })),
   // Gemini: the same questions in its instructions, labels instead of probabilities
-  timed(() => generateText({ model, instructions, prompt: comment, output: Output.object({ schema: geminiSchema }) })),
+  timed(() => ai.interactions.create({ model, system_instruction, input: comment, response_format })),
 ]);`,
   },
   {

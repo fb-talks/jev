@@ -33,11 +33,11 @@ if (intent in templates && probability >= threshold) {
 }
 
 // everything else, or when Jev isn't sure: Gemini writes the reply
-const { text } = await generateText({
-  model: "google/gemini-3.8-flash",
-  instructions: "You are a customer support agent of a software company. Reply in 1-3 sentences.",
-  prompt: message,
+const { output_text } = await ai.interactions.create({
+  model: "gemini-3.8-flash",
+  system_instruction: "You are a customer support agent of a software company. Reply in 1-3 sentences.",
+  input: message,
 });
-return { route: "gemini", reply: text };`,
+return { route: "gemini", reply: output_text };`,
   },
 ];

@@ -30,12 +30,13 @@ if (risk > threshold) {
   },
   {
     title: "2 · Gemini extracts the data",
-    code: `const { output } = await generateText({
-  model: "google/gemini-3.8-flash",
-  instructions: "You are the email assistant of the user. Extract the key data of the email below.",
-  prompt: email,
+    code: `const { output_text } = await ai.interactions.create({
+  model: "gemini-3.8-flash",
+  system_instruction: "You are the email assistant of the user. Extract the key data of the email below.",
+  input: email,
   // sender, topic, dates, amounts, actions, urgency: ready for a calendar or a to-do list
-  output: Output.object({ schema: dataSchema }),
-});`,
+  response_format: { type: "text", mime_type: "application/json", schema: dataSchema },
+});
+const data = JSON.parse(output_text);`,
   },
 ];

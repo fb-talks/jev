@@ -43,4 +43,28 @@ const verdict = (s) =>
 // the most severe verdict wins: moving a threshold changes it, with no new call to Jev
 const decision = signals.map(verdict).sort(bySeverity).at(-1);`,
   },
+  {
+    title: "Gemini Decision: the same questions",
+    code: `import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const { answers, usage } = await ai.decisions.create({
+  model: "gemini-decision-1",
+  input: text,
+  questions, // the same object as Jev: choice, score and noul
+});`,
+  },
+  {
+    title: "An LLM: we ask it to write the probabilities",
+    code: `const interaction = await ai.interactions.create({
+  model: "gemini-4-carbon", // or gemini-4-neon, gemini-4-hydrogen
+  generation_config: { thinking_level: "low" },
+  system_instruction: instructions, // the same questions, in the prompt
+  input: text,
+  response_format: { type: "text", mime_type: "application/json", schema },
+});
+
+JSON.parse(interaction.output_text); // one number for each option and level`,
+  },
 ];

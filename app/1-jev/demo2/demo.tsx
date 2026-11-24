@@ -1,32 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { ModelButtons, ModelRows } from "../model-buttons";
+import type { ChoiceAnswer, NoulAnswer, ScoreAnswer, Usage } from "../models";
+import { useAnswers } from "../use-answers";
 
 // The interactive part of the demo; the code panel comes from the server, already highlighted.
 export default function Demo2({ code }: { code: React.ReactNode }) {
   const [text, setText] = useState(examples[0]);
-  const [result, setResult] = useState<ApiResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { rows, run, selected, setSelected, reset, busy } = useAnswers<ApiResult>("/1-jev/demo2/api");
+  const result = rows[selected]?.result; // the answer on screen
 
-  async function analyze() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/1-jev/demo2/api", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setResult(data);
-    } catch (e) {
-      setResult(null);
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
+  function changeText(value: string) {
+    setText(value);
+    reset();
   }
 
   return (
@@ -36,6 +23,7 @@ export default function Demo2({ code }: { code: React.ReactNode }) {
         <h1 className="text-2xl font-semibold">Demo 2 · Choice, score and noul</h1>
         <p className="mt-1 text-zinc-600 dark:text-zinc-400">
           One question of each type: category (choice), toxicity (score) and &ldquo;does it ask the author something?&rdquo; (noul).
+          Jev, Gemini Decision or an LLM: the same questions.
         </p>
       </header>
 
@@ -46,8 +34,9 @@ export default function Demo2({ code }: { code: React.ReactNode }) {
           {examples.map((e, i) => (
             <button
               key={i}
-              onClick={() => setText(e)}
-              className="rounded-full border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              onClick={() => changeText(e)}
+              disabled={busy}
+              className="rounded-full border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
             >
               Example {i + 1}
             </button>
@@ -56,23 +45,16 @@ export default function Demo2({ code }: { code: React.ReactNode }) {
 
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => changeText(e.target.value)}
+          disabled={busy}
           rows={4}
           className="w-full rounded-xl border border-zinc-300 bg-transparent p-3 dark:border-zinc-700"
           placeholder="Write a comment…"
         />
 
-        <button
-          onClick={analyze}
-          disabled={loading || !text.trim()}
-          className="self-start rounded-full bg-indigo-600 px-5 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
-          {loading ? "Analyzing…" : "Analyze comment"}
-        </button>
+        <ModelButtons onRun={(m) => run(m, text)} disabled={(m) => Boolean(rows[m]?.running) || !text.trim()} />
 
-        {error && (
-          <p className="rounded-xl bg-rose-100 p-3 text-sm text-rose-900 dark:bg-rose-900/40 dark:text-rose-200">{error}</p>
-        )}
+        <ModelRows rows={rows} selected={selected} onSelect={setSelected} />
 
         {result && (
           <div className="grid gap-4">
@@ -116,14 +98,16 @@ interface Question {
 
 // The shape of the answers returned by the API route.
 interface Answers {
-  category: { choice: string; confidence: number; probabilities: Record<string, number> };
-  toxicity: { score: number; confidence: number; probabilities: Record<string, number>; legend: Record<string, string> };
-  asks_author: { noul: number };
+  category: ChoiceAnswer;
+  toxicity: ScoreAnswer;
+  asks_author: NoulAnswer;
 }
 
 interface ApiResult {
   questions: Record<keyof Answers, Question>;
+  model: string;
   answers: Answers;
+  usage: Usage;
 }
 
 // ---------- Constants ----------
@@ -165,7 +149,7 @@ function Card({ title, subtitle, question, children }: { title: string; subtitle
         <h3 className="font-semibold">{title}</h3>
         {subtitle && <span className="text-xs text-zinc-500">{subtitle}</span>}
       </div>
-      {/* the question text we sent to Jev, as written in the API route */}
+      {/* the question text we sent to the model, as written in the API route */}
       {question && <p className="-mt-2 mb-3 text-sm italic text-zinc-500">&ldquo;{question}&rdquo;</p>}
       <div className="flex flex-col gap-2">{children}</div>
     </section>

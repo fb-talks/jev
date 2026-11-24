@@ -20,14 +20,14 @@ const jevQuestions = {
   commercial: score("How commercial is this page?", commercialLevels),
 };
 
-const geminiSchema = jsonSchema({
+const geminiSchema = {
   type: "object",
   properties: {
     type: { type: "string", enum: Object.keys(types) },
     sector: { type: "string", enum: Object.keys(sectors) },
     commercial: { type: "integer", minimum: 0, maximum: 3 },
   },
-});`,
+};`,
   },
   {
     title: "Same text, both models, at the same time",
@@ -36,11 +36,11 @@ const geminiSchema = jsonSchema({
 const [jevResult, geminiResult] = await Promise.all([
   timed(() => jev.systemOne({ state: page.text, questions: jevQuestions })),
   timed(() =>
-    generateText({
-      model: "google/gemini-3.8-flash",
-      instructions: geminiInstructions,
-      prompt: page.text,
-      output: Output.object({ schema: geminiSchema }),
+    ai.interactions.create({
+      model: "gemini-3.8-flash",
+      system_instruction: geminiInstructions,
+      input: page.text,
+      response_format: { type: "text", mime_type: "application/json", schema: geminiSchema },
     }),
   ),
 ]);

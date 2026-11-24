@@ -41,4 +41,28 @@ answers.category.probabilities; // { relevant: 0.94, spam: 0.01, off_topic: 0.04
 answers.toxicity.score;         // 0.3 (from 0 to 3)
 answers.asks_author.noul;       // 0.91`,
   },
+  {
+    title: "Gemini Decision: the same questions",
+    code: `import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
+const { answers, usage } = await ai.decisions.create({
+  model: "gemini-decision-1",
+  input: text,
+  questions, // the same object as Jev: choice, score and noul
+});`,
+  },
+  {
+    title: "An LLM: we ask it to write the probabilities",
+    code: `const interaction = await ai.interactions.create({
+  model: "gemini-4-carbon", // or gemini-4-neon, gemini-4-hydrogen
+  generation_config: { thinking_level: "low" },
+  system_instruction: instructions, // the same questions, in the prompt
+  input: text,
+  response_format: { type: "text", mime_type: "application/json", schema },
+});
+
+JSON.parse(interaction.output_text); // one number for each option and level`,
+  },
 ];

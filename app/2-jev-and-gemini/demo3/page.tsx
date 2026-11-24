@@ -10,21 +10,24 @@ export default function Page() {
 const snippets: Snippet[] = [
   {
     title: "1 · Gemini proposes 3 replies, as data",
-    code: `import { generateText, jsonSchema, Output } from "ai";
+    code: `import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // structured output: always exactly three replies, no text to parse
-const repliesSchema = jsonSchema<{ curt: string; friendly: string; detailed: string }>({
+const schema = {
   type: "object",
   properties: { curt: { type: "string" }, friendly: { type: "string" }, detailed: { type: "string" } },
   required: ["curt", "friendly", "detailed"],
-});
+};
 
-const { output } = await generateText({
-  model: "google/gemini-3.8-flash",
-  instructions: "Write 3 very different replies to the reader's comment: one curt, one friendly, one detailed.",
-  prompt: comment,
-  output: Output.object({ schema: repliesSchema }),
-});`,
+const { output_text } = await ai.interactions.create({
+  model: "gemini-3.8-flash",
+  system_instruction: "Write 3 very different replies to the reader's comment: one curt, one friendly, one detailed.",
+  input: comment,
+  response_format: { type: "text", mime_type: "application/json", schema },
+});
+const replies = JSON.parse(output_text);`,
   },
   {
     title: "2 · Jev scores them, in parallel",

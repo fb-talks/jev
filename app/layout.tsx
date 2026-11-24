@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jev · Comment moderation",
+  title: "Decision Models vs LLM demo",
   description: "Comment moderation demo with TypeSafe Jev",
 };
 

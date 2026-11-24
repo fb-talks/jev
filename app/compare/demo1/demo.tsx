@@ -120,7 +120,7 @@ export default function Compare({ code }: { code: React.ReactNode }) {
                       {m.name}
                       {fastest === m.id && <span className="ml-2" title="Fastest">🏆</span>}
                       <Kind model={m} />
-                      <div className="font-mono text-xs font-normal text-zinc-500">{m.gateway}</div>
+                      <div className="font-mono text-xs font-normal text-zinc-500">{m.model}</div>
                     </td>
                     <td className="px-3 py-3">
                       {row.running ? "…" : r ? <strong>{Math.round(r.probability * 100)}%</strong> : row.error ? (

@@ -2,36 +2,23 @@
 
 import { useState } from "react";
 import { FlowDiagram } from "../../_components/flow";
+import { ModelButtons, ModelRows } from "../model-buttons";
+import type { ChoiceAnswer, NoulAnswer, ScoreAnswer, Usage } from "../models";
+import { useAnswers } from "../use-answers";
 
 // The interactive part of the demo; the code panel comes from the server, already highlighted.
 export default function Demo3({ code }: { code: React.ReactNode }) {
   const [text, setText] = useState(examples[0]);
-  const [result, setResult] = useState<ApiResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { rows, run, selected, setSelected, reset, busy } = useAnswers<ApiResult>("/1-jev/demo3/api");
   const [thresholds, setThresholds] = useState<Thresholds>(defaultThresholds);
+  const result = rows[selected]?.result; // the answer on screen
 
-  async function analyze() {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/1-jev/demo3/api", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      setResult(data);
-    } catch (e) {
-      setResult(null);
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setLoading(false);
-    }
+  function changeText(value: string) {
+    setText(value);
+    reset();
   }
 
-  // The decision is recomputed locally when you move the thresholds: no new call to Jev.
+  // The decision is recomputed locally when you move the thresholds: no new call to the model.
   const outcome = result ? decide(result.answers, thresholds) : null;
   const a = result?.answers;
 
@@ -41,7 +28,7 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
       <header>
         <h1 className="text-2xl font-semibold">Demo 3 · Moderation policy</h1>
         <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-          Jev returns probabilities; our code makes the decision based on the thresholds.
+          Every model returns probabilities; our code makes the decision based on the thresholds.
         </p>
       </header>
 
@@ -62,7 +49,7 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
               ],
             },
           ]}
-          caption="Jev only returns probabilities: the decision is our code. Moving the thresholds changes it without calling Jev again."
+          caption="The model only returns probabilities: the decision is our code. Moving the thresholds changes it without calling the model again."
           wide={false}
         />
 
@@ -74,8 +61,9 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
           {examples.map((e, i) => (
             <button
               key={i}
-              onClick={() => setText(e)}
-              className="rounded-full border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+              onClick={() => changeText(e)}
+              disabled={busy}
+              className="rounded-full border border-zinc-300 px-3 py-1 text-xs hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-900"
             >
               Example {i + 1}
             </button>
@@ -84,28 +72,24 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
 
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => changeText(e.target.value)}
+          disabled={busy}
           rows={4}
           className="w-full rounded-xl border border-zinc-300 bg-transparent p-3 dark:border-zinc-700"
           placeholder="Write a comment…"
         />
 
-        <button
-          onClick={analyze}
-          disabled={loading || !text.trim()}
-          className="self-start rounded-full bg-indigo-600 px-5 py-2 font-medium text-white hover:bg-indigo-500 disabled:opacity-50"
-        >
-          {loading ? "Analyzing…" : "Analyze comment"}
-        </button>
+        <ModelButtons onRun={(m) => run(m, text)} disabled={(m) => Boolean(rows[m]?.running) || !text.trim()} />
 
-        {error && (
-          <p className="rounded-xl bg-rose-100 p-3 text-sm text-rose-900 dark:bg-rose-900/40 dark:text-rose-200">{error}</p>
-        )}
+        {/* the decision of every model, with the same thresholds */}
+        <ModelRows rows={rows} selected={selected} onSelect={setSelected}>
+          {(r) => <span className="text-lg">{decisionStyle[decide(r.answers, thresholds).decision].label}</span>}
+        </ModelRows>
 
         {result && outcome && a && (
           <>
             {/* the decision and the thresholds that produce it, together */}
-            <Card accent title="Decision" subtitle="drag the handles: the decision changes without calling Jev again">
+            <Card accent title="Decision" subtitle="drag the handles: the decision changes without calling the model again">
               <div className="mb-2 flex flex-wrap items-center gap-3">
                 <span className={`rounded-full px-4 py-1.5 text-lg font-semibold ${decisionStyle[outcome.decision].className}`}>
                   {decisionStyle[outcome.decision].label}
@@ -117,14 +101,14 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
               <ThresholdSlider thresholds={thresholds} onChange={setThresholds} risk={outcome.reason.risk} />
             </Card>
 
-            <Card title="Risk signals" subtitle="derived from Jev's answers">
+            <Card title="Risk signals" subtitle="derived from the model's answers">
               {outcome.signals.map((s) => (
                 <Bar key={s.name} label={s.name} value={s.risk} highlight={s.name === outcome.reason.name} />
               ))}
             </Card>
 
             <div className="grid gap-4">
-              <Card title="category · choice" subtitle={`choice: ${a.category.choice} · confidence ${a.category.confidence.toFixed(2)}`} question={result.questions.category.instructions}>
+              <Card title="category · choice" subtitle={`choice: ${a.category.choice}${confidence(a.category)}`} question={result.questions.category.instructions}>
                 {Object.entries(a.category.probabilities).map(([k, v]) => (
                   <Bar
                     key={k}
@@ -136,7 +120,7 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
                 ))}
               </Card>
 
-              <Card title="toxicity · score" subtitle={`score: ${a.toxicity.score.toFixed(2)} / 3 · confidence ${a.toxicity.confidence.toFixed(2)}`} question={result.questions.toxicity.instructions}>
+              <Card title="toxicity · score" subtitle={`score: ${a.toxicity.score.toFixed(2)} / 3${confidence(a.toxicity)}`} question={result.questions.toxicity.instructions}>
                 {Object.entries(a.toxicity.probabilities).map(([k, v]) => (
                   <Bar key={k} label={`${k} · ${a.toxicity.legend[k] ?? ""}`} value={v} />
                 ))}
@@ -147,9 +131,7 @@ export default function Demo3({ code }: { code: React.ReactNode }) {
               </Card>
             </div>
 
-            <p className="text-xs text-zinc-500">
-              {result.model} · {result.ms} ms · {result.usage.input_tokens ?? "?"} input tokens
-            </p>
+            <p className="text-xs text-zinc-500">{result.model}</p>
 
             <details className="text-sm">
               <summary className="cursor-pointer text-zinc-500">Raw response</summary>
@@ -175,9 +157,9 @@ interface Question {
 
 // The shape of the answers returned by the API route.
 interface Answers {
-  category: { choice: string; confidence: number; probabilities: Record<string, number> };
-  toxicity: { score: number; confidence: number; probabilities: Record<string, number>; legend: Record<string, string> };
-  personal_data: { noul: number };
+  category: ChoiceAnswer;
+  toxicity: ScoreAnswer;
+  personal_data: NoulAnswer;
 }
 
 type Decision = "publish" | "review" | "reject";
@@ -199,9 +181,8 @@ interface Signal {
 interface ApiResult {
   questions: Record<keyof Answers, Question>;
   model: string;
-  ms: number;
-  usage: { input_tokens: number | null };
   answers: Answers;
+  usage: Usage;
 }
 
 // ---------- Constants ----------
@@ -229,7 +210,7 @@ const decisionStyle: Record<Decision, { label: string; className: string }> = {
 
 /**
  * The policy lives in OUR code, not in the model:
- * Jev gives probabilities, we decide what to do with them.
+ * the model gives probabilities, we decide what to do with them.
  */
 function decide(a: Answers, thresholds: Thresholds) {
   const signals: Signal[] = [
@@ -241,7 +222,7 @@ function decide(a: Answers, thresholds: Thresholds) {
     { name: "Off topic (not rejectable)", risk: a.category.probabilities.off_topic ?? 0, reviewOnly: true },
   ];
 
-  // each signal gets its own verdict; the risk stays the raw value from Jev
+  // each signal gets its own verdict; the risk stays the raw value from the model
   const verdict = (s: Signal): Decision =>
     s.risk >= thresholds.reject && !s.reviewOnly
       ? "reject"
@@ -269,6 +250,11 @@ function clampThresholds(t: Thresholds, key: keyof Thresholds, value: number): T
 }
 
 // ---------- UI ----------
+
+// the decision models report a confidence, the LLMs don't
+function confidence(a: { confidence?: number }) {
+  return a.confidence === undefined ? "" : ` · confidence ${a.confidence.toFixed(2)}`;
+}
 
 // Small presentational pieces, repeated in every demo page so each file reads on its own.
 function Bar({ label, value, highlight, hint }: { label: string; value: number; highlight?: boolean; hint?: string }) {
@@ -301,7 +287,7 @@ function Card({ title, subtitle, question, accent, children }: { title: string; 
         <h3 className="font-semibold">{title}</h3>
         {subtitle && <span className="text-xs text-zinc-500">{subtitle}</span>}
       </div>
-      {/* the question text we sent to Jev, as written in the API route */}
+      {/* the question text we sent to the model, as written in the API route */}
       {question && <p className="-mt-2 mb-3 text-sm italic text-zinc-500">&ldquo;{question}&rdquo;</p>}
       <div className="flex flex-col gap-2">{children}</div>
     </section>

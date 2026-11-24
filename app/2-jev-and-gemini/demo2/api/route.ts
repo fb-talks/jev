@@ -1,6 +1,6 @@
 import { choice, score } from "@typesafe-ai/sdk";
-import { generateText } from "ai";
-import { apiKeys, geminiModel, jevClient } from "@/lib/keys";
+import { generate } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 
 // The descriptions are our "prompt": the clearer they are, the better the probabilities.
 const questions = {
@@ -33,10 +33,9 @@ export async function POST(request: Request) {
       const send = (event: object) => controller.enqueue(encoder.encode(JSON.stringify(event) + "\n"));
 
       try {
-        // Gemini through Vercel AI Gateway, with the same key choice (see lib/keys.ts)
+        // Gemini with the Google SDK and the key from the 🔑 panel, or the server one (see lib/gemini.ts)
         let start = performance.now();
-        const { text } = await generateText({
-          model: geminiModel(keys),
+        const { text } = await generate(keys, {
           instructions:
             "You are a customer support agent of a software company. Reply to the customer's message in 1-3 sentences. Only the reply, no quotes, no signature.",
           prompt: `Customer's message: ${message}\n\nReply with this style: ${style}`,

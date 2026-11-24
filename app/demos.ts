@@ -1,7 +1,7 @@
 // Every demo, in talk order: the home page lists them, the arrows on each demo walk through them.
 export const groups = [
   {
-    title: "Jev",
+    title: "Simple Demos",
     demos: [
       { href: "/1-jev/demo1", title: "Demo 1 · One question", text: "Is this comment offensive? A single yes/no probability." },
       { href: "/1-jev/demo2", title: "Demo 2 · Choice, score and noul", text: "One question of each type, with the probability of every answer." },
@@ -10,7 +10,7 @@ export const groups = [
     ],
   },
   {
-    title: "Jev and Gemini",
+    title: "Decision Models and LLMs",
     demos: [
       { href: "/2-jev-and-gemini/demo1", title: "Demo 1 · Gemini rewrites, Jev confirms", text: "A rude comment rewritten politely, with the offensive probability before and after." },
       { href: "/2-jev-and-gemini/demo2", title: "Demo 2 · Gemini replies, Jev evaluates", text: "Gemini answers a support request, Jev measures relevance and tone of the reply." },

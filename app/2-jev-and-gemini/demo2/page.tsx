@@ -30,10 +30,10 @@ const questions = {
   },
   {
     title: "1 · Gemini writes the reply",
-    code: `const { text: reply } = await generateText({
-  model: "google/gemini-3.8-flash",
-  instructions: "You are a customer support agent of a software company. Reply in 1-3 sentences.",
-  prompt: \`Customer's message: \${message}\\n\\nReply with this style: \${style}\`,
+    code: `const { output_text: reply } = await ai.interactions.create({
+  model: "gemini-3.8-flash",
+  system_instruction: "You are a customer support agent of a software company. Reply in 1-3 sentences.",
+  input: \`Customer's message: \${message}\\n\\nReply with this style: \${style}\`,
 });`,
   },
   {

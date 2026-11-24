@@ -1,6 +1,6 @@
 import { choice, noul, score } from "@typesafe-ai/sdk";
-import { experimental_decide as decide, generateText, jsonSchema, Output } from "ai";
-import { apiKeys, decisionModel, geminiModel, jevClient } from "@/lib/keys";
+import { decide, generate, jsonSchema } from "@/lib/gemini";
+import { apiKeys, jevClient } from "@/lib/keys";
 import { estimateCost, models, type ModelId } from "../../models";
 
 // The criteria of 1-jev/demo4, written once and shared by every model, so the comparison is fair.
@@ -19,19 +19,12 @@ const toxicityLevels = [
 ];
 const personalData = "The comment contains personal data such as an email address, phone number or home address";
 
-// Jev: TypeSafe SDK
-const jevQuestions = {
+// Jev and Gemini Decision take the very same questions
+const questions = {
   category: choice(categoryQuestion, categories),
   toxicity: score(toxicityQuestion, toxicityLevels),
   personal_data: noul(personalData),
 };
-
-// Gemini Decision: the same three typed questions, with the AI SDK decide()
-const decisionQuestions = {
-  category: { type: "choice", instructions: categoryQuestion, criteria: categories },
-  toxicity: { type: "score", instructions: toxicityQuestion, criteria: toxicityLevels },
-  personal_data: { type: "boolean", instructions: personalData },
-} as const;
 
 // Gemini Flash / Flash Lite: the same questions in the prompt, the probabilities written as JSON.
 type LlmAnswers = {
@@ -86,7 +79,7 @@ export async function POST(request: Request) {
 
     if (m.id === "jev") {
       // Jev with the key from the 🔑 panel, or the server one (see lib/keys.ts)
-      const { answers, usage } = await jevClient(keys).systemOne({ state: text, questions: jevQuestions });
+      const { answers, usage } = await jevClient(keys).systemOne({ state: text, questions });
       signals = {
         spam: answers.category.probabilities.spam ?? 0,
         off_topic: answers.category.probabilities.off_topic ?? 0,
@@ -96,33 +89,23 @@ export async function POST(request: Request) {
       inputTokens = usage.input_tokens ?? 0;
       outputTokens = usage.output_tokens ?? 0;
     } else if (m.kind === "decision") {
-      const { answers, usage } = await decide({ model: decisionModel(keys, m.gateway), state: text, questions: decisionQuestions });
-      const p = answers.category.probabilities;
+      const { answers, tokens } = await decide(keys, { model: m.model, input: text, questions });
       signals = {
-        // without the distribution, the chosen option counts as certain
-        spam: p ? (p.spam ?? 0) : answers.category.choice === "spam" ? 1 : 0,
-        off_topic: p ? (p.off_topic ?? 0) : answers.category.choice === "off_topic" ? 1 : 0,
+        spam: answers.category.probabilities.spam ?? 0,
+        off_topic: answers.category.probabilities.off_topic ?? 0,
         toxicity: answers.toxicity.score / 3,
-        personal_data: answers.personal_data.probability,
+        personal_data: answers.personal_data.noul,
       };
-      inputTokens = usage.inputTokens ?? 0;
-      outputTokens = usage.outputTokens ?? 0;
+      ({ inputTokens, outputTokens } = tokens);
     } else {
-      const { output, usage } = await generateText({
-        model: geminiModel(keys, m.gateway),
-        instructions,
-        prompt: text,
-        output: Output.object({ schema }),
-      });
+      const { output, tokens } = await generate(keys, { model: m.model, instructions, prompt: text, schema });
       signals = {
         spam: output.category.spam,
         off_topic: output.category.off_topic,
         toxicity: output.toxicity / 3,
         personal_data: output.personal_data,
       };
-      inputTokens = usage.inputTokens ?? 0;
-      outputTokens = usage.outputTokens ?? 0; // reasoning tokens included: they are billed as output
-      reasoningTokens = usage.outputTokenDetails.reasoningTokens ?? 0;
+      ({ inputTokens, outputTokens, reasoningTokens } = tokens); // outputTokens includes the thinking: it's billed as output
     }
 
     return Response.json({
