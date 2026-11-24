@@ -43,6 +43,9 @@ Legenda:
 > È un modello che vi risponde con un numero: offensivo, all'ottanta per cento. In pochi millisecondi anziché secondi o minuti.
 > Tra i più noti troviamo **Jev** e **Gemini Decision Mode**, e oggi vediamo cosa sono, come si usano e, soprattutto, come fanno a "sapere" che una frase è un insulto.
 
+⏸ 1.9s
+>
+
 ✂️ Titolo a schermo: **"Un LLM scrive. Jev sceglie."**
 
 🗑️ **TO DELETE** — con l'hook spostato in apertura, prima di 01c, questa nota non è più vera.
