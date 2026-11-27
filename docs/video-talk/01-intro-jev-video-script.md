@@ -175,7 +175,7 @@ Legenda:
 ⏸ 5.1s
 > Possiamo invece ipotizzare regole semplici che estrapolano possibili valori. 
 > Città e zone, importi, superfici, le stanze nominate. Così a Jev non chiediamo di inventare niente: i candidati li prepariamo noi.
-> A Jev facciamo solo **domande a risposta chiusa**: vuole comprare o affittare? Il prezzo massimo è 200.000? Vuole un balcone? Ogni domanda ha anche la risposta "la frase non lo dice", così Jev non è costretto a forzare un valore. E sulle cose che la frase non tocca non facciamo domande: una sola chiamata, veloce ed economica.
+> A Jev facciamo solo **domande a risposta chiusa**: vuole comprare o affittare? Il prezzo massimo è 100.000 o 200.000? Vuole un balcone? Ogni domanda ha anche la risposta "la frase non lo dice", così Jev non è costretto a forzare un valore. E sulle cose che la frase non tocca non facciamo domande: una sola chiamata, veloce ed economica.
 
 ⏸ 9.9s
 > Le risposte sicure e valide diventano i filtri della ricerca normale, una normalissima query al database: possiamo lanciarla subito, oppure mostrare i filtri al visitatore, che li vede e li può correggere, aggiungere o togliere. Gli annunci arrivano dalla stessa ricerca della lista immobili. E la frase va dal browser a Jev con la chiave del visitatore: il nostro server riceve solo i filtri.
